@@ -1,0 +1,532 @@
+{
+  "communities": {
+    "0": [
+      "app_http_controllers_authcontroller",
+      "app_http_controllers_authcontroller_authcontroller",
+      "app_http_controllers_authcontroller_authcontroller_create",
+      "app_http_controllers_authcontroller_authcontroller_destroy",
+      "app_http_controllers_authcontroller_authcontroller_store",
+      "app_http_controllers_categorycontroller",
+      "app_http_controllers_categorycontroller_categorycontroller",
+      "app_http_controllers_categorycontroller_categorycontroller_destroy",
+      "app_http_controllers_categorycontroller_categorycontroller_index",
+      "app_http_controllers_categorycontroller_categorycontroller_store",
+      "app_http_controllers_categorycontroller_categorycontroller_update",
+      "app_http_controllers_controller",
+      "app_http_controllers_controller_controller",
+      "app_http_controllers_transactioncontroller_transactioncontroller",
+      "app_http_controllers_transactioncontroller_transactioncontroller_create",
+      "app_http_controllers_transactioncontroller_transactioncontroller_destroy",
+      "app_http_controllers_transactioncontroller_transactioncontroller_edit",
+      "app_http_controllers_transactioncontroller_transactioncontroller_form",
+      "app_http_controllers_transactioncontroller_transactioncontroller_index",
+      "app_http_controllers_transactioncontroller_transactioncontroller_model",
+      "app_http_controllers_transactioncontroller_transactioncontroller_show",
+      "app_http_controllers_transactioncontroller_transactioncontroller_store",
+      "app_http_controllers_transactioncontroller_transactioncontroller_type",
+      "app_http_controllers_transactioncontroller_transactioncontroller_update",
+      "app_http_controllers_transactioncontroller_transactioncontroller_validated",
+      "app_models_category_category",
+      "app_models_category_category_expenses",
+      "app_models_category_category_getisusedattribute",
+      "app_models_category_category_incomes",
+      "bootstrap_app",
+      "illuminate_foundation_application",
+      "illuminate_foundation_configuration_exceptions",
+      "illuminate_foundation_configuration_middleware",
+      "illuminate_http_request",
+      "illuminate_support_facades_auth",
+      "illuminate_support_facades_route",
+      "illuminate_validation_rule",
+      "public_index",
+      "routes_web"
+    ],
+    "1": [
+      "composer_scripts",
+      "composer_scripts_ci_check",
+      "composer_scripts_dev",
+      "composer_scripts_lint",
+      "composer_scripts_lint_check",
+      "composer_scripts_post_autoload_dump",
+      "composer_scripts_post_create_project_cmd",
+      "composer_scripts_post_root_package_install",
+      "composer_scripts_post_update_cmd",
+      "composer_scripts_pre_package_uninstall",
+      "composer_scripts_setup",
+      "composer_scripts_test",
+      "composer_scripts_types_check",
+      "ref_composer_config_disableprocesstimeout",
+      "ref_composer_install",
+      "ref_illuminate_foundation_composerscripts_postautoloaddump",
+      "ref_illuminate_foundation_composerscripts_prepackageuninstall",
+      "ref_lint_check",
+      "ref_npm_install",
+      "ref_npm_run_build",
+      "ref_npx_concurrently_c_93c5fd_c4b5fd_fdba74_php_artisan_serve_php_artisan_queue_listen_tries_1_timeout_0_npm_run_dev_names_server_queue_vite",
+      "ref_php_artisan_boost_update_ansi",
+      "ref_php_artisan_config_clear_ansi",
+      "ref_php_artisan_key_generate",
+      "ref_php_artisan_key_generate_ansi",
+      "ref_php_artisan_migrate_force",
+      "ref_php_artisan_migrate_graceful_ansi",
+      "ref_php_artisan_package_discover_ansi",
+      "ref_php_artisan_test",
+      "ref_php_artisan_vendor_publish_tag_laravel_assets_ansi_force",
+      "ref_php_r_file_exists_database_database_sqlite_touch_database_database_sqlite",
+      "ref_php_r_file_exists_env_copy_env_example_env",
+      "ref_phpstan_analyse",
+      "ref_pint_parallel",
+      "ref_pint_parallel_test",
+      "ref_test",
+      "ref_types_check"
+    ],
+    "2": [
+      "composer",
+      "composer_allow_plugins_pestphp_pest_plugin",
+      "composer_allow_plugins_php_http_discovery",
+      "composer_autoload_dev",
+      "composer_autoload_dev_psr_4",
+      "composer_config",
+      "composer_config_allow_plugins",
+      "composer_config_optimize_autoloader",
+      "composer_config_preferred_install",
+      "composer_config_sort_packages",
+      "composer_description",
+      "composer_extra",
+      "composer_extra_laravel",
+      "composer_keywords",
+      "composer_laravel_dont_discover",
+      "composer_license",
+      "composer_minimum_stability",
+      "composer_name",
+      "composer_prefer_stable",
+      "composer_psr_4_tests",
+      "composer_require",
+      "composer_require_barryvdh_laravel_dompdf",
+      "composer_require_laravel_framework",
+      "composer_require_laravel_tinker",
+      "composer_require_livewire_blaze",
+      "composer_require_livewire_livewire",
+      "composer_require_php",
+      "composer_schema",
+      "composer_type",
+      "ref_framework",
+      "ref_laravel"
+    ],
+    "3": [
+      "app_http_controllers_transactioncontroller",
+      "app_http_controllers_transactioncontroller_transactioncontroller_construct",
+      "app_models_category",
+      "app_models_expense",
+      "app_models_expense_expense",
+      "app_models_expense_expense_casts",
+      "app_models_expense_expense_category",
+      "app_models_expense_expense_details",
+      "app_models_expense_expense_user",
+      "app_models_expensedetail",
+      "app_models_expensedetail_expensedetail",
+      "app_models_expensedetail_expensedetail_expense",
+      "app_models_income",
+      "app_models_income_income",
+      "app_models_income_income_casts",
+      "app_models_income_income_category",
+      "app_models_income_income_details",
+      "app_models_income_income_user",
+      "app_models_incomedetail",
+      "app_models_incomedetail_incomedetail",
+      "app_models_incomedetail_incomedetail_income",
+      "app_models_user_user_expenses",
+      "app_services_transactionservice",
+      "app_services_transactionservice_transactionservice",
+      "app_services_transactionservice_transactionservice_delete",
+      "app_services_transactionservice_transactionservice_save",
+      "illuminate_database_eloquent_model",
+      "illuminate_database_eloquent_relations_belongsto",
+      "illuminate_database_eloquent_relations_hasmany"
+    ],
+    "4": [
+      "app_models_user",
+      "app_models_user_user",
+      "app_models_user_user_casts",
+      "app_models_user_user_incomes",
+      "app_models_user_user_initials",
+      "config_auth",
+      "config_cache",
+      "config_database",
+      "config_session",
+      "database_factories_userfactory",
+      "database_factories_userfactory_userfactory",
+      "database_factories_userfactory_userfactory_definition",
+      "database_factories_userfactory_userfactory_unverified",
+      "database_seeders_databaseseeder",
+      "database_seeders_databaseseeder_databaseseeder",
+      "database_seeders_databaseseeder_databaseseeder_run",
+      "illuminate_database_console_seeds_withoutmodelevents",
+      "illuminate_database_eloquent_attributes_fillable",
+      "illuminate_database_eloquent_attributes_hidden",
+      "illuminate_database_eloquent_factories_factory",
+      "illuminate_database_eloquent_factories_hasfactory",
+      "illuminate_database_seeder",
+      "illuminate_foundation_auth_user",
+      "illuminate_notifications_notifiable",
+      "illuminate_support_carbon",
+      "illuminate_support_facades_hash",
+      "illuminate_support_str",
+      "pdo_mysql",
+      "static"
+    ],
+    "5": [
+      "concurrently",
+      "laravel_multiplex",
+      "laravel_vite_plugin",
+      "lightningcss_linux_x64_gnu",
+      "package",
+      "package_dependencies",
+      "package_dependencies_concurrently",
+      "package_dependencies_laravel_vite_plugin",
+      "package_dependencies_tailwindcss",
+      "package_dependencies_tailwindcss_vite",
+      "package_dependencies_vite",
+      "package_optionaldependencies",
+      "package_optionaldependencies_laravel_multiplex",
+      "package_optionaldependencies_lightningcss_linux_x64_gnu",
+      "package_optionaldependencies_rollup_rollup_linux_x64_gnu",
+      "package_optionaldependencies_tailwindcss_oxide_linux_x64_gnu",
+      "package_private",
+      "package_schema",
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_dev",
+      "package_type",
+      "rollup_rollup_linux_x64_gnu",
+      "tailwindcss",
+      "tailwindcss_oxide_linux_x64_gnu",
+      "tailwindcss_vite",
+      "vite"
+    ],
+    "6": [
+      "app_http_controllers_dashboardcontroller",
+      "app_http_controllers_dashboardcontroller_dashboardcontroller",
+      "app_http_controllers_dashboardcontroller_dashboardcontroller_invoke",
+      "app_http_controllers_reportcontroller",
+      "app_http_controllers_reportcontroller_reportcontroller",
+      "app_http_controllers_reportcontroller_reportcontroller_download",
+      "app_http_controllers_reportcontroller_reportcontroller_invoke",
+      "app_repositories_reportrepository",
+      "app_repositories_reportrepository_reportrepository",
+      "app_repositories_reportrepository_reportrepository_between",
+      "app_repositories_reportrepository_reportrepository_bycategory",
+      "app_repositories_reportrepository_reportrepository_query",
+      "app_repositories_reportrepository_reportrepository_totalbetween",
+      "app_repositories_reportrepository_reportrepository_totaluntil",
+      "app_services_reportservice",
+      "app_services_reportservice_reportservice",
+      "app_services_reportservice_reportservice_construct",
+      "app_services_reportservice_reportservice_make",
+      "barryvdh_dompdf_facade_pdf",
+      "illuminate_database_eloquent_builder"
+    ],
+    "7": [
+      "database_migrations_0001_01_01_000000_create_users_table",
+      "database_migrations_0001_01_01_000000_create_users_table_down",
+      "database_migrations_0001_01_01_000000_create_users_table_up",
+      "database_migrations_0001_01_01_000001_create_cache_table",
+      "database_migrations_0001_01_01_000001_create_cache_table_down",
+      "database_migrations_0001_01_01_000001_create_cache_table_up",
+      "database_migrations_0001_01_01_000002_create_jobs_table",
+      "database_migrations_0001_01_01_000002_create_jobs_table_down",
+      "database_migrations_0001_01_01_000002_create_jobs_table_up",
+      "database_migrations_2026_08_14_000001_create_finance_tables",
+      "database_migrations_2026_08_14_000001_create_finance_tables_down",
+      "database_migrations_2026_08_14_000001_create_finance_tables_up",
+      "illuminate_database_migrations_migration",
+      "illuminate_database_schema_blueprint",
+      "illuminate_support_facades_schema"
+    ],
+    "8": [
+      "composer_require_dev",
+      "composer_require_dev_fakerphp_faker",
+      "composer_require_dev_larastan_larastan",
+      "composer_require_dev_laravel_boost",
+      "composer_require_dev_laravel_pail",
+      "composer_require_dev_laravel_pao",
+      "composer_require_dev_laravel_pint",
+      "composer_require_dev_laravel_sail",
+      "composer_require_dev_mockery_mockery",
+      "composer_require_dev_nunomaduro_collision",
+      "composer_require_dev_pestphp_pest",
+      "composer_require_dev_pestphp_pest_plugin_laravel"
+    ],
+    "9": [
+      "app_providers_appserviceprovider",
+      "app_providers_appserviceprovider_appserviceprovider",
+      "app_providers_appserviceprovider_appserviceprovider_boot",
+      "app_providers_appserviceprovider_appserviceprovider_configuredefaults",
+      "app_providers_appserviceprovider_appserviceprovider_register",
+      "bootstrap_providers",
+      "carbon_carbonimmutable",
+      "illuminate_support_facades_date",
+      "illuminate_support_facades_db",
+      "illuminate_support_serviceprovider",
+      "illuminate_validation_rules_password"
+    ],
+    "10": [
+      "opencode",
+      "opencode_laravel_boost_command",
+      "opencode_laravel_boost_enabled",
+      "opencode_laravel_boost_type",
+      "opencode_mcp",
+      "opencode_mcp_laravel_boost",
+      "opencode_schema",
+      "ref_artisan",
+      "ref_boost_mcp",
+      "ref_php"
+    ],
+    "11": [
+      "composer_autoload",
+      "composer_autoload_files",
+      "composer_autoload_psr_4",
+      "composer_psr_4_app",
+      "composer_psr_4_database_factories",
+      "composer_psr_4_database_seeders",
+      "ref_app_helpers_php"
+    ],
+    "12": [
+      "illuminate_foundation_testing_refreshdatabase",
+      "illuminate_foundation_testing_testcase",
+      "tests_feature_financetest",
+      "tests_pest",
+      "tests_pest_something",
+      "tests_testcase",
+      "tests_testcase_testcase"
+    ],
+    "13": [
+      "config_logging",
+      "monolog_handler_nullhandler",
+      "monolog_handler_streamhandler",
+      "monolog_handler_syslogudphandler",
+      "monolog_processor_psrlogmessageprocessor"
+    ],
+    "14": [
+      "app_helpers",
+      "app_helpers_rupiah",
+      "app_helpers_signed_rupiah"
+    ],
+    "15": [
+      "illuminate_foundation_inspiring",
+      "illuminate_support_facades_artisan",
+      "routes_console"
+    ],
+    "16": [
+      "artisan"
+    ],
+    "17": [
+      "config_app"
+    ],
+    "18": [
+      "config_filesystems"
+    ],
+    "19": [
+      "config_mail"
+    ],
+    "20": [
+      "config_queue"
+    ],
+    "21": [
+      "config_services"
+    ],
+    "22": [
+      "resources_js_app"
+    ],
+    "23": [
+      "resources_views_auth_login_blade"
+    ],
+    "24": [
+      "resources_views_categories_index_blade"
+    ],
+    "25": [
+      "resources_views_dashboard_blade"
+    ],
+    "26": [
+      "resources_views_layouts_app_blade"
+    ],
+    "27": [
+      "resources_views_reports_index_blade"
+    ],
+    "28": [
+      "resources_views_reports_pdf_blade"
+    ],
+    "29": [
+      "resources_views_transactions_form_blade"
+    ],
+    "30": [
+      "resources_views_transactions_index_blade"
+    ],
+    "31": [
+      "resources_views_transactions_show_blade"
+    ],
+    "32": [
+      "resources_views_welcome_blade"
+    ],
+    "33": [
+      "tests_feature_exampletest"
+    ],
+    "34": [
+      "tests_unit_exampletest"
+    ],
+    "35": [
+      "vite_config"
+    ]
+  },
+  "cohesion": {
+    "0": 0.0931174089068826,
+    "1": 0.057057057057057055,
+    "2": 0.06451612903225806,
+    "3": 0.13054187192118227,
+    "4": 0.09113300492610837,
+    "5": 0.07407407407407407,
+    "6": 0.15263157894736842,
+    "7": 0.19047619047619047,
+    "8": 0.16666666666666666,
+    "9": 0.21818181818181817,
+    "10": 0.2,
+    "11": 0.2857142857142857,
+    "12": 0.2857142857142857,
+    "13": 0.4,
+    "14": 0.6666666666666666,
+    "15": 0.6666666666666666,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0
+  },
+  "gods": [
+    {
+      "id": "app_http_controllers_transactioncontroller_transactioncontroller",
+      "label": "TransactionController",
+      "degree": 16
+    },
+    {
+      "id": "app_models_category_category",
+      "label": "Category",
+      "degree": 16
+    },
+    {
+      "id": "app_models_user_user",
+      "label": "User",
+      "degree": 13
+    },
+    {
+      "id": "composer_scripts",
+      "label": "scripts",
+      "degree": 13
+    },
+    {
+      "id": "app_models_income_income",
+      "label": "Income",
+      "degree": 12
+    },
+    {
+      "id": "composer_require_dev",
+      "label": "require-dev",
+      "degree": 12
+    },
+    {
+      "id": "app_models_expense_expense",
+      "label": "Expense",
+      "degree": 11
+    },
+    {
+      "id": "app_repositories_reportrepository_reportrepository",
+      "label": "ReportRepository",
+      "degree": 9
+    },
+    {
+      "id": "app_services_reportservice_reportservice",
+      "label": "ReportService",
+      "degree": 9
+    },
+    {
+      "id": "app_http_controllers_categorycontroller_categorycontroller",
+      "label": "CategoryController",
+      "degree": 7
+    }
+  ],
+  "surprises": [
+    {
+      "source": "DashboardController",
+      "target": "Controller",
+      "source_files": [
+        "app/Http/Controllers/DashboardController.php",
+        "app/Http/Controllers/Controller.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "ReportController",
+      "target": "Controller",
+      "source_files": [
+        "app/Http/Controllers/ReportController.php",
+        "app/Http/Controllers/Controller.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "TransactionController",
+      "target": "TransactionService",
+      "source_files": [
+        "app/Http/Controllers/TransactionController.php",
+        "app/Services/TransactionService.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "AuthController",
+      "target": "Controller",
+      "source_files": [
+        "app/Http/Controllers/AuthController.php",
+        "app/Http/Controllers/Controller.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "CategoryController",
+      "target": "Controller",
+      "source_files": [
+        "app/Http/Controllers/CategoryController.php",
+        "app/Http/Controllers/Controller.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "cross-file semantic connection"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}
