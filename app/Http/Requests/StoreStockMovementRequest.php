@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\ShuttlecockItem;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -16,7 +17,7 @@ class StoreStockMovementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shuttlecock_item_id' => ['required', 'exists:shuttlecock_items,id'],
+            'shuttlecock_item_id' => ['required', Rule::exists(ShuttlecockItem::class, 'id')->where('is_active', true)],
             'play_session_id' => ['nullable', 'exists:play_sessions,id'],
             'type' => ['required', Rule::in(['purchase', 'usage', 'adjustment'])],
             'quantity' => ['required', 'integer', 'min:1'],

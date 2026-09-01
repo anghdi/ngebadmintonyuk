@@ -12,22 +12,25 @@
 </head>
 <body class="login-page">
 <main class="login-card">
+    <span class="auth-shuttle" aria-hidden="true"><img src="{{ asset('icon.png') }}" alt=""></span>
     <img class="login-logo" src="{{ asset('logo.png') }}" alt="NgeBadmintonYuk">
-    <h1>Selamat datang</h1>
-    <p>Kelola kas komunitas dengan mudah dan rapi.</p>
+    <span class="eyebrow">NGE BADMINTON YUK</span>
+    <h1>Masuk ke akun</h1>
+    <p>Akses jadwal, kuota, dan informasi komunitas.</p>
     @if($errors->any())
         <div class="alert">{{ $errors->first() }}</div>
     @endif
     <form method="post" action="{{ route('login.store') }}">
         @csrf
         <label>Email<input type="email" name="email" value="{{ old('email') }}" required autofocus></label>
-        <label>Password<input type="password" name="password" required></label>
-        <label class="check"><input type="checkbox" name="remember"> Ingat saya</label>
+        <label>Kata sandi<input type="password" name="password" required></label>
+        <label class="check"><input type="checkbox" name="remember"> Tetap masuk</label>
         <button class="btn primary full">Masuk</button>
     </form>
     <div class="auth-divider"><span>atau</span></div>
-    <a class="btn dark full" href="{{ route('register') }}">Daftar jadi member</a>
-    <small>MAIN BARENG, SEHAT &amp; SERU!</small>
+    <a class="btn soft full" href="{{ route('public-sessions.index') }}">Lihat jadwal main</a>
+    <a class="btn dark full" href="{{ route('register') }}">Daftar sebagai member</a>
+    <small>KOMUNITAS BADMINTON</small>
 </main>
 </body>
 </html>

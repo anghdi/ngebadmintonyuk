@@ -65,4 +65,10 @@ class Membership extends Model
     {
         return $this->hasMany(Attendance::class);
     }
+
+    /** @return HasMany<TopUpRequest, $this> */
+    public function topUpRequests(): HasMany
+    {
+        return $this->hasMany(TopUpRequest::class);
+    }
 }

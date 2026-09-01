@@ -75,10 +75,22 @@ class User extends Authenticatable
         return $this->hasMany(Membership::class);
     }
 
+    /** @return HasMany<TopUpRequest, $this> */
+    public function topUpRequests(): HasMany
+    {
+        return $this->hasMany(TopUpRequest::class);
+    }
+
     /** @return HasMany<Attendance, $this> */
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    /** @return HasMany<SessionRegistration, $this> */
+    public function sessionRegistrations(): HasMany
+    {
+        return $this->hasMany(SessionRegistration::class);
     }
 
     public function isAdmin(): bool

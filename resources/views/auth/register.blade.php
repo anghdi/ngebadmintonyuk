@@ -11,26 +11,27 @@
 </head>
 <body class="login-page">
 <main class="login-card register-card">
-    <a href="{{ route('login') }}" class="auth-back">← Kembali masuk</a>
+    <span class="auth-shuttle" aria-hidden="true"><img src="{{ asset('icon.png') }}" alt=""></span>
+    <a href="{{ route('login') }}" class="auth-back">← Kembali ke halaman masuk</a>
     <img class="login-logo" src="{{ asset('logo.png') }}" alt="NgeBadmintonYuk">
-    <span class="eyebrow">MEMBERSHIP KOMUNITAS</span>
-    <h1>Masuk ke daftar pemain</h1>
-    <p>Akun langsung aktif. Admin akan menambahkan paket main setelah pembayaran dikonfirmasi.</p>
+    <span class="eyebrow">PENDAFTARAN MEMBER</span>
+    <h1>Buat akun member</h1>
+    <p>Daftar untuk mengakses jadwal dan kuota bermain.</p>
     @if($errors->any())
         <div class="alert">{{ $errors->first() }}</div>
     @endif
     <form method="post" action="{{ route('register.store') }}">
         @csrf
-        <label>Nama lengkap<input type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name"></label>
+        <label>Nama<input type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name"></label>
         <div class="form-grid">
             <label>Email<input type="email" name="email" value="{{ old('email') }}" required autocomplete="email"></label>
             <label>Nomor WhatsApp <span class="optional">Opsional</span><input type="tel" name="phone" value="{{ old('phone') }}" autocomplete="tel"></label>
-            <label>Password<input type="password" name="password" required autocomplete="new-password"></label>
-            <label>Ulangi password<input type="password" name="password_confirmation" required autocomplete="new-password"></label>
+            <label>Kata sandi<input type="password" name="password" required autocomplete="new-password"></label>
+            <label>Ulangi kata sandi<input type="password" name="password_confirmation" required autocomplete="new-password"></label>
         </div>
-        <button class="btn primary full">Buat akun member</button>
+        <button class="btn primary full">Daftar</button>
     </form>
-    <small>KUOTA MAINMU AKAN TERCATAT RAPI</small>
+    <small>KOMUNITAS BADMINTON</small>
 </main>
 </body>
 </html>

@@ -50,4 +50,10 @@ class PlaySession extends Model
     {
         return $this->hasMany(StockMovement::class);
     }
+
+    /** @return HasMany<SessionRegistration, $this> */
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(SessionRegistration::class);
+    }
 }
