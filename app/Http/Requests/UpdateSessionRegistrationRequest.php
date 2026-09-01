@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\PlaySession;
 use App\Models\SessionRegistration;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -28,9 +29,22 @@ class UpdateSessionRegistrationRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'user_id' => [
+                'nullable',
+                'integer',
+                Rule::exists(User::class, 'id')->where(fn ($query) => $query->where('role', 'member')),
+            ],
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'regex:/^[0-9]{10,15}$/'],
+            'payment_method' => ['required', Rule::in(['transfer', 'cash'])],
             'payment_status' => ['required', Rule::in(['unpaid', 'paid'])],
             'attendance_status' => ['required', Rule::in(['listed', 'present', 'no_show'])],
             'admin_notes' => ['nullable', 'string', 'max:1000'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge(['phone' => SessionRegistration::normalizePhone((string) $this->input('phone'))]);
     }
 }

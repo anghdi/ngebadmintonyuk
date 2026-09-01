@@ -300,11 +300,19 @@
     .membership-delete { display: flex; justify-content: flex-end; padding: .75rem 1rem; }
     .session-head-actions { display: grid; justify-items: end; gap: .75rem; }
     .registration-admin-card { overflow-x: auto; }
-    .registration-admin-card .card-head { min-width: 1050px; }
     .registration-table { min-width: 1050px; }
-    .session-registration-form { display: grid; min-width: 510px; grid-template-columns: 120px 120px minmax(130px, 1fr) auto; gap: .45rem; }
+    .registration-create-panel { margin-bottom: 1rem; border: 1px solid #dfe3ef; border-radius: 14px; background: #f8f9fc; padding: .9rem; }
+    .registration-create-panel > summary, .registration-editor > summary { cursor: pointer; color: #2455f5; font-size: .75rem; font-weight: 800; list-style: none; }
+    .registration-create-panel > summary::-webkit-details-marker, .registration-editor > summary::-webkit-details-marker { display: none; }
+    .registration-create-panel > small { display: block; margin-top: .65rem; color: #777; font-size: .65rem; }
+    .registration-create-form { display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr)) auto; align-items: end; gap: .65rem; margin-top: .9rem; }
+    .registration-editor { min-width: 720px; }
+    .session-registration-form { display: grid; grid-template-columns: repeat(4, minmax(145px, 1fr)); align-items: end; gap: .55rem; margin-top: .7rem; }
+    .session-registration-form label { font-size: .65rem; }
     .session-registration-form input, .session-registration-form select { padding: .62rem .7rem; }
     .session-registration-form .btn { min-height: 40px; padding: .55rem .75rem; }
+    .session-registration-form .registration-notes { grid-column: span 3; }
+    .registration-delete { margin-top: .65rem; text-align: right; }
     .public-nav { position: sticky; top: 0; z-index: 20; display: flex; height: 78px; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid rgb(218 221 231 / 78%); background: rgb(250 247 240 / 88%); padding: 0 max(1rem, calc((100vw - 1180px) / 2)); backdrop-filter: blur(18px); }
     .public-brand img { display: block; width: 190px; height: 64px; object-fit: contain; object-position: left center; }
     .public-actions { display: flex; align-items: center; gap: .65rem; }
@@ -392,6 +400,8 @@
     .table-card { padding: .5rem; }
     .public-registration-grid { grid-template-columns: 1fr; }
     .registration-form-card { position: static; }
+    .registration-create-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .registration-create-form .btn { width: 100%; }
 }
 
 @media (max-width: 640px) {
@@ -450,6 +460,7 @@
     .public-session-detail { align-items: flex-start; flex-direction: column; }
     .payment-options, .compact-bank-info { grid-template-columns: 1fr; }
     .compact-bank-info small { grid-column: auto; }
+    .registration-create-form { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 430px) {

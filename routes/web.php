@@ -55,7 +55,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/members/{member}/memberships/{membership}', [MembershipController::class, 'destroy'])->name('memberships.destroy');
         Route::resource('play-sessions', PlaySessionController::class)->only(['index', 'store', 'show', 'edit', 'update', 'destroy']);
         Route::put('/play-sessions/{playSession}/members/{member}/attendance', [AttendanceController::class, 'update'])->name('attendances.update');
+        Route::post('/play-sessions/{playSession}/registrations', [SessionRegistrationController::class, 'storeByAdmin'])->name('session-registrations.store');
         Route::put('/play-sessions/{playSession}/registrations/{registration}', [SessionRegistrationController::class, 'update'])->scopeBindings()->name('session-registrations.update');
+        Route::delete('/play-sessions/{playSession}/registrations/{registration}', [SessionRegistrationController::class, 'destroy'])->scopeBindings()->name('session-registrations.destroy');
         Route::get('/inventory', [ShuttlecockInventoryController::class, 'index'])->name('inventory.index');
         Route::post('/inventory/items', [ShuttlecockInventoryController::class, 'store'])->name('inventory.items.store');
         Route::put('/inventory/items/{shuttlecockItem}', [ShuttlecockInventoryController::class, 'update'])->name('inventory.items.update');

@@ -19,3 +19,6 @@ Public play-session registration is open to members and guests. Normalize Indone
 
 ## Top up grants exactly four credits
 This supersedes the earlier rule allowing admin-managed credit counts. Admin may change only the top-up price; every new request snapshots 4 credits and approval must atomically create one membership_transactions credit entry with quantity +4.
+
+## Session lists are scoped and member-backed
+Each play session owns an independent registration list. Admin-created or edited entries may link to a member; when linked, snapshot the member name and normalized phone. Only unpaid entries still in listed status may be deleted so attendance and payment history remain auditable.

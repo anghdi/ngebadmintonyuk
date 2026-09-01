@@ -16,3 +16,25 @@ document.addEventListener('keydown', (event) => {
         toggleSidebar(false);
     }
 });
+
+document.querySelectorAll('[data-member-select]').forEach((select) => {
+    select.addEventListener('change', () => {
+        const option = select.options[select.selectedIndex];
+        const form = select.closest('form');
+
+        if (!option?.value || !form) {
+            return;
+        }
+
+        const nameInput = form.querySelector('input[name="name"]');
+        const phoneInput = form.querySelector('input[name="phone"]');
+
+        if (nameInput) {
+            nameInput.value = option.dataset.memberName ?? '';
+        }
+
+        if (phoneInput && option.dataset.memberPhone) {
+            phoneInput.value = option.dataset.memberPhone;
+        }
+    });
+});
