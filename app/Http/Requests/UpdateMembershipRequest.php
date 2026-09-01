@@ -42,7 +42,7 @@ class UpdateMembershipRequest extends FormRequest
             function (Validator $validator): void {
                 $membership = $this->route('membership');
 
-                if (! $membership instanceof Membership || ! $membership->attendances()->exists()) {
+                if (! $membership instanceof Membership || (! $membership->attendances()->exists() && ! $membership->topUpRequests()->exists())) {
                     return;
                 }
 
@@ -52,7 +52,7 @@ class UpdateMembershipRequest extends FormRequest
                     || $membership->starts_on->format('Y-m-d') !== $this->input('starts_on');
 
                 if ($coreDataChanged) {
-                    $validator->errors()->add('venue_name', 'Venue, lapangan, harga, dan tanggal mulai tidak dapat diubah setelah paket digunakan.');
+                    $validator->errors()->add('venue_name', 'Venue, lapangan, harga, dan tanggal mulai tidak dapat diubah setelah paket digunakan atau memiliki top up.');
                 }
             },
         ];

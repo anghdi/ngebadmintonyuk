@@ -286,6 +286,12 @@
     .bank-card strong { font-size: 1.05rem; letter-spacing: .04em; overflow-wrap: anywhere; }
     .bank-card small { margin-top: .2rem; color: #cbd4ef; font-size: .68rem; }
     .payment-note { margin-top: 1rem; border-radius: 10px; background: rgb(255 210 63 / 12%); padding: .75rem; color: #f9e9a8; font-size: .72rem; line-height: 1.5; }
+    .top-up-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .45rem; margin: 1rem 0 1.25rem; }
+    .top-up-steps span { display: grid; justify-items: center; gap: .35rem; border-radius: 10px; background: #f5f7fc; padding: .65rem .3rem; color: #606779; font-size: .62rem; font-weight: 700; text-align: center; }
+    .top-up-steps b { display: grid; width: 24px; height: 24px; place-items: center; border-radius: 50%; background: #2455f5; color: #fff; font-size: .65rem; }
+    .top-up-target { display: grid; gap: .2rem; border: 1px solid #d9e0fa; border-radius: 12px; background: #f4f7ff; padding: .8rem .9rem; }
+    .top-up-target strong { color: #172a63; font-size: .8rem; }
+    .top-up-target span { color: #697187; font-size: .68rem; line-height: 1.5; }
     .field-help { color: #848795; font-size: .66rem; font-weight: 500; }
     .review-table { min-width: 1120px; }
     .top-up-setting-card { display: grid; grid-template-columns: minmax(220px, .65fr) minmax(0, 1.35fr); align-items: end; gap: 1.5rem; }
@@ -444,6 +450,7 @@
     .quota-hero { border-radius: 16px; padding: 1.25rem; }
     .membership-ticket { grid-template-columns: minmax(0, 1fr) 68px; }
     .membership-ticket::before, .membership-ticket::after { right: 67px; }
+    .top-up-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .attendance-actions { display: grid; grid-template-columns: 1fr; }
     .inventory-summary { grid-template-columns: 1fr; }
     .session-head { align-items: flex-start; }

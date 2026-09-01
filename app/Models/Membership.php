@@ -30,6 +30,12 @@ class Membership extends Model
     /** @use HasFactory<MembershipFactory> */
     use HasFactory;
 
+    public const string COMMUNITY_VENUE = 'Paket Komunitas';
+
+    public const string COMMUNITY_COURT = 'Semua Sesi';
+
+    public const int COMMUNITY_PRICE = 0;
+
     protected $attributes = ['initial_credits' => 4, 'status' => 'active'];
 
     protected function casts(): array
@@ -40,6 +46,13 @@ class Membership extends Model
             'starts_on' => 'date',
             'expires_on' => 'date',
         ];
+    }
+
+    public function isCommunityPackage(): bool
+    {
+        return $this->venue_name === self::COMMUNITY_VENUE
+            && $this->court_name === self::COMMUNITY_COURT
+            && $this->price_per_session === self::COMMUNITY_PRICE;
     }
 
     /** @return BelongsTo<User, $this> */

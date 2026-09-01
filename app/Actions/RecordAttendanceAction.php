@@ -54,9 +54,17 @@ class RecordAttendanceAction
         $memberships = Membership::query()
             ->whereBelongsTo($member)
             ->where('status', 'active')
-            ->where('venue_name', $playSession->venue_name)
-            ->where('court_name', $playSession->court_name)
-            ->where('price_per_session', $playSession->price_per_session)
+            ->where(function ($query) use ($playSession): void {
+                $query->where(function ($query) use ($playSession): void {
+                    $query->where('venue_name', $playSession->venue_name)
+                        ->where('court_name', $playSession->court_name)
+                        ->where('price_per_session', $playSession->price_per_session);
+                })->orWhere(function ($query): void {
+                    $query->where('venue_name', Membership::COMMUNITY_VENUE)
+                        ->where('court_name', Membership::COMMUNITY_COURT)
+                        ->where('price_per_session', Membership::COMMUNITY_PRICE);
+                });
+            })
             ->whereDate('starts_on', '<=', $playSession->scheduled_at->toDateString())
             ->where(fn ($query) => $query->whereNull('expires_on')->orWhereDate('expires_on', '>=', $playSession->scheduled_at->toDateString()))
             ->withSum('transactions as balance', 'quantity')
@@ -64,14 +72,17 @@ class RecordAttendanceAction
             ->oldest('id')
             ->lockForUpdate()
             ->get()
-            ->first(fn (Membership $membership): bool => (int) $membership->balance > 0);
+            ->filter(fn (Membership $membership): bool => (int) $membership->balance > 0);
 
-        if (! $memberships) {
+        $membership = $memberships->first(fn (Membership $membership): bool => ! $membership->isCommunityPackage())
+            ?? $memberships->first(fn (Membership $membership): bool => $membership->isCommunityPackage());
+
+        if (! $membership) {
             throw ValidationException::withMessages([
-                'status' => 'Member tidak memiliki kuota yang cocok dengan lapangan dan harga sesi ini.',
+                'status' => 'Member tidak memiliki kuota yang dapat digunakan untuk sesi ini.',
             ]);
         }
 
-        return $memberships;
+        return $membership;
     }
 }

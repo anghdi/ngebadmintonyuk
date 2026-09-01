@@ -15,7 +15,7 @@ use Throwable;
 
 class CreateTopUpRequestAction
 {
-    public function handle(User $member, Membership $membership, int $amount, string $bank, UploadedFile $proof): TopUpRequest
+    public function handle(User $member, ?Membership $membership, int $amount, string $bank, UploadedFile $proof): TopUpRequest
     {
         $proofPath = $proof->store('top-up-proofs/'.$member->id, 'local');
 
@@ -25,7 +25,10 @@ class CreateTopUpRequestAction
 
         try {
             return DB::transaction(function () use ($member, $membership, $amount, $bank, $proofPath): TopUpRequest {
-                $lockedMembership = Membership::query()->lockForUpdate()->findOrFail($membership->id);
+                $lockedMember = User::query()->lockForUpdate()->findOrFail($member->id);
+                $lockedMembership = $membership
+                    ? Membership::query()->lockForUpdate()->findOrFail($membership->id)
+                    : $this->communityMembership($lockedMember);
 
                 if ($lockedMembership->user_id !== $member->id || $lockedMembership->status !== 'active') {
                     throw ValidationException::withMessages(['membership_id' => 'Paket tidak tersedia untuk top up.']);
@@ -49,5 +52,36 @@ class CreateTopUpRequestAction
 
             throw $exception;
         }
+    }
+
+    private function communityMembership(User $member): Membership
+    {
+        $membership = Membership::query()
+            ->whereBelongsTo($member)
+            ->where('venue_name', Membership::COMMUNITY_VENUE)
+            ->where('court_name', Membership::COMMUNITY_COURT)
+            ->where('price_per_session', Membership::COMMUNITY_PRICE)
+            ->lockForUpdate()
+            ->first();
+
+        if ($membership) {
+            if ($membership->status !== 'active') {
+                $membership->update(['status' => 'active']);
+            }
+
+            return $membership;
+        }
+
+        return Membership::create([
+            'user_id' => $member->id,
+            'venue_name' => Membership::COMMUNITY_VENUE,
+            'court_name' => Membership::COMMUNITY_COURT,
+            'price_per_session' => Membership::COMMUNITY_PRICE,
+            'initial_credits' => TopUpSetting::DEFAULT_CREDITS,
+            'starts_on' => today(),
+            'status' => 'active',
+            'notes' => 'Paket otomatis untuk top up kuota.',
+            'created_by' => $member->id,
+        ]);
     }
 }

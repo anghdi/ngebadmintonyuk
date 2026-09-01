@@ -33,13 +33,13 @@
             <div class="ticket-main">
                 <span class="status-pill {{ (int) $membership->balance > 0 ? 'active' : 'muted' }}">{{ (int) $membership->balance > 0 ? 'Bisa dipakai' : 'Kuota habis' }}</span>
                 <strong>{{ $membership->venue_name }}</strong>
-                <p>{{ $membership->court_name }} · {{ rupiah($membership->price_per_session) }}/main</p>
+                <p>{{ $membership->isCommunityPackage() ? 'Berlaku untuk semua sesi komunitas' : $membership->court_name.' · '.rupiah($membership->price_per_session).'/main' }}</p>
             </div>
-            <div class="ticket-balance"><strong>{{ (int) $membership->balance }}</strong><small>dari {{ $membership->initial_credits }}</small></div>
+            <div class="ticket-balance"><strong>{{ (int) $membership->balance }}</strong><small>kuota</small></div>
             <footer>Mulai {{ $membership->starts_on->translatedFormat('d M Y') }} · {{ $membership->expires_on ? 'Sampai '.$membership->expires_on->translatedFormat('d M Y') : 'Tanpa kedaluwarsa' }}</footer>
         </article>
     @empty
-        <div class="empty-state"><span>🏸</span><h2>Belum ada paket</h2><p>Hubungi administrator untuk menambahkan kuota.</p></div>
+        <div class="empty-state"><span>🏸</span><h2>Belum ada kuota</h2><p>Ajukan top up untuk mendapatkan kuota bermain.</p><a class="btn primary" href="{{ route('top-ups.index') }}">Ajukan top up</a></div>
     @endforelse
 </div>
 

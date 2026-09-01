@@ -35,7 +35,9 @@ class TopUpRequestController extends Controller
     public function store(StoreTopUpRequest $request, CreateTopUpRequestAction $createTopUpRequest): RedirectResponse
     {
         $data = $request->validated();
-        $membership = $request->user()->memberships()->findOrFail($data['membership_id']);
+        $membership = isset($data['membership_id'])
+            ? $request->user()->memberships()->findOrFail($data['membership_id'])
+            : null;
         $createTopUpRequest->handle($request->user(), $membership, $data['amount'], $data['bank'], $request->file('proof'));
 
         return back()->with('success', 'Pengajuan top up berhasil dikirim.');

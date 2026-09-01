@@ -19,11 +19,13 @@ class StoreTopUpRequest extends FormRequest
     public function rules(): array
     {
         $topUpSetting = TopUpSetting::current();
+        $hasActiveMembership = $this->user()?->memberships()->where('status', 'active')->exists() ?? false;
 
         return [
             'amount' => ['required', 'integer', Rule::in([$topUpSetting->amount])],
             'membership_id' => [
-                'required',
+                Rule::requiredIf($hasActiveMembership),
+                'nullable',
                 'integer',
                 Rule::exists(Membership::class, 'id')->where(fn ($query) => $query
                     ->where('user_id', $this->user()->id)
@@ -45,10 +47,10 @@ class StoreTopUpRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                $hasPendingRequest = $this->user()?->topUpRequests()
-                    ->where('membership_id', $this->integer('membership_id'))
-                    ->where('status', 'pending')
-                    ->exists();
+                $pendingRequests = $this->user()?->topUpRequests()->where('status', 'pending');
+                $hasPendingRequest = $this->filled('membership_id')
+                    ? $pendingRequests?->where('membership_id', $this->integer('membership_id'))->exists()
+                    : $pendingRequests?->exists();
 
                 if ($hasPendingRequest) {
                     $validator->errors()->add('membership_id', 'Paket ini masih memiliki pengajuan yang menunggu verifikasi.');

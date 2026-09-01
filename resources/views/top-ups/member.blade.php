@@ -33,10 +33,18 @@
             <span class="eyebrow">BUKTI TRANSFER</span>
             <h2>Kirim pengajuan</h2>
 
-            @if($memberships->isNotEmpty())
-                <form method="post" action="{{ route('top-ups.store') }}" enctype="multipart/form-data" class="compact-form">
-                    @csrf
-                    <input type="hidden" name="amount" value="{{ $topUpSetting->amount }}">
+            <div class="top-up-steps" aria-label="Tahapan top up">
+                <span><b>1</b>Transfer</span>
+                <span><b>2</b>Unggah bukti</span>
+                <span><b>3</b>Verifikasi</span>
+                <span><b>4</b>Kuota masuk</span>
+            </div>
+
+            <form method="post" action="{{ route('top-ups.store') }}" enctype="multipart/form-data" class="compact-form">
+                @csrf
+                <input type="hidden" name="amount" value="{{ $topUpSetting->amount }}">
+
+                @if($memberships->isNotEmpty())
                     <label>Paket
                         <select name="membership_id" required>
                             <option value="">Pilih paket</option>
@@ -45,23 +53,27 @@
                             @endforeach
                         </select>
                     </label>
-                    <label>Rekening tujuan
-                        <select name="bank" required>
-                            <option value="">Pilih rekening</option>
-                            @foreach(config('community.top_up.accounts') as $key => $account)
-                                <option value="{{ $key }}" @selected(old('bank') === $key)>{{ $account['bank'] }} · {{ $account['number'] }}</option>
-                            @endforeach
-                        </select>
-                    </label>
-                    <label>Bukti transfer
-                        <input type="file" name="proof" accept=".jpg,.jpeg,.png,.webp,.pdf" required>
-                        <span class="field-help">JPG, PNG, WebP, atau PDF. Maksimal 4 MB.</span>
-                    </label>
-                    <button class="btn primary full">Kirim pengajuan</button>
-                </form>
-            @else
-                <div class="empty-state compact"><span>◇</span><h2>Belum ada paket aktif</h2><p>Hubungi administrator untuk membuat paket.</p></div>
-            @endif
+                @else
+                    <div class="top-up-target">
+                        <strong>Paket Komunitas</strong>
+                        <span>Dibuat otomatis dan berlaku untuk semua sesi komunitas.</span>
+                    </div>
+                @endif
+
+                <label>Rekening tujuan
+                    <select name="bank" required>
+                        <option value="">Pilih rekening</option>
+                        @foreach(config('community.top_up.accounts') as $key => $account)
+                            <option value="{{ $key }}" @selected(old('bank') === $key)>{{ $account['bank'] }} · {{ $account['number'] }}</option>
+                        @endforeach
+                    </select>
+                </label>
+                <label>Bukti transfer
+                    <input type="file" name="proof" accept=".jpg,.jpeg,.png,.webp,.pdf" required>
+                    <span class="field-help">JPG, PNG, WebP, atau PDF. Maksimal 4 MB.</span>
+                </label>
+                <button class="btn primary full">Kirim pengajuan</button>
+            </form>
         </section>
     </div>
 
