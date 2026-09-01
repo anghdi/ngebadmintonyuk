@@ -10,7 +10,7 @@
             <h1>{{ $playSession->venue_name }}</h1>
             <p>{{ $playSession->court_name }} · {{ $playSession->scheduled_at->translatedFormat('l, d M Y') }} · {{ $playSession->scheduled_at->format('H:i') }} WITA</p>
         </div>
-        <strong>{{ rupiah($playSession->price_per_session) }}</strong>
+        <div class="public-session-capacity"><strong>{{ rupiah($playSession->price_per_session) }}</strong><span>{{ $playSession->registrations->count() }}/{{ $playSession->max_players }} pemain</span></div>
     </section>
 
     <div class="public-registration-grid">
@@ -20,6 +20,10 @@
                 <h2>Nama Anda sudah masuk</h2>
                 <p>Silakan hadir sesuai jadwal.</p>
                 <div class="registration-confirmation"><strong>{{ $registration->name }}</strong><span>{{ $registration->payment_method === 'transfer' ? 'Transfer bank' : 'Bayar tunai' }}</span></div>
+            @elseif($isFull)
+                <span class="eyebrow">DAFTAR PENUH</span>
+                <h2>Kapasitas terpenuhi</h2>
+                <p>Sesi ini sudah diisi {{ $playSession->max_players }} pemain.</p>
             @elseif($noShowCount >= 3)
                 <span class="eyebrow">PENDAFTARAN DIBLOKIR</span>
                 <h2>Hubungi admin</h2>
@@ -43,7 +47,7 @@
         </section>
 
         <section class="card participant-list-card">
-            <div class="card-head"><div><span class="eyebrow">PEMAIN</span><h2>{{ $playSession->registrations->count() }} nama terdaftar</h2></div></div>
+            <div class="card-head"><div><span class="eyebrow">PEMAIN</span><h2>{{ $playSession->registrations->count() }}/{{ $playSession->max_players }} nama terdaftar</h2></div></div>
             <ol class="participant-list">
                 @forelse($playSession->registrations as $participant)
                     <li><span>{{ $loop->iteration }}</span><strong>{{ $participant->name }}</strong></li>

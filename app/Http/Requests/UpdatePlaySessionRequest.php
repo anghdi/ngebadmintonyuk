@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\PlaySession;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -21,6 +22,7 @@ class UpdatePlaySessionRequest extends FormRequest
             'venue_name' => ['required', 'string', 'max:255'],
             'court_name' => ['required', 'string', 'max:255'],
             'price_per_session' => ['required', 'integer', 'min:0'],
+            'max_players' => ['required', 'integer', 'min:1', 'max:200'],
             'status' => ['required', Rule::in(['scheduled', 'completed', 'cancelled'])],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
@@ -33,7 +35,15 @@ class UpdatePlaySessionRequest extends FormRequest
             function (Validator $validator): void {
                 $playSession = $this->route('play_session');
 
-                if (! $playSession || ! $playSession->attendances()->exists()) {
+                if (! $playSession instanceof PlaySession) {
+                    return;
+                }
+
+                if ($playSession->registrations()->count() > $this->integer('max_players')) {
+                    $validator->errors()->add('max_players', 'Kapasitas tidak boleh lebih kecil dari jumlah pemain yang sudah terdaftar.');
+                }
+
+                if (! $playSession->attendances()->exists()) {
                     return;
                 }
 

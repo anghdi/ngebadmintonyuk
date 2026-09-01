@@ -16,21 +16,22 @@ use Illuminate\Support\Carbon;
  * @property string $venue_name
  * @property string $court_name
  * @property int $price_per_session
+ * @property int $max_players
  * @property string $status
  * @property string|null $notes
  * @property int $created_by
  */
-#[Fillable(['scheduled_at', 'venue_name', 'court_name', 'price_per_session', 'status', 'notes', 'created_by'])]
+#[Fillable(['scheduled_at', 'venue_name', 'court_name', 'price_per_session', 'max_players', 'status', 'notes', 'created_by'])]
 class PlaySession extends Model
 {
     /** @use HasFactory<PlaySessionFactory> */
     use HasFactory;
 
-    protected $attributes = ['status' => 'scheduled'];
+    protected $attributes = ['max_players' => 12, 'status' => 'scheduled'];
 
     protected function casts(): array
     {
-        return ['scheduled_at' => 'datetime', 'price_per_session' => 'integer'];
+        return ['scheduled_at' => 'datetime', 'price_per_session' => 'integer', 'max_players' => 'integer'];
     }
 
     /** @return BelongsTo<User, $this> */

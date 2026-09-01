@@ -4,19 +4,23 @@
 <div class="page-head session-head"><div><a class="back-link" href="{{ route('play-sessions.index') }}">← Semua sesi</a><span class="eyebrow">ABSENSI SESI</span><h1>{{ $playSession->venue_name }}</h1><p>{{ $playSession->court_name }} · {{ $playSession->scheduled_at->translatedFormat('l, d M Y') }} pukul {{ $playSession->scheduled_at->format('H:i') }} WITA</p></div><div class="session-head-actions"><div class="session-price"><small>HARGA SESI</small><strong>{{ rupiah($playSession->price_per_session) }}</strong></div><div class="actions"><a class="btn soft" href="{{ route('play-sessions.edit', $playSession) }}">Edit</a><form method="post" action="{{ route('play-sessions.destroy', $playSession) }}" onsubmit="return confirm('Hapus sesi ini? Absensi akan dihapus dan kuota yang terpakai akan dikembalikan.')">@csrf @method('delete')<button class="btn danger-bg">Hapus</button></form></div></div></div>
 
 <section class="card table-card registration-admin-card">
-    <div class="card-head"><div><span class="eyebrow">DAFTAR PEMAIN</span><h2>Kehadiran dan pembayaran</h2></div><a class="btn soft" href="{{ route('public-sessions.show', $playSession) }}" target="_blank" rel="noopener">Lihat halaman publik</a></div>
-    <details class="registration-create-panel">
-        <summary>+ Tambah pemain</summary>
-        <form method="post" action="{{ route('session-registrations.store', $playSession) }}" class="registration-create-form">
-            @csrf
-            <label>Akun member<select name="user_id" data-member-select><option value="">Nonmember</option>@foreach($members as $member)<option value="{{ $member->id }}" data-member-name="{{ $member->name }}" data-member-phone="{{ $member->phone }}">{{ $member->name }}{{ $member->phone ? ' · '.$member->phone : '' }}</option>@endforeach</select></label>
-            <label>Nama pemain<input name="name" placeholder="Otomatis jika member"></label>
-            <label>WhatsApp<input name="phone" inputmode="numeric" placeholder="Otomatis jika member"></label>
-            <label>Pembayaran<select name="payment_method" required><option value="transfer">Transfer</option><option value="cash">Tunai</option></select></label>
-            <button class="btn primary">Tambahkan</button>
-        </form>
-        <small>Pilih akun member agar nama mengikuti data member.</small>
-    </details>
+    <div class="card-head"><div><span class="eyebrow">DAFTAR PEMAIN</span><h2>{{ $registrations->count() }}/{{ $playSession->max_players }} pemain</h2></div><a class="btn soft" href="{{ route('public-sessions.show', $playSession) }}" target="_blank" rel="noopener">Lihat halaman publik</a></div>
+    @if($registrations->count() < $playSession->max_players)
+        <details class="registration-create-panel">
+            <summary>+ Tambah pemain</summary>
+            <form method="post" action="{{ route('session-registrations.store', $playSession) }}" class="registration-create-form">
+                @csrf
+                <label>Akun member<select name="user_id" data-member-select><option value="">Nonmember</option>@foreach($members as $member)<option value="{{ $member->id }}" data-member-name="{{ $member->name }}" data-member-phone="{{ $member->phone }}">{{ $member->name }}{{ $member->phone ? ' · '.$member->phone : '' }}</option>@endforeach</select></label>
+                <label>Nama pemain<input name="name" placeholder="Otomatis jika member"></label>
+                <label>WhatsApp<input name="phone" inputmode="numeric" placeholder="Otomatis jika member"></label>
+                <label>Pembayaran<select name="payment_method" required><option value="transfer">Transfer</option><option value="cash">Tunai</option></select></label>
+                <button class="btn primary">Tambahkan</button>
+            </form>
+            <small>Pilih akun member agar nama mengikuti data member.</small>
+        </details>
+    @else
+        <div class="capacity-full-note">Daftar sudah penuh. Ubah kapasitas sesi jika diperlukan.</div>
+    @endif
     <table class="registration-table"><thead><tr><th>PEMAIN</th><th>PEMBAYARAN</th><th>STATUS</th><th>RIWAYAT</th><th>PERBARUI</th></tr></thead><tbody>
     @forelse($registrations as $registration)
         @php($noShows = (int) $noShowCounts->get($registration->phone, 0))

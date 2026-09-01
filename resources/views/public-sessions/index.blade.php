@@ -17,8 +17,8 @@
                     <small>{{ $playSession->scheduled_at->translatedFormat('l') }} · {{ $playSession->scheduled_at->format('H:i') }} WITA</small>
                     <h2>{{ $playSession->venue_name }}</h2>
                     <p>{{ $playSession->court_name }}</p>
-                    <div class="public-session-meta"><span>{{ rupiah($playSession->price_per_session) }}</span><span>{{ $playSession->registrations_count }} pemain</span></div>
-                    <a class="btn primary full" href="{{ route('public-sessions.show', $playSession) }}">Lihat dan ikut</a>
+                    <div class="public-session-meta"><span>{{ rupiah($playSession->price_per_session) }}</span><span>{{ $playSession->registrations_count }}/{{ $playSession->max_players }} pemain</span></div>
+                    <a class="btn {{ $playSession->registrations_count >= $playSession->max_players ? 'soft' : 'primary' }} full" href="{{ route('public-sessions.show', $playSession) }}">{{ $playSession->registrations_count >= $playSession->max_players ? 'Daftar penuh' : 'Lihat dan ikut' }}</a>
                 </div>
             </article>
         @empty

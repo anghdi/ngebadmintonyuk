@@ -305,6 +305,7 @@
     .registration-create-panel > summary, .registration-editor > summary { cursor: pointer; color: #2455f5; font-size: .75rem; font-weight: 800; list-style: none; }
     .registration-create-panel > summary::-webkit-details-marker, .registration-editor > summary::-webkit-details-marker { display: none; }
     .registration-create-panel > small { display: block; margin-top: .65rem; color: #777; font-size: .65rem; }
+    .capacity-full-note { margin-bottom: 1rem; border: 1px solid #efd18c; border-radius: 12px; background: #fff8e7; padding: .8rem 1rem; color: #805d12; font-size: .72rem; font-weight: 700; }
     .registration-create-form { display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr)) auto; align-items: end; gap: .65rem; margin-top: .9rem; }
     .registration-editor { min-width: 720px; }
     .session-registration-form { display: grid; grid-template-columns: repeat(4, minmax(145px, 1fr)); align-items: end; gap: .55rem; margin-top: .7rem; }
@@ -337,7 +338,9 @@
     .public-session-detail { display: flex; align-items: end; justify-content: space-between; gap: 1.5rem; margin: 1rem 0 1.5rem; border-radius: 22px; background: linear-gradient(125deg, #1d3b8d, #172a63); color: white; padding: clamp(1.5rem, 4vw, 2.5rem); }
     .public-session-detail .eyebrow { color: #ffd23f; }
     .public-session-detail p { color: #d7def2; }
-    .public-session-detail > strong { color: #ffd23f; font-size: 1.45rem; white-space: nowrap; }
+    .public-session-capacity { display: grid; justify-items: end; gap: .3rem; }
+    .public-session-capacity strong { color: #ffd23f; font-size: 1.45rem; white-space: nowrap; }
+    .public-session-capacity span { color: #d7def2; font-size: .7rem; font-weight: 800; }
     .public-registration-grid { display: grid; grid-template-columns: minmax(280px, .8fr) minmax(0, 1.2fr); gap: 1.25rem; align-items: start; }
     .registration-form-card { position: sticky; top: 96px; }
     .registration-confirmation { display: grid; gap: .25rem; margin-top: 1rem; border-radius: 14px; background: #eef2ff; padding: 1rem; }
@@ -458,6 +461,7 @@
     .public-content { padding-top: 1.25rem; }
     .public-session-grid { grid-template-columns: 1fr; }
     .public-session-detail { align-items: flex-start; flex-direction: column; }
+    .public-session-capacity { justify-items: start; }
     .payment-options, .compact-bank-info { grid-template-columns: 1fr; }
     .compact-bank-info small { grid-column: auto; }
     .registration-create-form { grid-template-columns: 1fr; }

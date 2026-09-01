@@ -22,3 +22,6 @@ This supersedes the earlier rule allowing admin-managed credit counts. Admin may
 
 ## Session lists are scoped and member-backed
 Each play session owns an independent registration list. Admin-created or edited entries may link to a member; when linked, snapshot the member name and normalized phone. Only unpaid entries still in listed status may be deleted so attendance and payment history remain auditable.
+
+## Play-session capacity is enforced atomically
+Each play session has an admin-managed max_players value, default 12. Public and admin registration actions must lock the play-session row and reject additions when registrations count reaches capacity. Admin may not lower capacity below the existing registration count.

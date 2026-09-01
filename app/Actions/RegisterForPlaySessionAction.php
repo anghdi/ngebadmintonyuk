@@ -22,6 +22,10 @@ class RegisterForPlaySessionAction
                     throw ValidationException::withMessages(['session' => 'Pendaftaran untuk sesi ini sudah ditutup.']);
                 }
 
+                if ($lockedSession->registrations()->count() >= $lockedSession->max_players) {
+                    throw ValidationException::withMessages(['session' => 'Daftar pemain untuk sesi ini sudah penuh.']);
+                }
+
                 $noShowCount = SessionRegistration::query()
                     ->where('phone', $data['phone'])
                     ->where('attendance_status', 'no_show')

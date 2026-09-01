@@ -23,6 +23,7 @@ class PlaySessionFactory extends Factory
             'venue_name' => 'GOR NgeBadmintonYuk',
             'court_name' => 'Lapangan 1',
             'price_per_session' => 25000,
+            'max_players' => 12,
             'status' => 'scheduled',
             'notes' => fake()->optional()->sentence(),
             'created_by' => User::factory()->admin(),

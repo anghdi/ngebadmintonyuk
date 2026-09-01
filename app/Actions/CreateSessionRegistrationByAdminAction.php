@@ -20,6 +20,10 @@ class CreateSessionRegistrationByAdminAction
                 $lockedSession = PlaySession::query()->lockForUpdate()->findOrFail($playSession->id);
                 [$member, $name, $phone] = $this->resolveIdentity($data);
 
+                if ($lockedSession->registrations()->count() >= $lockedSession->max_players) {
+                    throw ValidationException::withMessages(['session' => 'Daftar pemain untuk sesi ini sudah penuh.']);
+                }
+
                 $noShowCount = SessionRegistration::query()
                     ->where('phone', $phone)
                     ->where('attendance_status', 'no_show')

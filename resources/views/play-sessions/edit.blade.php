@@ -19,6 +19,7 @@
             <label>Venue<input name="venue_name" value="{{ old('venue_name', $playSession->venue_name) }}" required></label>
             <label>Lapangan<input name="court_name" value="{{ old('court_name', $playSession->court_name) }}" required></label>
             <label>Harga per pemain<input type="number" name="price_per_session" value="{{ old('price_per_session', $playSession->price_per_session) }}" min="0" required></label>
+            <label>Maksimal pemain<input type="number" name="max_players" value="{{ old('max_players', $playSession->max_players) }}" min="1" max="200" required></label>
             <label>Status<select name="status" required><option value="scheduled" @selected(old('status', $playSession->status) === 'scheduled')>Terjadwal</option><option value="completed" @selected(old('status', $playSession->status) === 'completed')>Selesai</option><option value="cancelled" @selected(old('status', $playSession->status) === 'cancelled')>Dibatalkan</option></select></label>
         </div>
         <label>Catatan <span class="optional">Opsional</span><textarea name="notes" rows="3">{{ old('notes', $playSession->notes) }}</textarea></label>
