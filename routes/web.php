@@ -24,7 +24,6 @@ Route::redirect('/', '/dashboard')->name('home');
 Route::get('/app.css', fn () => response()->file(resource_path('css/app.css'), ['Content-Type' => 'text/css']))->name('app.css');
 Route::get('/jadwal', [PublicPlaySessionController::class, 'index'])->name('public-sessions.index');
 Route::get('/jadwal/{playSession}', [PublicPlaySessionController::class, 'show'])->name('public-sessions.show');
-Route::post('/jadwal/{playSession}/daftar', [SessionRegistrationController::class, 'store'])->middleware('throttle:5,1')->name('public-sessions.register');
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'create'])->name('login');
     Route::post('/login', [AuthController::class, 'store'])->name('login.store');
@@ -34,6 +33,7 @@ Route::middleware('guest')->group(function () {
 
 Route::bind('transaction', fn ($id) => request()->routeIs('incomes.*') ? Income::findOrFail($id) : Expense::findOrFail($id));
 Route::middleware('auth')->group(function () {
+    Route::post('/jadwal/{playSession}/daftar', [SessionRegistrationController::class, 'store'])->middleware('throttle:5,1')->name('public-sessions.register');
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::get('/top-ups', [TopUpRequestController::class, 'index'])->name('top-ups.index');
@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('members', MemberController::class)->only(['index', 'show', 'update', 'destroy']);
         Route::post('/members/{member}/memberships', [MembershipController::class, 'store'])->name('memberships.store');
         Route::put('/members/{member}/memberships/{membership}', [MembershipController::class, 'update'])->name('memberships.update');
+        Route::post('/members/{member}/memberships/{membership}/credits/adjust', [MembershipController::class, 'adjustCredits'])->scopeBindings()->name('memberships.credits.adjust');
         Route::delete('/members/{member}/memberships/{membership}', [MembershipController::class, 'destroy'])->name('memberships.destroy');
         Route::resource('play-sessions', PlaySessionController::class)->only(['index', 'store', 'show', 'edit', 'update', 'destroy']);
         Route::put('/play-sessions/{playSession}/members/{member}/attendance', [AttendanceController::class, 'update'])->name('attendances.update');

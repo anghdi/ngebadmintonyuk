@@ -7,12 +7,11 @@ use App\Models\SessionRegistration;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class CreateSessionRegistrationByAdminAction
 {
-    /** @param array{user_id?: int|null, name?: string|null, phone?: string|null, payment_method: string} $data */
+    /** @param array{user_id: int, payment_method: string} $data */
     public function handle(PlaySession $playSession, array $data): SessionRegistration
     {
         try {
@@ -20,12 +19,16 @@ class CreateSessionRegistrationByAdminAction
                 $lockedSession = PlaySession::query()->lockForUpdate()->findOrFail($playSession->id);
                 [$member, $name, $phone] = $this->resolveIdentity($data);
 
+                if ($lockedSession->registrations()->where('user_id', $member->id)->exists()) {
+                    throw ValidationException::withMessages(['account' => 'Akun ini sudah masuk dalam daftar sesi.']);
+                }
+
                 if ($lockedSession->registrations()->count() >= $lockedSession->max_players) {
                     throw ValidationException::withMessages(['session' => 'Daftar pemain untuk sesi ini sudah penuh.']);
                 }
 
                 $noShowCount = SessionRegistration::query()
-                    ->where('phone', $phone)
+                    ->where('user_id', $member->id)
                     ->where('attendance_status', 'no_show')
                     ->count();
 
@@ -34,7 +37,7 @@ class CreateSessionRegistrationByAdminAction
                 }
 
                 return $lockedSession->registrations()->create([
-                    'user_id' => $member?->id,
+                    'user_id' => $member->id,
                     'name' => $name,
                     'phone' => $phone,
                     'payment_method' => $data['payment_method'],
@@ -42,7 +45,7 @@ class CreateSessionRegistrationByAdminAction
             }, attempts: 3);
         } catch (QueryException $exception) {
             if (($exception->errorInfo[1] ?? null) === 1062) {
-                throw ValidationException::withMessages(['phone' => 'Pemain ini sudah masuk dalam daftar sesi.']);
+                throw ValidationException::withMessages(['account' => 'Akun ini sudah masuk dalam daftar sesi.']);
             }
 
             throw $exception;
@@ -50,26 +53,14 @@ class CreateSessionRegistrationByAdminAction
     }
 
     /**
-     * @param  array{user_id?: int|null, name?: string|null, phone?: string|null}  $data
-     * @return array{User|null, string, string}
+     * @param  array{user_id: int}  $data
+     * @return array{User, string, string|null}
      */
     private function resolveIdentity(array $data): array
     {
-        $member = isset($data['user_id'])
-            ? User::query()->where('role', 'member')->findOrFail($data['user_id'])
-            : null;
-        $memberPhone = $member?->phone ? SessionRegistration::normalizePhone($member->phone) : null;
-        $phone = $memberPhone && Str::length($memberPhone) >= 10 ? $memberPhone : ($data['phone'] ?? null);
-        $name = $member?->name ?? ($data['name'] ?? null);
+        $member = User::query()->where('role', 'member')->findOrFail($data['user_id']);
+        $phone = $member->phone ? SessionRegistration::normalizePhone($member->phone) : null;
 
-        if (! $phone) {
-            throw ValidationException::withMessages(['phone' => 'Nomor WhatsApp member belum tersedia.']);
-        }
-
-        if (! $name) {
-            throw ValidationException::withMessages(['name' => 'Nama pemain wajib diisi.']);
-        }
-
-        return [$member, $name, $phone];
+        return [$member, $member->name, $phone];
     }
 }

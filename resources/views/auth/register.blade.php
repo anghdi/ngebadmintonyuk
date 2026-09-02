@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#2455f5">
-    <title>Daftar Member — NgeBadmintonYuk</title>
+    <title>Buat Akun — NgeBadmintonYuk</title>
     <link rel="icon" href="{{ asset('icon.png') }}" type="image/png">
     @vite(['resources/css/app.css'])
     <link rel="stylesheet" href="{{ route('app.css') }}">
@@ -14,9 +14,9 @@
     <span class="auth-shuttle" aria-hidden="true"><img src="{{ asset('icon.png') }}" alt=""></span>
     <a href="{{ route('login') }}" class="auth-back">← Kembali ke halaman masuk</a>
     <img class="login-logo" src="{{ asset('logo.png') }}" alt="NgeBadmintonYuk">
-    <span class="eyebrow">PENDAFTARAN MEMBER</span>
-    <h1>Buat akun member</h1>
-    <p>Daftar untuk mengakses jadwal dan kuota bermain.</p>
+    <span class="eyebrow">PENDAFTARAN AKUN</span>
+    <h1>Buat akun pemain</h1>
+    <p>Member maupun non-member perlu akun untuk masuk daftar bermain.</p>
     @if($errors->any())
         <div class="alert">{{ $errors->first() }}</div>
     @endif

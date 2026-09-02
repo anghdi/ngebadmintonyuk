@@ -11,8 +11,8 @@ use Illuminate\Validation\ValidationException;
 
 class RegisterForPlaySessionAction
 {
-    /** @param array{name: string, phone: string, payment_method: string} $data */
-    public function handle(PlaySession $playSession, array $data, ?User $user): SessionRegistration
+    /** @param array{phone?: string|null, payment_method: string} $data */
+    public function handle(PlaySession $playSession, array $data, User $user): SessionRegistration
     {
         try {
             return DB::transaction(function () use ($playSession, $data, $user): SessionRegistration {
@@ -22,29 +22,33 @@ class RegisterForPlaySessionAction
                     throw ValidationException::withMessages(['session' => 'Pendaftaran untuk sesi ini sudah ditutup.']);
                 }
 
+                if ($lockedSession->registrations()->where('user_id', $user->id)->exists()) {
+                    throw ValidationException::withMessages(['account' => 'Akun ini sudah terdaftar pada sesi tersebut.']);
+                }
+
                 if ($lockedSession->registrations()->count() >= $lockedSession->max_players) {
                     throw ValidationException::withMessages(['session' => 'Daftar pemain untuk sesi ini sudah penuh.']);
                 }
 
                 $noShowCount = SessionRegistration::query()
-                    ->where('phone', $data['phone'])
+                    ->where('user_id', $user->id)
                     ->where('attendance_status', 'no_show')
                     ->count();
 
                 if ($noShowCount >= 3) {
-                    throw ValidationException::withMessages(['phone' => 'Nomor ini diblokir karena tiga kali tidak hadir. Hubungi admin untuk peninjauan.']);
+                    throw ValidationException::withMessages(['account' => 'Akun ini diblokir karena tiga kali tidak hadir. Hubungi admin untuk peninjauan.']);
                 }
 
                 return $lockedSession->registrations()->create([
-                    'user_id' => $user && ! $user->isAdmin() ? $user->id : null,
-                    'name' => $user && ! $user->isAdmin() ? $user->name : $data['name'],
-                    'phone' => $data['phone'],
+                    'user_id' => $user->id,
+                    'name' => $user->name,
+                    'phone' => $data['phone'] ?? null,
                     'payment_method' => $data['payment_method'],
                 ]);
             }, attempts: 3);
         } catch (QueryException $exception) {
             if (($exception->errorInfo[1] ?? null) === 1062) {
-                throw ValidationException::withMessages(['phone' => 'Nomor ini sudah terdaftar pada sesi tersebut.']);
+                throw ValidationException::withMessages(['account' => 'Akun ini sudah terdaftar pada sesi tersebut.']);
             }
 
             throw $exception;

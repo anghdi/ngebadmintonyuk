@@ -15,7 +15,19 @@
 
     <div class="public-registration-grid">
         <section class="card registration-form-card">
-            @if($registration)
+            @guest
+                <span class="eyebrow">AKUN DIPERLUKAN</span>
+                <h2>Buat akun dulu</h2>
+                <p>Semua pemain, termasuk non-member, perlu masuk dengan akun sebelum mengisi daftar.</p>
+                <div class="actions">
+                    <a class="btn primary" href="{{ route('register') }}">Buat akun</a>
+                    <a class="btn soft" href="{{ route('login') }}">Sudah punya akun</a>
+                </div>
+            @elseif(auth()->user()->isAdmin())
+                <span class="eyebrow">AKUN ADMIN</span>
+                <h2>Gunakan akun pemain</h2>
+                <p>Administrator dapat menambahkan pemain melalui halaman pengelolaan sesi.</p>
+            @elseif($registration)
                 <span class="eyebrow">TERDAFTAR</span>
                 <h2>Nama Anda sudah masuk</h2>
                 <p>Silakan hadir sesuai jadwal.</p>
@@ -33,8 +45,8 @@
                 <h2>Ikut bermain</h2>
                 <form method="post" action="{{ route('public-sessions.register', $playSession) }}" class="compact-form">
                     @csrf
-                    <label>Nama<input name="name" value="{{ old('name', auth()->user()?->name) }}" required @readonly(auth()->check() && ! auth()->user()->isAdmin())></label>
-                    <label>Nomor WhatsApp<input name="phone" inputmode="numeric" value="{{ old('phone', auth()->user()?->phone) }}" placeholder="08xxxxxxxxxx" required></label>
+                    <label>Nama<input value="{{ auth()->user()->name }}" readonly></label>
+                    <label>Nomor WhatsApp <span class="optional">Opsional</span><input name="phone" inputmode="numeric" value="{{ old('phone', auth()->user()->phone) }}" placeholder="08xxxxxxxxxx"></label>
                     <fieldset class="payment-options">
                         <legend>Pembayaran</legend>
                         <label><input type="radio" name="payment_method" value="transfer" @checked(old('payment_method') === 'transfer') required><span><b>Transfer</b><small>BCA atau BRI</small></span></label>

@@ -28,3 +28,6 @@ Each play session has an admin-managed max_players value, default 12. Public and
 
 ## Top up bootstraps a community package
 Member tanpa paket aktif tetap dapat mengajukan top up. Sistem membuat atau memakai Paket Komunitas tanpa menulis saldo awal; hanya persetujuan admin yang menambahkan tepat 4 kuota. Paket Komunitas dapat dipakai pada semua sesi komunitas.
+
+## Session registration requires an account
+This supersedes guest registration and phone-backed sanctions. Every new public or admin-created play-session registration must link to a non-admin player account; WhatsApp is optional. Enforce per-session uniqueness and no-show blocking by user_id, while retaining legacy rows without an account for historical display.

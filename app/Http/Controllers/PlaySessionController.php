@@ -52,12 +52,12 @@ class PlaySessionController extends Controller
         $playSession->load('attendances.transaction');
         $registrations = $playSession->registrations()->with('user:id,name')->oldest()->get();
         $noShowCounts = SessionRegistration::query()
-            ->whereIn('phone', $registrations->pluck('phone'))
+            ->whereIn('user_id', $registrations->pluck('user_id')->filter())
             ->where('attendance_status', 'no_show')
-            ->select('phone')
+            ->select('user_id')
             ->selectRaw('COUNT(*) as total')
-            ->groupBy('phone')
-            ->pluck('total', 'phone');
+            ->groupBy('user_id')
+            ->pluck('total', 'user_id');
         $attendances = $playSession->attendances->keyBy('user_id');
         $members = User::query()
             ->where('role', 'member')

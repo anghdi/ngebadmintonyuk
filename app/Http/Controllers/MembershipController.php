@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AdjustMembershipCreditAction;
 use App\Actions\DeleteMembershipAction;
 use App\Actions\GrantMembershipAction;
+use App\Http\Requests\AdjustMembershipCreditRequest;
 use App\Http\Requests\StoreMembershipRequest;
 use App\Http\Requests\UpdateMembershipRequest;
 use App\Models\Membership;
@@ -24,6 +26,14 @@ class MembershipController extends Controller
         $membership->update($request->validated());
 
         return back()->with('success', 'Paket member berhasil diperbarui.');
+    }
+
+    public function adjustCredits(AdjustMembershipCreditRequest $request, User $member, Membership $membership, AdjustMembershipCreditAction $adjustMembershipCredit): RedirectResponse
+    {
+        $data = $request->validated();
+        $adjustMembershipCredit->handle($membership, $data['quantity'], $data['notes'] ?? null, $request->user());
+
+        return back()->with('success', 'Kuota member berhasil dikurangi.');
     }
 
     public function destroy(User $member, Membership $membership, DeleteMembershipAction $deleteMembership): RedirectResponse

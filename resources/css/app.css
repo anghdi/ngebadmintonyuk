@@ -189,8 +189,25 @@
     .quota-meta { display: grid; align-content: center; gap: .7rem; border-left: 1px solid rgb(255 255 255 / 18%); padding-left: 2rem; }
     .quota-meta span { color: #c8c8c8; font-size: .82rem; }
     .quota-meta b { color: white; font-size: 1.05rem; }
+    .dashboard-bank-section { display: grid; grid-template-columns: minmax(180px, .55fr) minmax(0, 1.45fr); align-items: center; gap: 1.25rem; margin-bottom: 1.8rem; border: 1px solid #e1e3ea; border-radius: 18px; background: #fffdfa; padding: 1.2rem; box-shadow: 0 8px 25px rgb(23 42 99 / 4%); }
+    .dashboard-bank-section h2 { margin-bottom: .2rem; }
+    .dashboard-bank-section p { font-size: .72rem; }
+    .dashboard-bank-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+    .dashboard-bank-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .75rem; border: 1px solid #dce2f4; border-radius: 13px; background: #f5f7fc; padding: .75rem; }
+    .dashboard-bank-card > span { display: grid; width: 42px; height: 36px; place-items: center; border-radius: 8px; background: #172a63; color: #ffd23f; font-size: .68rem; font-weight: 800; }
+    .dashboard-bank-card strong { min-width: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .82rem; overflow-wrap: anywhere; }
+    .copy-bank-button { min-height: 36px; padding: .45rem .65rem; }
     .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: .8rem; }
     .section-heading h2, .member-welcome h1, .card-head h2 { margin-bottom: 0; }
+    .usage-guide { margin-bottom: 1.5rem; border: 1px solid #e1e3ea; border-radius: 18px; background: #fffdfa; padding: 1.2rem; box-shadow: 0 8px 25px rgb(23 42 99 / 4%); }
+    .usage-guide-head { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+    .usage-guide-head h2 { margin-bottom: 0; }
+    .usage-guide-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .usage-guide-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; padding: 0; list-style: none; }
+    .usage-guide-steps li { display: flex; align-items: flex-start; gap: .7rem; border: 1px solid #e7e8ed; border-radius: 13px; background: #f8f9fc; padding: .9rem; }
+    .usage-guide-steps li > span { display: grid; width: 30px; height: 30px; flex: 0 0 30px; place-items: center; border-radius: 50%; background: #172a63; color: #ffd23f; font-size: .7rem; font-weight: 800; }
+    .usage-guide-steps strong { display: block; font-size: .78rem; }
+    .usage-guide-steps p { margin-top: .25rem; color: #6f7380; font-size: .68rem; line-height: 1.5; }
     .membership-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1.8rem; }
     .membership-ticket { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; overflow: hidden; border: 1px solid #e1e3ea; border-radius: 18px; background: #fffdfa; box-shadow: 0 8px 25px rgb(23 42 99 / 4%); transition: transform .18s ease, box-shadow .18s ease; }
     .membership-ticket:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgb(23 42 99 / 7%); }
@@ -376,6 +393,7 @@
     .attendance-card { grid-template-columns: 1fr; }
     .inventory-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .public-session-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .usage-guide-steps { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 800px) {
@@ -397,7 +415,7 @@
     .content { padding: 1.25rem 1rem; }
     .page-head { align-items: flex-start; flex-wrap: wrap; margin-bottom: 1.3rem; }
     .stats, .grid-2 { grid-template-columns: 1fr; }
-    .club-strip, .membership-grid, .member-columns, .admin-split, .inventory-forms, .top-up-grid, .top-up-setting-card, .member-edit-card { grid-template-columns: 1fr; }
+    .club-strip, .membership-grid, .member-columns, .admin-split, .inventory-forms, .top-up-grid, .top-up-setting-card, .member-edit-card, .dashboard-bank-section { grid-template-columns: 1fr; }
     .setting-form { grid-template-columns: repeat(2, minmax(0, 1fr)) auto; }
     .member-edit-card .setting-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .package-form-card { position: static; }
@@ -447,7 +465,9 @@
     .login-logo { width: min(230px, 75%); height: 105px; margin-top: -.4rem; }
     .auth-shuttle { top: .85rem; right: .85rem; width: 36px; height: 36px; font-size: 1rem; }
     .member-welcome { align-items: flex-start; flex-direction: column; }
+    .usage-guide-head { align-items: flex-start; flex-direction: column; }
     .quota-hero { border-radius: 16px; padding: 1.25rem; }
+    .dashboard-bank-list { grid-template-columns: 1fr; }
     .membership-ticket { grid-template-columns: minmax(0, 1fr) 68px; }
     .membership-ticket::before, .membership-ticket::after { right: 67px; }
     .top-up-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }

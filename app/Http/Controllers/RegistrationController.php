@@ -21,6 +21,6 @@ class RegistrationController extends Controller
         Auth::login($member);
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard')->with('success', 'Akun member kamu sudah aktif. Selamat bergabung!');
+        return redirect()->route('dashboard')->with('success', 'Akun kamu sudah aktif. Selamat bergabung!');
     }
 }

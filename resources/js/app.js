@@ -38,3 +38,44 @@ document.querySelectorAll('[data-member-select]').forEach((select) => {
         }
     });
 });
+
+document.querySelectorAll('[data-copy-text]').forEach((button) => {
+    button.addEventListener('click', async () => {
+        const text = button.dataset.copyText;
+
+        if (!text) {
+            return;
+        }
+
+        try {
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(text);
+            } else {
+                const input = document.createElement('textarea');
+                input.value = text;
+                input.setAttribute('readonly', '');
+                input.style.position = 'fixed';
+                input.style.opacity = '0';
+                document.body.append(input);
+                input.select();
+
+                const copied = document.execCommand('copy');
+                input.remove();
+
+                if (!copied) {
+                    throw new Error('Browser tidak mendukung penyalinan otomatis.');
+                }
+            }
+
+            button.textContent = 'Tersalin';
+            button.setAttribute('aria-label', `${button.dataset.copyLabel ?? 'Nomor rekening'} tersalin`);
+        } catch {
+            button.textContent = 'Gagal menyalin';
+        }
+
+        window.setTimeout(() => {
+            button.textContent = 'Salin';
+            button.setAttribute('aria-label', button.dataset.copyLabel ?? 'Salin nomor rekening');
+        }, 1800);
+    });
+});

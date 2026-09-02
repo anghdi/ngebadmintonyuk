@@ -59,7 +59,7 @@
             </a>
             <div class="user-summary">
                 <span class="user-avatar"><img src="{{ asset('icon.png') }}" alt=""></span>
-                <span><b>{{ auth()->user()->name }}</b><small>{{ auth()->user()->isAdmin() ? 'Administrator' : 'Member aktif' }}</small></span>
+                <span><b>{{ auth()->user()->name }}</b><small>{{ auth()->user()->isAdmin() ? 'Administrator' : 'Akun pemain' }}</small></span>
             </div>
         </header>
         <section class="content">

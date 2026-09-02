@@ -11,7 +11,7 @@ use Illuminate\Validation\ValidationException;
 
 class UpdateSessionRegistrationAction
 {
-    /** @param array{user_id?: int|null, name: string, phone: string, payment_method: string, payment_status: string, attendance_status: string, admin_notes?: string|null} $data */
+    /** @param array{user_id: int, name: string, phone?: string|null, payment_method: string, payment_status: string, attendance_status: string, admin_notes?: string|null} $data */
     public function handle(SessionRegistration $registration, array $data, User $administrator): SessionRegistration
     {
         try {
@@ -21,16 +21,16 @@ class UpdateSessionRegistrationAction
 
                 $alreadyListed = SessionRegistration::query()
                     ->where('play_session_id', $lockedRegistration->play_session_id)
-                    ->where('phone', $phone)
+                    ->where('user_id', $member->id)
                     ->whereKeyNot($lockedRegistration->id)
                     ->exists();
 
                 if ($alreadyListed) {
-                    throw ValidationException::withMessages(['phone' => 'Pemain ini sudah masuk dalam daftar sesi.']);
+                    throw ValidationException::withMessages(['account' => 'Akun ini sudah masuk dalam daftar sesi.']);
                 }
 
                 $lockedRegistration->update(array_replace($data, [
-                    'user_id' => $member?->id,
+                    'user_id' => $member->id,
                     'name' => $name,
                     'phone' => $phone,
                     'checked_by' => $administrator->id,
@@ -41,7 +41,7 @@ class UpdateSessionRegistrationAction
             }, attempts: 3);
         } catch (QueryException $exception) {
             if (($exception->errorInfo[1] ?? null) === 1062) {
-                throw ValidationException::withMessages(['phone' => 'Pemain ini sudah masuk dalam daftar sesi.']);
+                throw ValidationException::withMessages(['account' => 'Akun ini sudah masuk dalam daftar sesi.']);
             }
 
             throw $exception;
@@ -49,17 +49,15 @@ class UpdateSessionRegistrationAction
     }
 
     /**
-     * @param  array{user_id?: int|null, name: string, phone: string}  $data
-     * @return array{User|null, string, string}
+     * @param  array{user_id: int, name: string, phone?: string|null}  $data
+     * @return array{User, string, string|null}
      */
     private function resolveIdentity(array $data): array
     {
-        $member = isset($data['user_id'])
-            ? User::query()->where('role', 'member')->findOrFail($data['user_id'])
-            : null;
-        $memberPhone = $member?->phone ? SessionRegistration::normalizePhone($member->phone) : null;
-        $phone = $memberPhone && Str::length($memberPhone) >= 10 ? $memberPhone : $data['phone'];
+        $member = User::query()->where('role', 'member')->findOrFail($data['user_id']);
+        $memberPhone = $member->phone ? SessionRegistration::normalizePhone($member->phone) : null;
+        $phone = $memberPhone && Str::length($memberPhone) >= 10 ? $memberPhone : ($data['phone'] ?? null);
 
-        return [$member, $member?->name ?? $data['name'], $phone];
+        return [$member, $member->name, $phone];
     }
 }

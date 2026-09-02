@@ -5,18 +5,18 @@ use App\Models\User;
 test('guest can open member registration from login', function () {
     $this->get(route('login'))
         ->assertSuccessful()
-        ->assertSee('Daftar jadi member');
+        ->assertSee('Buat akun pemain');
 
     $this->get(route('register'))
         ->assertSuccessful()
-        ->assertSee('Buat akun member');
+        ->assertSee('Buat akun pemain');
 });
 
 test('new member is activated and signed in immediately', function () {
     $response = $this->post(route('register.store'), [
         'name' => 'Made Surya',
         'email' => 'made@example.com',
-        'phone' => '08123456789',
+        'phone' => null,
         'password' => 'password',
         'password_confirmation' => 'password',
     ]);
@@ -25,7 +25,8 @@ test('new member is activated and signed in immediately', function () {
 
     $response->assertRedirect(route('dashboard'));
     $this->assertAuthenticatedAs($member);
-    expect($member->role)->toBe('member');
+    expect($member->role)->toBe('member')
+        ->and($member->phone)->toBeNull();
 });
 
 test('member cannot open administrator pages', function () {

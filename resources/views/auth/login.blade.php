@@ -29,7 +29,7 @@
     </form>
     <div class="auth-divider"><span>atau</span></div>
     <a class="btn soft full" href="{{ route('public-sessions.index') }}">Lihat jadwal main</a>
-    <a class="btn dark full" href="{{ route('register') }}">Daftar sebagai member</a>
+    <a class="btn dark full" href="{{ route('register') }}">Buat akun pemain</a>
     <small>KOMUNITAS BADMINTON</small>
 </main>
 </body>

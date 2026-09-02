@@ -10,22 +10,20 @@
             <summary>+ Tambah pemain</summary>
             <form method="post" action="{{ route('session-registrations.store', $playSession) }}" class="registration-create-form">
                 @csrf
-                <label>Akun member<select name="user_id" data-member-select><option value="">Nonmember</option>@foreach($members as $member)<option value="{{ $member->id }}" data-member-name="{{ $member->name }}" data-member-phone="{{ $member->phone }}">{{ $member->name }}{{ $member->phone ? ' · '.$member->phone : '' }}</option>@endforeach</select></label>
-                <label>Nama pemain<input name="name" placeholder="Otomatis jika member"></label>
-                <label>WhatsApp<input name="phone" inputmode="numeric" placeholder="Otomatis jika member"></label>
+                <label>Akun pemain<select name="user_id" data-member-select required><option value="">Pilih akun</option>@foreach($members as $member)<option value="{{ $member->id }}" data-member-name="{{ $member->name }}" data-member-phone="{{ $member->phone }}">{{ $member->name }}{{ $member->phone ? ' · '.$member->phone : '' }}</option>@endforeach</select></label>
                 <label>Pembayaran<select name="payment_method" required><option value="transfer">Transfer</option><option value="cash">Tunai</option></select></label>
                 <button class="btn primary">Tambahkan</button>
             </form>
-            <small>Pilih akun member agar nama mengikuti data member.</small>
+            <small>Pemain harus mempunyai akun. Nama dan WhatsApp (jika ada) mengikuti data akun.</small>
         </details>
     @else
         <div class="capacity-full-note">Daftar sudah penuh. Ubah kapasitas sesi jika diperlukan.</div>
     @endif
     <table class="registration-table"><thead><tr><th>PEMAIN</th><th>PEMBAYARAN</th><th>STATUS</th><th>RIWAYAT</th><th>PERBARUI</th></tr></thead><tbody>
     @forelse($registrations as $registration)
-        @php($noShows = (int) $noShowCounts->get($registration->phone, 0))
+        @php($noShows = (int) $noShowCounts->get($registration->user_id, 0))
         <tr>
-            <td><strong>{{ $registration->name }}</strong><small>{{ $registration->user ? 'Member' : 'Nonmember' }} · {{ $registration->phone }}</small></td>
+            <td><strong>{{ $registration->name }}</strong><small>{{ $registration->user ? 'Punya akun' : 'Data lama tanpa akun' }}{{ $registration->phone ? ' · '.$registration->phone : ' · WhatsApp tidak diisi' }}</small></td>
             <td><span class="status-pill {{ $registration->payment_status === 'paid' ? 'active' : 'warning' }}">{{ $registration->payment_method === 'transfer' ? 'Transfer' : 'Tunai' }} · {{ $registration->payment_status === 'paid' ? 'Lunas' : 'Belum bayar' }}</span></td>
             <td><span class="status-pill {{ $registration->attendance_status === 'present' ? 'active' : ($registration->attendance_status === 'no_show' ? 'danger' : 'muted') }}">{{ ['listed' => 'Terdaftar', 'present' => 'Hadir', 'no_show' => 'Tidak hadir'][$registration->attendance_status] }}</span></td>
             <td><strong>{{ $noShows }}/3</strong><small>{{ $noShows >= 3 ? 'Diblokir' : 'Tidak hadir' }}</small></td>
@@ -34,9 +32,9 @@
                     <summary>Edit data</summary>
                     <form method="post" action="{{ route('session-registrations.update', [$playSession, $registration]) }}" class="session-registration-form">
                         @csrf @method('put')
-                        <label>Member<select name="user_id" data-member-select><option value="">Nonmember</option>@foreach($members as $member)<option value="{{ $member->id }}" data-member-name="{{ $member->name }}" data-member-phone="{{ $member->phone }}" @selected($registration->user_id === $member->id)>{{ $member->name }}</option>@endforeach</select></label>
+                        <label>Akun pemain<select name="user_id" data-member-select required><option value="">Pilih akun</option>@foreach($members as $member)<option value="{{ $member->id }}" data-member-name="{{ $member->name }}" data-member-phone="{{ $member->phone }}" @selected($registration->user_id === $member->id)>{{ $member->name }}</option>@endforeach</select></label>
                         <label>Nama<input name="name" value="{{ $registration->name }}" required></label>
-                        <label>WhatsApp<input name="phone" value="{{ $registration->phone }}" inputmode="numeric" required></label>
+                        <label>WhatsApp <span class="optional">Opsional</span><input name="phone" value="{{ $registration->phone }}" inputmode="numeric"></label>
                         <label>Metode<select name="payment_method"><option value="transfer" @selected($registration->payment_method === 'transfer')>Transfer</option><option value="cash" @selected($registration->payment_method === 'cash')>Tunai</option></select></label>
                         <label>Pembayaran<select name="payment_status"><option value="unpaid" @selected($registration->payment_status === 'unpaid')>Belum bayar</option><option value="paid" @selected($registration->payment_status === 'paid')>Lunas</option></select></label>
                         <label>Kehadiran<select name="attendance_status"><option value="listed" @selected($registration->attendance_status === 'listed')>Terdaftar</option><option value="present" @selected($registration->attendance_status === 'present')>Hadir</option><option value="no_show" @selected($registration->attendance_status === 'no_show')>Tidak hadir</option></select></label>

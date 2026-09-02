@@ -30,12 +30,12 @@ class UpdateSessionRegistrationRequest extends FormRequest
     {
         return [
             'user_id' => [
-                'nullable',
+                'required',
                 'integer',
                 Rule::exists(User::class, 'id')->where(fn ($query) => $query->where('role', 'member')),
             ],
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'regex:/^[0-9]{10,15}$/'],
+            'phone' => ['nullable', 'regex:/^[0-9]{10,15}$/'],
             'payment_method' => ['required', Rule::in(['transfer', 'cash'])],
             'payment_status' => ['required', Rule::in(['unpaid', 'paid'])],
             'attendance_status' => ['required', Rule::in(['listed', 'present', 'no_show'])],
@@ -45,6 +45,8 @@ class UpdateSessionRegistrationRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge(['phone' => SessionRegistration::normalizePhone((string) $this->input('phone'))]);
+        $phone = SessionRegistration::normalizePhone((string) $this->input('phone'));
+
+        $this->merge(['phone' => $phone !== '' ? $phone : null]);
     }
 }

@@ -13,6 +13,8 @@
     </div>
 </div>
 
+<x-usage-guide />
+
 <section class="quota-hero">
     <div>
         <small>KUOTA SIAP PAKAI</small>
@@ -23,6 +25,26 @@
         <span><b>{{ $memberships->count() }}</b> paket aktif</span>
         <span><b>{{ $usedCredits }}</b> kali digunakan</span>
         <span>Kuota tersedia sesuai paket aktif.</span>
+    </div>
+</section>
+
+<section class="dashboard-bank-section" aria-labelledby="dashboard-bank-title">
+    <div>
+        <span class="eyebrow">REKENING PEMBAYARAN</span>
+        <h2 id="dashboard-bank-title">Transfer top up</h2>
+        <p>a.n. Angga Hadi Permana</p>
+    </div>
+    <div class="dashboard-bank-list">
+        <article class="dashboard-bank-card">
+            <span>BCA</span>
+            <strong>6690685688</strong>
+            <button type="button" class="btn soft copy-bank-button" data-copy-text="6690685688" data-copy-label="Salin BCA">Salin</button>
+        </article>
+        <article class="dashboard-bank-card">
+            <span>BRI</span>
+            <strong>036801013857535</strong>
+            <button type="button" class="btn soft copy-bank-button" data-copy-text="036801013857535" data-copy-label="Salin BRI">Salin</button>
+        </article>
     </div>
 </section>
 

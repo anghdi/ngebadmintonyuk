@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
  * @property int $play_session_id
  * @property int|null $user_id
  * @property string $name
- * @property string $phone
+ * @property string|null $phone
  * @property string $payment_method
  * @property string $payment_status
  * @property string $attendance_status

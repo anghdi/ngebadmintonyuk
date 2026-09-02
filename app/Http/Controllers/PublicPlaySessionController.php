@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\PlaySession;
-use App\Models\SessionRegistration;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -30,12 +29,8 @@ class PublicPlaySessionController extends Controller
         $registration = $request->user() && ! $request->user()->isAdmin()
             ? $playSession->registrations->firstWhere('user_id', $request->user()->id)
             : null;
-        $phone = $request->user()?->phone
-            ? SessionRegistration::normalizePhone($request->user()->phone)
-            : $registration?->phone;
-        $registration ??= $phone ? $playSession->registrations->firstWhere('phone', $phone) : null;
-        $noShowCount = $phone
-            ? SessionRegistration::query()->where('phone', $phone)->where('attendance_status', 'no_show')->count()
+        $noShowCount = $request->user() && ! $request->user()->isAdmin()
+            ? $request->user()->sessionRegistrations()->where('attendance_status', 'no_show')->count()
             : 0;
 
         return view('public-sessions.show', compact('playSession', 'registration', 'noShowCount', 'isFull'));

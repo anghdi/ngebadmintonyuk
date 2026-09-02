@@ -10,7 +10,7 @@ class StoreSessionRegistrationRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user() !== null && ! $this->user()->isAdmin();
     }
 
     /**
@@ -21,15 +21,16 @@ class StoreSessionRegistrationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'regex:/^[0-9]{10,15}$/'],
+            'phone' => ['nullable', 'regex:/^[0-9]{10,15}$/'],
             'payment_method' => ['required', Rule::in(['transfer', 'cash'])],
         ];
     }
 
     protected function prepareForValidation(): void
     {
-        $this->merge(['phone' => SessionRegistration::normalizePhone((string) $this->input('phone'))]);
+        $phone = SessionRegistration::normalizePhone((string) $this->input('phone'));
+
+        $this->merge(['phone' => $phone !== '' ? $phone : null]);
     }
 
     /** @return array<string, string> */

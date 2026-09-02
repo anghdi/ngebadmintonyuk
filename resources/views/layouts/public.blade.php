@@ -22,7 +22,7 @@
             <a class="btn soft" href="{{ route('dashboard') }}">Dashboard</a>
         @else
             <a class="btn soft" href="{{ route('login') }}">Masuk</a>
-            <a class="btn dark" href="{{ route('register') }}">Daftar member</a>
+            <a class="btn dark" href="{{ route('register') }}">Buat akun</a>
         @endauth
     </div>
 </header>

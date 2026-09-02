@@ -9,6 +9,8 @@
         <p>Terbuka untuk member dan pemain umum.</p>
     </section>
 
+    <x-usage-guide />
+
     <section class="public-session-grid">
         @forelse($playSessions as $playSession)
             <article class="public-session-card">

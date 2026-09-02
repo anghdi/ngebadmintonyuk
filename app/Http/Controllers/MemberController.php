@@ -25,7 +25,11 @@ class MemberController extends Controller
     {
         abort_if($member->isAdmin(), 404);
         $member->load([
-            'memberships' => fn ($query) => $query->withCount(['attendances', 'topUpRequests'])->withSum('transactions as balance', 'quantity')->latest(),
+            'memberships' => fn ($query) => $query
+                ->withCount(['attendances', 'topUpRequests'])
+                ->withSum('transactions as balance', 'quantity')
+                ->with(['transactions' => fn ($query) => $query->with('creator')->latest()->limit(5)])
+                ->latest(),
             'attendances' => fn ($query) => $query->with('playSession')->latest()->limit(12),
         ]);
 
