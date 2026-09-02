@@ -20,10 +20,23 @@
 
     <section class="card session-list-card">
         <div class="card-head"><div><span class="eyebrow">AGENDA</span><h2>Daftar sesi</h2></div></div>
+        <form method="get" action="{{ route('play-sessions.index') }}" class="schedule-month-form admin-month-form">
+            <label for="admin-month">Pilih bulan</label>
+            <select id="admin-month" name="month" required>
+                <option value="">Pilih bulan</option>
+                @foreach($availableMonths as $month)
+                    <option value="{{ $month['value'] }}" @selected($selectedMonth === $month['value'])>{{ $month['label'] }}</option>
+                @endforeach
+            </select>
+            <button class="btn primary">Tampilkan</button>
+        </form>
+        @if($selectedMonth)
+            <p class="selected-month-label">Menampilkan {{ $selectedMonthLabel }}</p>
+        @endif
         @forelse($playSessions as $session)
             <article class="session-row"><time><b>{{ $session->scheduled_at->format('d') }}</b>{{ $session->scheduled_at->translatedFormat('M') }}</time><span><a href="{{ route('play-sessions.show', $session) }}"><strong>{{ $session->venue_name }}</strong></a><small>{{ $session->court_name }} · {{ $session->scheduled_at->format('H:i') }} WITA</small></span><span><b>{{ $session->registrations_count }}/{{ $session->max_players }}</b><small>pemain</small></span><div class="row-actions"><a class="link" href="{{ route('play-sessions.edit', $session) }}">Edit</a><form method="post" action="{{ route('play-sessions.destroy', $session) }}" onsubmit="return confirm('Hapus sesi ini?')">@csrf @method('delete')<button class="link danger">Hapus</button></form></div></article>
         @empty
-            <div class="empty-state"><span>◫</span><h2>Belum ada jadwal</h2><p>Sesi baru akan ditampilkan di sini.</p></div>
+            <div class="empty-state"><span>◫</span><h2>{{ $selectedMonth ? 'Belum ada jadwal' : 'Pilih bulan terlebih dahulu' }}</h2><p>{{ $selectedMonth ? 'Tidak ada sesi pada bulan ini.' : 'Pilih bulan untuk melihat dan mengelola sesi.' }}</p></div>
         @endforelse
         {{ $playSessions->links() }}
     </section>

@@ -35,4 +35,18 @@ return [
         ],
     ],
 
+    'firebase' => [
+        'credentials' => env('FIREBASE_CREDENTIALS'),
+        'project_id' => env('FIREBASE_PROJECT_ID', 'ngebadmintonyuk'),
+        'web' => [
+            'apiKey' => env('FIREBASE_WEB_API_KEY', 'AIzaSyChFJ3ChSD6oHqnWmFOh0aUecdM9chqrSs'),
+            'authDomain' => env('FIREBASE_WEB_AUTH_DOMAIN', 'ngebadmintonyuk.firebaseapp.com'),
+            'projectId' => env('FIREBASE_PROJECT_ID', 'ngebadmintonyuk'),
+            'storageBucket' => env('FIREBASE_WEB_STORAGE_BUCKET', 'ngebadmintonyuk.firebasestorage.app'),
+            'messagingSenderId' => env('FIREBASE_MESSAGING_SENDER_ID', '4302480298'),
+            'appId' => env('FIREBASE_WEB_APP_ID', '1:4302480298:web:3d19aac67c701b0f9681d3'),
+        ],
+        'vapid_key' => env('FIREBASE_VAPID_KEY', 'BFIQDfeBTND-UDw-UMurboznvoPzZZ9IFtT5Uq1QQIH5If5uUczJOPLfE8UtTovgGCeEX30ROH0cGWqJM9IcwMQ'),
+    ],
+
 ];

@@ -11,7 +11,31 @@
 
     <x-usage-guide />
 
-    <section class="public-session-grid">
+    <section class="schedule-month-picker" aria-labelledby="public-month-title">
+        <div>
+            <span class="eyebrow">PILIH BULAN</span>
+            <h2 id="public-month-title">Jadwal per bulan</h2>
+            <p>Daftar jadwal baru ditampilkan setelah kamu memilih bulan.</p>
+        </div>
+        <form method="get" action="{{ route('public-sessions.index') }}" class="schedule-month-form">
+            <label for="public-month">Bulan</label>
+            <select id="public-month" name="month" required>
+                <option value="">Pilih bulan</option>
+                @foreach($availableMonths as $month)
+                    <option value="{{ $month['value'] }}" @selected($selectedMonth === $month['value'])>{{ $month['label'] }}</option>
+                @endforeach
+            </select>
+            <button class="btn primary">Lihat jadwal</button>
+        </form>
+    </section>
+
+    @if($selectedMonth)
+        <div class="section-heading schedule-month-heading">
+            <div><span class="eyebrow">JADWAL TERPILIH</span><h2>{{ $selectedMonthLabel }}</h2></div>
+        </div>
+    @endif
+
+    <section class="public-session-grid" aria-live="polite">
         @forelse($playSessions as $playSession)
             <article class="public-session-card">
                 <div class="public-session-date"><strong>{{ $playSession->scheduled_at->format('d') }}</strong><span>{{ $playSession->scheduled_at->translatedFormat('M') }}</span></div>
@@ -24,7 +48,7 @@
                 </div>
             </article>
         @empty
-            <div class="empty-state"><span>🏸</span><h2>Belum ada jadwal</h2><p>Jadwal baru akan ditampilkan di sini.</p></div>
+            <div class="empty-state"><span>🏸</span><h2>{{ $selectedMonth ? 'Belum ada jadwal' : 'Pilih bulan terlebih dahulu' }}</h2><p>{{ $selectedMonth ? 'Tidak ada jadwal tersedia pada bulan ini.' : 'Pilih salah satu bulan di atas untuk melihat jadwal main.' }}</p></div>
         @endforelse
     </section>
 

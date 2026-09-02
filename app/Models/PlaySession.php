@@ -57,4 +57,10 @@ class PlaySession extends Model
     {
         return $this->hasMany(SessionRegistration::class);
     }
+
+    /** @return HasMany<PushNotification, $this> */
+    public function pushNotifications(): HasMany
+    {
+        return $this->hasMany(PushNotification::class);
+    }
 }

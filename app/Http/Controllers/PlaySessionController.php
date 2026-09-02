@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\DeletePlaySessionAction;
+use App\Http\Requests\FilterPlaySessionsRequest;
 use App\Http\Requests\StorePlaySessionRequest;
 use App\Http\Requests\UpdatePlaySessionRequest;
 use App\Models\Membership;
@@ -10,15 +11,43 @@ use App\Models\PlaySession;
 use App\Models\SessionRegistration;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Date;
 use Illuminate\View\View;
 
 class PlaySessionController extends Controller
 {
-    public function index(): View
+    public function index(FilterPlaySessionsRequest $request): View
     {
-        $playSessions = PlaySession::query()->withCount(['attendances', 'registrations'])->latest('scheduled_at')->paginate(15);
+        $selectedMonth = $request->validated('month');
+        $query = PlaySession::query();
+        $availableMonths = (clone $query)
+            ->latest('scheduled_at')
+            ->get(['scheduled_at'])
+            ->map(fn (PlaySession $playSession): array => [
+                'value' => $playSession->scheduled_at->format('Y-m'),
+                'label' => $playSession->scheduled_at->translatedFormat('F Y'),
+            ])
+            ->unique('value')
+            ->values();
+        $playSessions = $query
+            ->when(
+                $selectedMonth,
+                function ($query, string $month): void {
+                    $start = Date::parse($month.'-01')->startOfMonth();
 
-        return view('play-sessions.index', compact('playSessions'));
+                    $query->whereBetween('scheduled_at', [$start, $start->copy()->endOfMonth()]);
+                },
+                fn ($query) => $query->whereIn('id', []),
+            )
+            ->withCount(['attendances', 'registrations'])
+            ->latest('scheduled_at')
+            ->paginate(15)
+            ->withQueryString();
+        $selectedMonthLabel = $selectedMonth
+            ? Date::parse($selectedMonth.'-01')->translatedFormat('F Y')
+            : null;
+
+        return view('play-sessions.index', compact('playSessions', 'availableMonths', 'selectedMonth', 'selectedMonthLabel'));
     }
 
     public function store(StorePlaySessionRequest $request): RedirectResponse

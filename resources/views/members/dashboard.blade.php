@@ -15,6 +15,8 @@
 
 <x-usage-guide />
 
+<x-push-notification-opt-in />
+
 <section class="quota-hero">
     <div>
         <small>KUOTA SIAP PAKAI</small>

@@ -1,3 +1,14 @@
+import { initializeApp } from 'firebase/app';
+import {
+    getMessaging,
+    isSupported,
+    onMessage,
+    onRegistered,
+    onUnregistered,
+    register as registerForPush,
+    unregister as unregisterFromPush,
+} from 'firebase/messaging';
+
 const sidebar = document.querySelector('#sidebar');
 const menu = document.querySelector('[data-sidebar-open]');
 
@@ -79,3 +90,173 @@ document.querySelectorAll('[data-copy-text]').forEach((button) => {
         }, 1800);
     });
 });
+
+const pushClient = document.querySelector('[data-push-client]');
+
+if (pushClient) {
+    const pushCard = document.querySelector('[data-push-opt-in]');
+    const pushButton = pushCard?.querySelector('[data-push-toggle]');
+    const pushStatus = pushCard?.querySelector('[data-push-status]');
+    const installationStorageKey = 'ngebadmintonyuk-firebase-installation-id';
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    let messaging;
+
+    const setPushState = (state, message) => {
+        if (pushStatus) {
+            pushStatus.textContent = message;
+        }
+
+        if (!pushButton) {
+            return;
+        }
+
+        pushButton.disabled = state === 'loading' || state === 'unsupported' || state === 'denied';
+        pushButton.dataset.pushState = state;
+        pushButton.textContent = {
+            active: 'Nonaktifkan',
+            denied: 'Izin diblokir',
+            inactive: 'Aktifkan notifikasi',
+            loading: 'Memproses...',
+            unsupported: 'Tidak didukung',
+        }[state];
+    };
+
+    const syncInstallation = async (installationId) => {
+        const response = await fetch(pushClient.dataset.pushStoreUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({
+                installation_id: installationId,
+                user_agent: navigator.userAgent,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Perangkat gagal disimpan.');
+        }
+
+        localStorage.setItem(installationStorageKey, installationId);
+        setPushState('active', 'Notifikasi aktif di perangkat ini. Tekan tombol jika ingin menonaktifkannya.');
+    };
+
+    const removeInstallation = async (installationId) => {
+        if (!installationId) {
+            return;
+        }
+
+        await fetch(pushClient.dataset.pushDeleteUrl, {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({ installation_id: installationId }),
+        });
+        localStorage.removeItem(installationStorageKey);
+    };
+
+    const showForegroundNotification = (payload) => {
+        const title = payload.notification?.title;
+
+        if (!title) {
+            return;
+        }
+
+        const toast = document.createElement(payload.data?.url ? 'a' : 'div');
+        toast.className = 'push-toast';
+        toast.textContent = title;
+
+        if (payload.data?.url) {
+            toast.href = payload.data.url;
+        }
+
+        const body = document.createElement('small');
+        body.textContent = payload.notification?.body ?? '';
+        toast.append(body);
+        document.body.append(toast);
+        window.setTimeout(() => toast.remove(), 7000);
+    };
+
+    const enablePush = async () => {
+        setPushState('loading', 'Meminta izin notifikasi...');
+
+        const permission = await Notification.requestPermission();
+
+        if (permission !== 'granted') {
+            setPushState('denied', 'Izin notifikasi diblokir. Aktifkan kembali melalui pengaturan browser.');
+
+            return;
+        }
+
+        const serviceWorkerRegistration = await navigator.serviceWorker.register(
+            pushClient.dataset.firebaseServiceWorkerUrl,
+        );
+        await registerForPush(messaging, {
+            vapidKey: pushClient.dataset.firebaseVapidKey,
+            serviceWorkerRegistration,
+        });
+    };
+
+    const disablePush = async () => {
+        setPushState('loading', 'Menonaktifkan notifikasi...');
+        const installationId = localStorage.getItem(installationStorageKey);
+
+        await unregisterFromPush(messaging);
+        await removeInstallation(installationId);
+        setPushState('inactive', 'Notifikasi dinonaktifkan di perangkat ini.');
+    };
+
+    const initializePush = async () => {
+        if (!('Notification' in window) || !('serviceWorker' in navigator) || !(await isSupported())) {
+            setPushState('unsupported', 'Browser ini belum mendukung push notification.');
+
+            return;
+        }
+
+        const firebaseConfig = JSON.parse(pushClient.dataset.firebaseConfig);
+        messaging = getMessaging(initializeApp(firebaseConfig));
+
+        onRegistered(messaging, (installationId) => {
+            syncInstallation(installationId).catch(() => {
+                setPushState('inactive', 'Perangkat belum berhasil disimpan. Silakan coba lagi.');
+            });
+        });
+        onUnregistered(messaging, (installationId) => {
+            removeInstallation(installationId).catch(() => {});
+        });
+        onMessage(messaging, showForegroundNotification);
+
+        pushButton?.addEventListener('click', () => {
+            const operation = pushButton.dataset.pushState === 'active' ? disablePush() : enablePush();
+
+            operation.catch(() => {
+                setPushState('inactive', 'Notifikasi gagal diproses. Muat ulang halaman lalu coba lagi.');
+            });
+        });
+
+        const installationId = localStorage.getItem(installationStorageKey);
+
+        if (Notification.permission === 'denied') {
+            setPushState('denied', 'Izin notifikasi diblokir. Aktifkan kembali melalui pengaturan browser.');
+        } else if (Notification.permission === 'granted') {
+            if (installationId) {
+                setPushState('active', 'Notifikasi aktif di perangkat ini. Tekan tombol jika ingin menonaktifkannya.');
+            }
+
+            await enablePush();
+        } else {
+            setPushState('inactive', 'Aktifkan agar jadwal baru, sisa slot, dan informasi penting masuk ke perangkat ini.');
+        }
+    };
+
+    initializePush().catch(() => {
+        setPushState('inactive', 'Notifikasi belum siap. Muat ulang halaman lalu coba lagi.');
+    });
+}

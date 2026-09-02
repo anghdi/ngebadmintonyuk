@@ -66,6 +66,76 @@ test('administrator must select a player account when adding a registration', fu
         ->and($registration->phone)->toBeNull();
 });
 
+test('player can cancel their own unpaid listed registration before the session', function () {
+    $account = User::factory()->member()->create();
+    $playSession = PlaySession::factory()->create();
+    $registration = SessionRegistration::factory()->create([
+        'play_session_id' => $playSession->id,
+        'user_id' => $account->id,
+        'payment_status' => 'unpaid',
+        'attendance_status' => 'listed',
+    ]);
+
+    $this->actingAs($account)
+        ->get(route('public-sessions.show', $playSession))
+        ->assertSuccessful()
+        ->assertSee('Batalkan keikutsertaan');
+
+    $this->actingAs($account)
+        ->delete(route('public-sessions.cancel', [$playSession, $registration]))
+        ->assertRedirect(route('public-sessions.show', $playSession));
+
+    $this->assertModelMissing($registration);
+});
+
+test('player cannot cancel another accounts registration', function () {
+    $account = User::factory()->member()->create();
+    $otherAccount = User::factory()->member()->create();
+    $playSession = PlaySession::factory()->create();
+    $registration = SessionRegistration::factory()->create([
+        'play_session_id' => $playSession->id,
+        'user_id' => $otherAccount->id,
+    ]);
+
+    $this->actingAs($account)
+        ->delete(route('public-sessions.cancel', [$playSession, $registration]))
+        ->assertForbidden();
+
+    $this->assertModelExists($registration);
+});
+
+test('player cannot cancel a paid registration', function () {
+    $account = User::factory()->member()->create();
+    $playSession = PlaySession::factory()->create();
+    $registration = SessionRegistration::factory()->create([
+        'play_session_id' => $playSession->id,
+        'user_id' => $account->id,
+        'payment_status' => 'paid',
+        'attendance_status' => 'listed',
+    ]);
+
+    $this->actingAs($account)
+        ->delete(route('public-sessions.cancel', [$playSession, $registration]))
+        ->assertSessionHasErrors('registration');
+
+    $this->assertModelExists($registration);
+});
+
+test('player cannot cancel a registration after the session time', function () {
+    $account = User::factory()->member()->create();
+    $playSession = PlaySession::factory()->create(['scheduled_at' => now()->subMinute()]);
+    $registration = SessionRegistration::factory()->create([
+        'play_session_id' => $playSession->id,
+        'user_id' => $account->id,
+    ]);
+
+    $this->actingAs($account)
+        ->delete(route('public-sessions.cancel', [$playSession, $registration]))
+        ->assertForbidden();
+
+    $this->assertModelExists($registration);
+});
+
 test('no show blocking follows the account when whatsapp is empty', function () {
     $account = User::factory()->member()->create(['phone' => null]);
 

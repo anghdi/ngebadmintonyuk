@@ -6,6 +6,7 @@ use App\Actions\CreateSessionRegistrationByAdminAction;
 use App\Actions\DeleteSessionRegistrationAction;
 use App\Actions\RegisterForPlaySessionAction;
 use App\Actions\UpdateSessionRegistrationAction;
+use App\Http\Requests\CancelSessionRegistrationRequest;
 use App\Http\Requests\StoreSessionRegistrationByAdminRequest;
 use App\Http\Requests\StoreSessionRegistrationRequest;
 use App\Http\Requests\UpdateSessionRegistrationRequest;
@@ -27,6 +28,13 @@ class SessionRegistrationController extends Controller
         $registration = $create->handle($playSession, $request->validated());
 
         return back()->with('success', "{$registration->name} berhasil ditambahkan ke daftar.");
+    }
+
+    public function cancel(CancelSessionRegistrationRequest $request, PlaySession $playSession, SessionRegistration $registration, DeleteSessionRegistrationAction $delete): RedirectResponse
+    {
+        $delete->handle($registration);
+
+        return redirect()->route('public-sessions.show', $playSession)->with('success', 'Keikutsertaan berhasil dibatalkan.');
     }
 
     public function update(UpdateSessionRegistrationRequest $request, PlaySession $playSession, SessionRegistration $registration, UpdateSessionRegistrationAction $update): RedirectResponse

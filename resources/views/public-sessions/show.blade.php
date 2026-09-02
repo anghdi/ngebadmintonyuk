@@ -32,6 +32,15 @@
                 <h2>Nama Anda sudah masuk</h2>
                 <p>Silakan hadir sesuai jadwal.</p>
                 <div class="registration-confirmation"><strong>{{ $registration->name }}</strong><span>{{ $registration->payment_method === 'transfer' ? 'Transfer bank' : 'Bayar tunai' }}</span></div>
+                @if($registration->attendance_status === 'listed' && $registration->payment_status === 'unpaid')
+                    <form method="post" action="{{ route('public-sessions.cancel', [$playSession, $registration]) }}" class="registration-cancel" onsubmit="return confirm('Batalkan keikutsertaan dari sesi ini?')">
+                        @csrf
+                        @method('delete')
+                        <button class="btn danger-bg full">Batalkan keikutsertaan</button>
+                    </form>
+                @else
+                    <p class="registration-cancel-note">Pendaftaran yang sudah dibayar atau diproses admin tidak dapat dibatalkan sendiri.</p>
+                @endif
             @elseif($isFull)
                 <span class="eyebrow">DAFTAR PENUH</span>
                 <h2>Kapasitas terpenuhi</h2>

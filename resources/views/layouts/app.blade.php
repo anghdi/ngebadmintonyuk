@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#171717">
     <title>@yield('title', 'NgeKas') — NgeBadmintonYuk</title>
     <link rel="icon" href="{{ asset('icon.png') }}" type="image/png">
@@ -13,7 +14,16 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ route('app.css') }}">
 </head>
-<body>
+<body
+    @if(! auth()->user()->isAdmin())
+        data-push-client
+        data-firebase-config='@json(config('services.firebase.web'))'
+        data-firebase-vapid-key="{{ config('services.firebase.vapid_key') }}"
+        data-firebase-service-worker-url="{{ route('firebase.service-worker') }}"
+        data-push-store-url="{{ route('push-subscriptions.store') }}"
+        data-push-delete-url="{{ route('push-subscriptions.destroy') }}"
+    @endif
+>
 <div class="shell">
     <aside id="sidebar" aria-label="Navigasi utama">
         <div class="sidebar-head">
@@ -40,6 +50,7 @@
                 <a @class(['active' => request()->routeIs('expenses.*')]) href="{{ route('expenses.index') }}"><span aria-hidden="true">↘</span> Pengeluaran</a>
                 <a @class(['active' => request()->routeIs('categories.*')]) href="{{ route('categories.index') }}"><span aria-hidden="true">◇</span> Kategori</a>
                 <a @class(['active' => request()->routeIs('reports.*')]) href="{{ route('reports.index') }}"><span aria-hidden="true">▤</span> Laporan</a>
+                <a @class(['active' => request()->routeIs('push-notifications.*')]) href="{{ route('push-notifications.index') }}"><span aria-hidden="true">◉</span> Notifikasi</a>
             @endif
         </nav>
         <form method="post" action="{{ route('logout') }}">

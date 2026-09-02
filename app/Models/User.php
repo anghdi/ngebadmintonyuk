@@ -93,6 +93,12 @@ class User extends Authenticatable
         return $this->hasMany(SessionRegistration::class);
     }
 
+    /** @return HasMany<PushSubscription, $this> */
+    public function pushSubscriptions(): HasMany
+    {
+        return $this->hasMany(PushSubscription::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
