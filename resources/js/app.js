@@ -97,9 +97,13 @@ if (pushClient) {
     const pushCard = document.querySelector('[data-push-opt-in]');
     const pushButton = pushCard?.querySelector('[data-push-toggle]');
     const pushStatus = pushCard?.querySelector('[data-push-status]');
-    const installationStorageKey = 'ngebadmintonyuk-firebase-installation-id';
+    const installationStorageKey = 'ngebadmintonyuk-push-installation-id';
+    const legacyInstallationStorageKey = 'ngebadmintonyuk-firebase-installation-id';
+    const driverStorageKey = 'ngebadmintonyuk-push-driver';
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
     let messaging;
+    let pushDriver;
+    let serviceWorkerRegistration;
 
     const setPushState = (state, message) => {
         if (pushStatus) {
@@ -121,7 +125,7 @@ if (pushClient) {
         }[state];
     };
 
-    const syncInstallation = async (installationId) => {
+    const storeSubscription = async (payload) => {
         const response = await fetch(pushClient.dataset.pushStoreUrl, {
             method: 'POST',
             credentials: 'same-origin',
@@ -131,7 +135,7 @@ if (pushClient) {
                 'X-CSRF-TOKEN': csrfToken,
             },
             body: JSON.stringify({
-                installation_id: installationId,
+                ...payload,
                 user_agent: navigator.userAgent,
             }),
         });
@@ -140,7 +144,11 @@ if (pushClient) {
             throw new Error('Gagal menyimpan perangkat.');
         }
 
-        localStorage.setItem(installationStorageKey, installationId);
+        const responsePayload = await response.json();
+
+        localStorage.setItem(installationStorageKey, responsePayload.installation_id);
+        localStorage.setItem(driverStorageKey, payload.driver);
+        localStorage.removeItem(legacyInstallationStorageKey);
         setPushState('active', 'Notifikasi aktif pada perangkat ini.');
     };
 
@@ -160,6 +168,28 @@ if (pushClient) {
             body: JSON.stringify({ installation_id: installationId }),
         });
         localStorage.removeItem(installationStorageKey);
+        localStorage.removeItem(legacyInstallationStorageKey);
+        localStorage.removeItem(driverStorageKey);
+    };
+
+    const base64UrlToUint8Array = (value) => {
+        const padding = '='.repeat((4 - (value.length % 4)) % 4);
+        const base64 = (value + padding).replaceAll('-', '+').replaceAll('_', '/');
+        const rawData = window.atob(base64);
+
+        return Uint8Array.from([...rawData].map((character) => character.charCodeAt(0)));
+    };
+
+    const serializeWebPushSubscription = (subscription) => {
+        const serialized = subscription.toJSON();
+
+        return {
+            driver: 'webpush',
+            endpoint: serialized.endpoint,
+            public_key: serialized.keys?.p256dh,
+            auth_token: serialized.keys?.auth,
+            content_encoding: 'aes128gcm',
+        };
     };
 
     const showForegroundNotification = (payload) => {
@@ -195,43 +225,80 @@ if (pushClient) {
             return;
         }
 
-        const serviceWorkerRegistration = await navigator.serviceWorker.register(
+        serviceWorkerRegistration ??= await navigator.serviceWorker.register(
             pushClient.dataset.firebaseServiceWorkerUrl,
         );
-        await registerForPush(messaging, {
-            vapidKey: pushClient.dataset.firebaseVapidKey,
-            serviceWorkerRegistration,
-        });
+
+        if (pushDriver === 'fcm') {
+            await registerForPush(messaging, {
+                vapidKey: pushClient.dataset.firebaseVapidKey,
+                serviceWorkerRegistration,
+            });
+
+            return;
+        }
+
+        if (!pushClient.dataset.webpushVapidKey) {
+            throw new Error('Konfigurasi Web Push belum tersedia.');
+        }
+
+        const subscription = await serviceWorkerRegistration.pushManager.getSubscription()
+            ?? await serviceWorkerRegistration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: base64UrlToUint8Array(pushClient.dataset.webpushVapidKey),
+            });
+
+        await storeSubscription(serializeWebPushSubscription(subscription));
     };
 
     const disablePush = async () => {
         setPushState('loading', 'Memproses permintaan...');
         const installationId = localStorage.getItem(installationStorageKey);
 
-        await unregisterFromPush(messaging);
+        if (localStorage.getItem(driverStorageKey) === 'webpush') {
+            serviceWorkerRegistration ??= await navigator.serviceWorker.ready;
+            const subscription = await serviceWorkerRegistration.pushManager.getSubscription();
+            await subscription?.unsubscribe();
+        } else {
+            await unregisterFromPush(messaging);
+        }
+
         await removeInstallation(installationId);
         setPushState('inactive', 'Notifikasi dinonaktifkan pada perangkat ini.');
     };
 
     const initializePush = async () => {
-        if (!('Notification' in window) || !('serviceWorker' in navigator) || !(await isSupported())) {
+        if (!('Notification' in window) || !('serviceWorker' in navigator)) {
             setPushState('unsupported', 'Notifikasi tidak didukung pada browser ini.');
 
             return;
         }
 
-        const firebaseConfig = JSON.parse(pushClient.dataset.firebaseConfig);
-        messaging = getMessaging(initializeApp(firebaseConfig));
+        const supportsFirebase = await isSupported().catch(() => false);
+        const supportsWebPush = 'PushManager' in window && Boolean(pushClient.dataset.webpushVapidKey);
 
-        onRegistered(messaging, (installationId) => {
-            syncInstallation(installationId).catch(() => {
-                setPushState('inactive', 'Aktivasi gagal. Silakan coba kembali.');
+        if (!supportsFirebase && !supportsWebPush) {
+            setPushState('unsupported', 'Notifikasi tidak tersedia pada browser ini.');
+
+            return;
+        }
+
+        pushDriver = supportsFirebase ? 'fcm' : 'webpush';
+
+        if (pushDriver === 'fcm') {
+            const firebaseConfig = JSON.parse(pushClient.dataset.firebaseConfig);
+            messaging = getMessaging(initializeApp(firebaseConfig));
+
+            onRegistered(messaging, (installationId) => {
+                storeSubscription({ driver: 'fcm', installation_id: installationId }).catch(() => {
+                    setPushState('inactive', 'Aktivasi gagal. Silakan coba kembali.');
+                });
             });
-        });
-        onUnregistered(messaging, (installationId) => {
-            removeInstallation(installationId).catch(() => {});
-        });
-        onMessage(messaging, showForegroundNotification);
+            onUnregistered(messaging, (installationId) => {
+                removeInstallation(installationId).catch(() => {});
+            });
+            onMessage(messaging, showForegroundNotification);
+        }
 
         pushButton?.addEventListener('click', () => {
             const operation = pushButton.dataset.pushState === 'active' ? disablePush() : enablePush();
@@ -241,12 +308,13 @@ if (pushClient) {
             });
         });
 
-        const installationId = localStorage.getItem(installationStorageKey);
+        const installationId = localStorage.getItem(installationStorageKey)
+            ?? localStorage.getItem(legacyInstallationStorageKey);
 
         if (Notification.permission === 'denied') {
             setPushState('denied', 'Izin notifikasi dinonaktifkan pada browser.');
         } else if (Notification.permission === 'granted') {
-            if (installationId) {
+            if (installationId && localStorage.getItem(driverStorageKey) === pushDriver) {
                 setPushState('active', 'Notifikasi aktif pada perangkat ini.');
             }
 

@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use App\Contracts\PushNotificationSender;
 use App\Models\User;
-use App\Services\FirebaseCloudMessaging;
+use App\Services\PushNotificationManager;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(PushNotificationSender::class, FirebaseCloudMessaging::class);
+        $this->app->bind(PushNotificationSender::class, PushNotificationManager::class);
     }
 
     /**

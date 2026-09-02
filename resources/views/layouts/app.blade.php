@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#171717">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="NgeBadmintonYuk">
     <title>@yield('title', 'NgeKas') — NgeBadmintonYuk</title>
     <link rel="icon" href="{{ asset('icon.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('icon.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,6 +23,7 @@
         data-push-client
         data-firebase-config='@json(config('services.firebase.web'))'
         data-firebase-vapid-key="{{ config('services.firebase.vapid_key') }}"
+        data-webpush-vapid-key="{{ config('services.webpush.public_key') }}"
         data-firebase-service-worker-url="{{ route('firebase.service-worker') }}"
         data-push-store-url="{{ route('push-subscriptions.store') }}"
         data-push-delete-url="{{ route('push-subscriptions.destroy') }}"

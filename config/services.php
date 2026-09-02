@@ -49,4 +49,10 @@ return [
         'vapid_key' => env('FIREBASE_VAPID_KEY', 'BFIQDfeBTND-UDw-UMurboznvoPzZZ9IFtT5Uq1QQIH5If5uUczJOPLfE8UtTovgGCeEX30ROH0cGWqJM9IcwMQ'),
     ],
 
+    'webpush' => [
+        'subject' => env('WEBPUSH_VAPID_SUBJECT', 'https://ngebadmintonyuk.web.id'),
+        'public_key' => env('WEBPUSH_VAPID_PUBLIC_KEY'),
+        'private_key' => env('WEBPUSH_VAPID_PRIVATE_KEY'),
+    ],
+
 ];

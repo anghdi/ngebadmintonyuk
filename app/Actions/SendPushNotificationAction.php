@@ -48,7 +48,7 @@ class SendPushNotificationAction
         $subscriptions->eachById(function (PushSubscription $subscription) use ($data, $url, &$successCount, &$failureCount): void {
             try {
                 $result = $this->sender->send(
-                    $subscription->installation_id,
+                    $subscription,
                     $data['title'],
                     $data['body'],
                     $url,

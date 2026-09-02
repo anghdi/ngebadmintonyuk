@@ -2,6 +2,8 @@
 
 namespace App\Contracts;
 
+use App\Models\PushSubscription;
+
 interface PushNotificationSender
 {
     public const string Sent = 'sent';
@@ -10,5 +12,5 @@ interface PushNotificationSender
 
     public const string Failed = 'failed';
 
-    public function send(string $installationId, string $title, string $body, string $url): string;
+    public function send(PushSubscription $subscription, string $title, string $body, string $url): string;
 }

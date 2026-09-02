@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Contracts\PushNotificationSender;
+use App\Models\PushSubscription;
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
@@ -15,11 +15,11 @@ use JsonException;
 use RuntimeException;
 use Throwable;
 
-class FirebaseCloudMessaging implements PushNotificationSender
+class FirebaseCloudMessaging
 {
     private ?string $accessToken = null;
 
-    public function send(string $installationId, string $title, string $body, string $url): string
+    public function send(PushSubscription $subscription, string $title, string $body, string $url): string
     {
         $projectId = $this->projectId();
         $response = Http::acceptJson()
@@ -35,7 +35,7 @@ class FirebaseCloudMessaging implements PushNotificationSender
             )
             ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
                 'message' => [
-                    'token' => $installationId,
+                    'token' => $subscription->installation_id,
                     'notification' => [
                         'title' => $title,
                         'body' => $body,

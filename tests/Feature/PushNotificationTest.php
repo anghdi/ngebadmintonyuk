@@ -11,6 +11,7 @@ test('player can activate and deactivate notifications for a browser', function 
     $player = User::factory()->member()->create();
 
     $this->actingAs($player)->postJson(route('push-subscriptions.store'), [
+        'driver' => 'fcm',
         'installation_id' => 'firebase-installation-one',
         'user_agent' => 'Mobile browser',
     ])->assertSuccessful()->assertJson(['active' => true]);
@@ -27,8 +28,32 @@ test('player can activate and deactivate notifications for a browser', function 
     $this->assertModelMissing($subscription);
 });
 
+test('player can activate standard web push for Safari', function () {
+    $player = User::factory()->member()->create();
+    $endpoint = 'https://web.push.apple.com/QHk-example-endpoint';
+
+    $this->actingAs($player)->postJson(route('push-subscriptions.store'), [
+        'driver' => 'webpush',
+        'endpoint' => $endpoint,
+        'public_key' => 'browser-public-key',
+        'auth_token' => 'browser-auth-token',
+        'content_encoding' => 'aes128gcm',
+        'user_agent' => 'Safari',
+    ])->assertSuccessful()->assertJson([
+        'active' => true,
+        'installation_id' => hash('sha256', $endpoint),
+    ]);
+
+    $subscription = PushSubscription::firstOrFail();
+
+    expect($subscription->driver)->toBe('webpush')
+        ->and($subscription->endpoint)->toBe($endpoint)
+        ->and($subscription->auth_token)->toBe('browser-auth-token')
+        ->and($subscription->getRawOriginal('auth_token'))->not->toBe('browser-auth-token');
+});
+
 test('guest and administrator cannot register a player push subscription', function () {
-    $payload = ['installation_id' => 'firebase-installation-one'];
+    $payload = ['driver' => 'fcm', 'installation_id' => 'firebase-installation-one'];
 
     $this->postJson(route('push-subscriptions.store'), $payload)->assertUnauthorized();
 
@@ -63,9 +88,9 @@ test('administrator can send an important notification directly to all player de
         /** @var list<string> */
         public array $installationIds = [];
 
-        public function send(string $installationId, string $title, string $body, string $url): string
+        public function send(PushSubscription $subscription, string $title, string $body, string $url): string
         {
-            $this->installationIds[] = $installationId;
+            $this->installationIds[] = $subscription->installation_id;
 
             return self::Sent;
         }
@@ -103,9 +128,9 @@ test('session audience only receives devices belonging to listed players', funct
         /** @var list<string> */
         public array $installationIds = [];
 
-        public function send(string $installationId, string $title, string $body, string $url): string
+        public function send(PushSubscription $subscription, string $title, string $body, string $url): string
         {
-            $this->installationIds[] = $installationId;
+            $this->installationIds[] = $subscription->installation_id;
 
             return self::Sent;
         }
@@ -128,7 +153,7 @@ test('invalid Firebase installation is removed after a failed delivery', functio
     $subscription = PushSubscription::factory()->create();
     $this->app->instance(PushNotificationSender::class, new class implements PushNotificationSender
     {
-        public function send(string $installationId, string $title, string $body, string $url): string
+        public function send(PushSubscription $subscription, string $title, string $body, string $url): string
         {
             return self::Invalid;
         }

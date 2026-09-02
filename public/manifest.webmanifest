@@ -1,0 +1,17 @@
+{
+    "name": "NgeBadmintonYuk",
+    "short_name": "NgeBadmintonYuk",
+    "start_url": "/dashboard",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#171717",
+    "icons": [
+        {
+            "src": "/icon.png",
+            "sizes": "any",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
