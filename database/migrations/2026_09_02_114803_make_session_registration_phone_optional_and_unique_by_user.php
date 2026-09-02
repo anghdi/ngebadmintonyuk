@@ -12,6 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('session_registrations', function (Blueprint $table) {
+            $table->index('play_session_id');
+        });
+
+        Schema::table('session_registrations', function (Blueprint $table) {
             $table->dropUnique(['play_session_id', 'phone']);
             $table->string('phone', 20)->nullable()->change();
             $table->unique(['play_session_id', 'user_id']);
@@ -26,6 +30,10 @@ return new class extends Migration
         Schema::table('session_registrations', function (Blueprint $table) {
             $table->dropUnique(['play_session_id', 'user_id']);
             $table->unique(['play_session_id', 'phone']);
+        });
+
+        Schema::table('session_registrations', function (Blueprint $table) {
+            $table->dropIndex(['play_session_id']);
         });
     }
 };
