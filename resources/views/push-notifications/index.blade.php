@@ -5,9 +5,9 @@
 @section('content')
     <div class="page-head">
         <div>
-            <span class="eyebrow">PUSH NOTIFICATION</span>
-            <h1>Kirim pemberitahuan</h1>
-            <p>Kirim langsung ke perangkat pemain tanpa menunggu queue.</p>
+            <span class="eyebrow">NOTIFIKASI</span>
+            <h1>Kirim notifikasi</h1>
+            <p>Kirim informasi langsung ke perangkat pemain.</p>
         </div>
         <span class="notification-device-count"><b>{{ $subscriptionCount }}</b> perangkat aktif</span>
     </div>
@@ -15,7 +15,7 @@
     <div class="admin-split notification-layout">
         <section class="card notification-form-card">
             <span class="eyebrow">PESAN BARU</span>
-            <h2>Buat notifikasi</h2>
+            <h2>Detail notifikasi</h2>
             <form method="post" action="{{ route('push-notifications.store') }}" class="compact-form">
                 @csrf
                 <label>Jenis
@@ -49,7 +49,7 @@
                 </label>
                 <button class="btn primary full">Kirim sekarang</button>
             </form>
-            <p class="notification-hint">Pemain perlu menekan “Aktifkan notifikasi” di dashboard pada setiap HP atau browser yang ingin dipakai.</p>
+            <p class="notification-hint">Notifikasi hanya dikirim ke perangkat yang telah diaktifkan oleh pemain melalui dashboard.</p>
         </section>
 
         <section class="card notification-history-card">

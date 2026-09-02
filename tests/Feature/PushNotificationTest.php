@@ -118,7 +118,7 @@ test('session audience only receives devices belonging to listed players', funct
         'play_session_id' => $playSession->id,
         'title' => 'Sisa slot',
         'body' => 'Masih tersedia dua tempat.',
-    ])->assertRedirect();
+    ])->assertRedirect()->assertSessionHas('success');
 
     expect($sender->installationIds)->toBe([$listedSubscription->installation_id]);
 });
@@ -139,7 +139,7 @@ test('invalid Firebase installation is removed after a failed delivery', functio
         'audience' => 'all',
         'title' => 'Informasi penting',
         'body' => 'Jadwal diperbarui.',
-    ])->assertRedirect();
+    ])->assertRedirect()->assertSessionHasErrors('notification');
 
     $this->assertModelMissing($subscription);
     expect(PushNotification::firstOrFail()->failure_count)->toBe(1);

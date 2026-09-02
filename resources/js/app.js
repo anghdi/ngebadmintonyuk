@@ -114,10 +114,10 @@ if (pushClient) {
         pushButton.dataset.pushState = state;
         pushButton.textContent = {
             active: 'Nonaktifkan',
-            denied: 'Izin diblokir',
-            inactive: 'Aktifkan notifikasi',
-            loading: 'Memproses...',
-            unsupported: 'Tidak didukung',
+            denied: 'Izin dinonaktifkan',
+            inactive: 'Aktifkan',
+            loading: 'Memproses',
+            unsupported: 'Tidak tersedia',
         }[state];
     };
 
@@ -137,11 +137,11 @@ if (pushClient) {
         });
 
         if (!response.ok) {
-            throw new Error('Perangkat gagal disimpan.');
+            throw new Error('Gagal menyimpan perangkat.');
         }
 
         localStorage.setItem(installationStorageKey, installationId);
-        setPushState('active', 'Notifikasi aktif di perangkat ini. Tekan tombol jika ingin menonaktifkannya.');
+        setPushState('active', 'Notifikasi aktif pada perangkat ini.');
     };
 
     const removeInstallation = async (installationId) => {
@@ -185,12 +185,12 @@ if (pushClient) {
     };
 
     const enablePush = async () => {
-        setPushState('loading', 'Meminta izin notifikasi...');
+        setPushState('loading', 'Memproses permintaan...');
 
         const permission = await Notification.requestPermission();
 
         if (permission !== 'granted') {
-            setPushState('denied', 'Izin notifikasi diblokir. Aktifkan kembali melalui pengaturan browser.');
+            setPushState('denied', 'Izin notifikasi dinonaktifkan pada browser.');
 
             return;
         }
@@ -205,17 +205,17 @@ if (pushClient) {
     };
 
     const disablePush = async () => {
-        setPushState('loading', 'Menonaktifkan notifikasi...');
+        setPushState('loading', 'Memproses permintaan...');
         const installationId = localStorage.getItem(installationStorageKey);
 
         await unregisterFromPush(messaging);
         await removeInstallation(installationId);
-        setPushState('inactive', 'Notifikasi dinonaktifkan di perangkat ini.');
+        setPushState('inactive', 'Notifikasi dinonaktifkan pada perangkat ini.');
     };
 
     const initializePush = async () => {
         if (!('Notification' in window) || !('serviceWorker' in navigator) || !(await isSupported())) {
-            setPushState('unsupported', 'Browser ini belum mendukung push notification.');
+            setPushState('unsupported', 'Notifikasi tidak didukung pada browser ini.');
 
             return;
         }
@@ -225,7 +225,7 @@ if (pushClient) {
 
         onRegistered(messaging, (installationId) => {
             syncInstallation(installationId).catch(() => {
-                setPushState('inactive', 'Perangkat belum berhasil disimpan. Silakan coba lagi.');
+                setPushState('inactive', 'Aktivasi gagal. Silakan coba kembali.');
             });
         });
         onUnregistered(messaging, (installationId) => {
@@ -237,26 +237,26 @@ if (pushClient) {
             const operation = pushButton.dataset.pushState === 'active' ? disablePush() : enablePush();
 
             operation.catch(() => {
-                setPushState('inactive', 'Notifikasi gagal diproses. Muat ulang halaman lalu coba lagi.');
+                setPushState('inactive', 'Permintaan gagal diproses. Silakan coba kembali.');
             });
         });
 
         const installationId = localStorage.getItem(installationStorageKey);
 
         if (Notification.permission === 'denied') {
-            setPushState('denied', 'Izin notifikasi diblokir. Aktifkan kembali melalui pengaturan browser.');
+            setPushState('denied', 'Izin notifikasi dinonaktifkan pada browser.');
         } else if (Notification.permission === 'granted') {
             if (installationId) {
-                setPushState('active', 'Notifikasi aktif di perangkat ini. Tekan tombol jika ingin menonaktifkannya.');
+                setPushState('active', 'Notifikasi aktif pada perangkat ini.');
             }
 
             await enablePush();
         } else {
-            setPushState('inactive', 'Aktifkan agar jadwal baru, sisa slot, dan informasi penting masuk ke perangkat ini.');
+            setPushState('inactive', 'Terima pembaruan jadwal, ketersediaan slot, dan informasi penting.');
         }
     };
 
     initializePush().catch(() => {
-        setPushState('inactive', 'Notifikasi belum siap. Muat ulang halaman lalu coba lagi.');
+        setPushState('inactive', 'Layanan notifikasi belum tersedia. Silakan coba kembali.');
     });
 }

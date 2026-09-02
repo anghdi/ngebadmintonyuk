@@ -34,12 +34,21 @@ class PushNotificationController extends Controller
     public function store(SendPushNotificationRequest $request, SendPushNotificationAction $sendPushNotification): RedirectResponse
     {
         $notification = $sendPushNotification->handle($request->validated(), $request->user());
-        $message = "Notifikasi selesai dikirim: {$notification->success_count} berhasil";
 
-        if ($notification->failure_count > 0) {
-            $message .= ", {$notification->failure_count} gagal";
+        if ($notification->device_count === 0) {
+            return back()->withErrors(['notification' => 'Tidak ada perangkat aktif yang dapat menerima notifikasi.']);
         }
 
-        return back()->with('success', $message.'.');
+        if ($notification->success_count === 0) {
+            return back()->withErrors(['notification' => "Notifikasi gagal dikirim ke {$notification->failure_count} perangkat."]);
+        }
+
+        $message = "Notifikasi berhasil dikirim ke {$notification->success_count} perangkat.";
+
+        if ($notification->failure_count > 0) {
+            $message .= " Gagal dikirim ke {$notification->failure_count} perangkat.";
+        }
+
+        return back()->with('success', $message);
     }
 }
