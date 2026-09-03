@@ -46,8 +46,8 @@ class FirebaseCloudMessaging
                     ],
                     'webpush' => [
                         'notification' => [
-                            'icon' => url('/icon.png'),
-                            'badge' => url('/icon.png'),
+                            'icon' => url('/notification-icon.png'),
+                            'badge' => url('/notification-badge-96.png'),
                         ],
                         'fcm_options' => [
                             'link' => $url,

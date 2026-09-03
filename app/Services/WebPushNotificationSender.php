@@ -43,7 +43,8 @@ class WebPushNotificationSender
                 'title' => $title,
                 'body' => $body,
                 'url' => $url,
-                'icon' => url('/icon.png'),
+                'icon' => url('/notification-icon.png'),
+                'badge' => url('/notification-badge-96.png'),
             ], JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
             throw new RuntimeException('Isi notifikasi tidak dapat diproses.', previous: $exception);

@@ -7,7 +7,24 @@ use App\Models\PushSubscription;
 use App\Models\SessionRegistration;
 use App\Models\User;
 use App\Services\FirebaseCloudMessaging;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+
+test('PWA manifest uses resized variants of the community logo', function () {
+    $manifest = json_decode(file_get_contents(public_path('manifest.webmanifest')), true, flags: JSON_THROW_ON_ERROR);
+    $icons = collect($manifest['icons'])->keyBy('src');
+
+    expect($icons->keys()->all())->toBe([
+        '/pwa-icon-192.png',
+        '/pwa-icon-512.png',
+        '/pwa-maskable-512.png',
+    ])->and(array_slice(getimagesize(public_path('pwa-icon-192.png')), 0, 2))->toBe([192, 192])
+        ->and(array_slice(getimagesize(public_path('pwa-icon-512.png')), 0, 2))->toBe([512, 512])
+        ->and(array_slice(getimagesize(public_path('pwa-maskable-512.png')), 0, 2))->toBe([512, 512])
+        ->and(array_slice(getimagesize(public_path('apple-touch-icon.png')), 0, 2))->toBe([180, 180])
+        ->and(array_slice(getimagesize(public_path('notification-icon.png')), 0, 2))->toBe([192, 192])
+        ->and(array_slice(getimagesize(public_path('notification-badge-96.png')), 0, 2))->toBe([96, 96]);
+});
 
 test('player can activate and deactivate notifications for a browser', function () {
     $player = User::factory()->member()->create();
@@ -127,6 +144,11 @@ test('firebase sender returns the shared delivery result constants', function (i
     $subscription = new PushSubscription(['installation_id' => 'test-fcm-token']);
 
     expect($sender->send($subscription, 'Judul', 'Isi', route('dashboard')))->toBe($expectedResult);
+
+    Http::assertSent(fn (Request $request): bool => $request['message']['webpush']['notification'] === [
+        'icon' => url('/notification-icon.png'),
+        'badge' => url('/notification-badge-96.png'),
+    ]);
 })->with([
     'successful response' => [200, PushNotificationSender::Sent],
     'expired token' => [404, PushNotificationSender::Invalid],
@@ -194,5 +216,6 @@ test('service worker exposes the configured Firebase web application', function 
     $this->get(route('firebase.service-worker'))
         ->assertSuccessful()
         ->assertHeader('Content-Type', 'application/javascript')
-        ->assertSee('ngebadmintonyuk', escape: false);
+        ->assertSee('ngebadmintonyuk', escape: false)
+        ->assertSee('/notification-icon.png', escape: false);
 });

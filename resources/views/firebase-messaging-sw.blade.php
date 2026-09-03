@@ -13,8 +13,8 @@ const showWebPushNotification = (event) => {
 
     event.waitUntil(self.registration.showNotification(payload.title, {
         body: payload.body ?? '',
-        icon: payload.icon ?? '/icon.png',
-        badge: '/icon.png',
+        icon: payload.icon ?? '/notification-icon.png',
+        badge: payload.badge ?? '/notification-badge-96.png',
         data: { source: 'webpush', url: payload.url ?? '/dashboard' },
     }));
 };

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#2455f5">
     <title>Masuk — NgeKas</title>
-    <link rel="icon" href="{{ asset('icon.png') }}" type="image/png">
-    <link rel="apple-touch-icon" href="{{ asset('icon.png') }}">
+    <link rel="icon" href="{{ asset('pwa-icon-192.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" sizes="180x180">
     @vite(['resources/css/app.css'])
     <link rel="stylesheet" href="{{ route('app.css') }}">
 </head>

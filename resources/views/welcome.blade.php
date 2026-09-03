@@ -6,8 +6,8 @@
 
         <title>{{ __('Welcome') }} - {{ config('app.name', 'Laravel') }}</title>
 
-        <link rel="icon" href="{{ asset('icon.png') }}" type="image/png">
-        <link rel="apple-touch-icon" href="{{ asset('icon.png') }}">
+        <link rel="icon" href="{{ asset('pwa-icon-192.png') }}" type="image/png">
+        <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" sizes="180x180">
 
         @fonts
 

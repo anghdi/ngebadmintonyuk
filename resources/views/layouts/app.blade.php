@@ -9,8 +9,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="NgeBadmintonYuk">
     <title>@yield('title', 'NgeKas') — NgeBadmintonYuk</title>
-    <link rel="icon" href="{{ asset('icon.png') }}" type="image/png">
-    <link rel="apple-touch-icon" href="{{ asset('icon.png') }}">
+    <link rel="icon" href="{{ asset('pwa-icon-192.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" sizes="180x180">
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -74,11 +74,11 @@
         <header>
             <button type="button" class="menu" aria-label="Buka navigasi" aria-controls="sidebar" aria-expanded="false" data-sidebar-open><x-nav-icon name="menu" /></button>
             <a href="{{ route('dashboard') }}" class="mobile-brand" aria-label="NgeKas">
-                <img src="{{ asset('icon.png') }}" alt="">
+                <img src="{{ asset('pwa-icon-192.png') }}" alt="">
                 <strong>NgeBadmintonYuk</strong>
             </a>
             <div class="user-summary">
-                <span class="user-avatar"><img src="{{ asset('icon.png') }}" alt=""></span>
+                <span class="user-avatar"><img src="{{ asset('pwa-icon-192.png') }}" alt=""></span>
                 <span><b>{{ auth()->user()->name }}</b><small>{{ auth()->user()->isAdmin() ? 'Administrator' : 'Akun pemain' }}</small></span>
             </div>
         </header>
@@ -96,7 +96,7 @@
 
 <dialog class="pwa-install-dialog" data-pwa-guide aria-labelledby="pwa-install-title">
     <button type="button" class="pwa-dialog-close" aria-label="Tutup" data-pwa-guide-close><x-nav-icon name="close" /></button>
-    <img src="{{ asset('icon.png') }}" alt="">
+    <img src="{{ asset('pwa-icon-192.png') }}" alt="">
     <span class="eyebrow">INSTALL APLIKASI</span>
     <h2 id="pwa-install-title">Pasang NgeBadmintonYuk</h2>
     <p>Tekan tombol Share di browser, lalu pilih <strong>Add to Home Screen</strong>.</p>
