@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Income extends Model
 {
@@ -28,5 +29,10 @@ class Income extends Model
     public function details(): HasMany
     {
         return $this->hasMany(IncomeDetail::class);
+    }
+
+    public function sessionRegistration(): HasOne
+    {
+        return $this->hasOne(SessionRegistration::class);
     }
 }

@@ -23,6 +23,7 @@ class UpdatePlaySessionRequest extends FormRequest
             'court_name' => ['required', 'string', 'max:255'],
             'price_per_session' => ['required', 'integer', 'min:0'],
             'max_players' => ['required', 'integer', 'min:1', 'max:200'],
+            'max_waiting_players' => ['required', 'integer', 'min:0', 'max:200'],
             'status' => ['required', Rule::in(['scheduled', 'completed', 'cancelled'])],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
@@ -39,11 +40,22 @@ class UpdatePlaySessionRequest extends FormRequest
                     return;
                 }
 
-                if ($playSession->registrations()->count() > $this->integer('max_players')) {
-                    $validator->errors()->add('max_players', 'Kapasitas tidak boleh lebih kecil dari jumlah pemain yang sudah terdaftar.');
+                $registrationCount = $playSession->registrations()->count();
+                $confirmedCount = min($registrationCount, $playSession->max_players);
+                $proposedCapacity = $this->integer('max_players') + $this->integer('max_waiting_players');
+
+                if ($confirmedCount > $this->integer('max_players')) {
+                    $validator->errors()->add('max_players', 'Slot utama tidak boleh menggeser pemain yang sudah terdaftar ke waiting list.');
                 }
 
-                if (! $playSession->attendances()->exists()) {
+                if ($registrationCount > $proposedCapacity) {
+                    $validator->errors()->add('max_waiting_players', 'Total slot utama dan waiting list tidak boleh kurang dari jumlah pendaftar.');
+                }
+
+                $hasRecordedActivity = $playSession->attendances()->exists()
+                    || $playSession->registrations()->where('payment_status', 'paid')->exists();
+
+                if (! $hasRecordedActivity) {
                     return;
                 }
 
@@ -53,7 +65,7 @@ class UpdatePlaySessionRequest extends FormRequest
                     || $playSession->price_per_session !== $this->integer('price_per_session');
 
                 if ($coreDataChanged) {
-                    $validator->errors()->add('scheduled_at', 'Jadwal, lapangan, dan harga tidak dapat diubah setelah absensi tercatat.');
+                    $validator->errors()->add('scheduled_at', 'Jadwal, lapangan, dan harga tidak dapat diubah setelah pembayaran atau absensi tercatat.');
                 }
             },
         ];

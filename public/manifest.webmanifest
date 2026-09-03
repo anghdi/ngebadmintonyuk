@@ -1,17 +1,27 @@
 {
     "name": "NgeBadmintonYuk",
     "short_name": "NgeBadmintonYuk",
+    "id": "/",
+    "description": "Pengelolaan komunitas badminton.",
     "start_url": "/dashboard",
     "scope": "/",
     "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#171717",
+    "display_override": ["standalone"],
+    "background_color": "#faf7f0",
+    "theme_color": "#172a63",
+    "categories": ["sports", "utilities"],
     "icons": [
         {
             "src": "/icon.png",
-            "sizes": "any",
+            "sizes": "512x512",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
+        },
+        {
+            "src": "/icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
         }
     ]
 }

@@ -31,3 +31,6 @@ Member tanpa paket aktif tetap dapat mengajukan top up. Sistem membuat atau mema
 
 ## Session registration requires an account
 This supersedes guest registration and phone-backed sanctions. Every new public or admin-created play-session registration must link to a non-admin player account; WhatsApp is optional. Enforce per-session uniqueness and no-show blocking by user_id, while retaining legacy rows without an account for historical display.
+
+## Play sessions include an ordered waiting list and linked income
+Each session has max_players plus admin-managed max_waiting_players. Registrations are ordered by id: entries beyond max_players are waiting and promote automatically when an earlier unpaid registration is removed; reject only when both capacities are full. Only confirmed players may be marked paid. Admin payment confirmation must atomically create one linked Iuran Lapangan income, and reverting payment removes that linked income.

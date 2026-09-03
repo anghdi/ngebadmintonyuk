@@ -79,7 +79,9 @@ class PlaySessionController extends Controller
     public function show(PlaySession $playSession): View
     {
         $playSession->load('attendances.transaction');
-        $registrations = $playSession->registrations()->with('user:id,name')->oldest()->get();
+        $registrations = $playSession->registrations()->with('user:id,name')->oldest('id')->get();
+        $confirmedRegistrations = $registrations->take($playSession->max_players)->values();
+        $waitingRegistrations = $registrations->slice($playSession->max_players)->values();
         $noShowCounts = SessionRegistration::query()
             ->whereIn('user_id', $registrations->pluck('user_id')->filter())
             ->where('attendance_status', 'no_show')
@@ -106,6 +108,6 @@ class PlaySessionController extends Controller
             return [$member->id => (int) $balance];
         });
 
-        return view('play-sessions.show', compact('playSession', 'members', 'attendances', 'compatibleBalances', 'registrations', 'noShowCounts'));
+        return view('play-sessions.show', compact('playSession', 'members', 'attendances', 'compatibleBalances', 'registrations', 'confirmedRegistrations', 'waitingRegistrations', 'noShowCounts'));
     }
 }

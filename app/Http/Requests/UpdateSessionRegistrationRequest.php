@@ -36,8 +36,6 @@ class UpdateSessionRegistrationRequest extends FormRequest
             ],
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'regex:/^[0-9]{10,15}$/'],
-            'payment_method' => ['required', Rule::in(['transfer', 'cash'])],
-            'payment_status' => ['required', Rule::in(['unpaid', 'paid'])],
             'attendance_status' => ['required', Rule::in(['listed', 'present', 'no_show'])],
             'admin_notes' => ['nullable', 'string', 'max:1000'],
         ];

@@ -21,9 +21,10 @@ use Illuminate\Support\Str;
  * @property string $attendance_status
  * @property string|null $admin_notes
  * @property int|null $checked_by
+ * @property int|null $income_id
  * @property Carbon|null $checked_at
  */
-#[Fillable(['play_session_id', 'user_id', 'name', 'phone', 'payment_method', 'payment_status', 'attendance_status', 'admin_notes', 'checked_by', 'checked_at'])]
+#[Fillable(['play_session_id', 'user_id', 'name', 'phone', 'payment_method', 'payment_status', 'attendance_status', 'admin_notes', 'checked_by', 'checked_at', 'income_id'])]
 class SessionRegistration extends Model
 {
     /** @use HasFactory<SessionRegistrationFactory> */
@@ -70,5 +71,11 @@ class SessionRegistration extends Model
     public function checkedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'checked_by');
+    }
+
+    /** @return BelongsTo<Income, $this> */
+    public function income(): BelongsTo
+    {
+        return $this->belongsTo(Income::class);
     }
 }

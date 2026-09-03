@@ -24,6 +24,7 @@ class PlaySessionFactory extends Factory
             'court_name' => 'Lapangan 1',
             'price_per_session' => 25000,
             'max_players' => 12,
+            'max_waiting_players' => 4,
             'status' => 'scheduled',
             'notes' => fake()->optional()->sentence(),
             'created_by' => User::factory()->admin(),

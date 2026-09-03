@@ -11,7 +11,7 @@ use Illuminate\Validation\ValidationException;
 
 class UpdateSessionRegistrationAction
 {
-    /** @param array{user_id: int, name: string, phone?: string|null, payment_method: string, payment_status: string, attendance_status: string, admin_notes?: string|null} $data */
+    /** @param array{user_id: int, name: string, phone?: string|null, attendance_status: string, admin_notes?: string|null} $data */
     public function handle(SessionRegistration $registration, array $data, User $administrator): SessionRegistration
     {
         try {
@@ -36,6 +36,7 @@ class UpdateSessionRegistrationAction
                     'checked_by' => $administrator->id,
                     'checked_at' => now(),
                 ]));
+                $lockedRegistration->income?->details()->update(['name' => $name]);
 
                 return $lockedRegistration;
             }, attempts: 3);

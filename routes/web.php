@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/jadwal/{playSession}/daftar/{registration}', [SessionRegistrationController::class, 'cancel'])->scopeBindings()->name('public-sessions.cancel');
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::view('/papan-skor', 'scoreboard')->name('scoreboard');
     Route::post('/push-subscriptions', [PushSubscriptionController::class, 'store'])->middleware('throttle:10,1')->name('push-subscriptions.store');
     Route::delete('/push-subscriptions', [PushSubscriptionController::class, 'destroy'])->middleware('throttle:10,1')->name('push-subscriptions.destroy');
     Route::get('/top-ups', [TopUpRequestController::class, 'index'])->name('top-ups.index');
@@ -71,6 +72,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/play-sessions/{playSession}/members/{member}/attendance', [AttendanceController::class, 'update'])->name('attendances.update');
         Route::post('/play-sessions/{playSession}/registrations', [SessionRegistrationController::class, 'storeByAdmin'])->name('session-registrations.store');
         Route::put('/play-sessions/{playSession}/registrations/{registration}', [SessionRegistrationController::class, 'update'])->scopeBindings()->name('session-registrations.update');
+        Route::patch('/play-sessions/{playSession}/registrations/{registration}/payment', [SessionRegistrationController::class, 'updatePayment'])->scopeBindings()->name('session-registrations.payment');
         Route::delete('/play-sessions/{playSession}/registrations/{registration}', [SessionRegistrationController::class, 'destroy'])->scopeBindings()->name('session-registrations.destroy');
         Route::get('/inventory', [ShuttlecockInventoryController::class, 'index'])->name('inventory.index');
         Route::post('/inventory/items', [ShuttlecockInventoryController::class, 'store'])->name('inventory.items.store');

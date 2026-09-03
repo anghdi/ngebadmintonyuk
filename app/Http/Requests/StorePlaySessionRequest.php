@@ -20,6 +20,7 @@ class StorePlaySessionRequest extends FormRequest
             'court_name' => ['required', 'string', 'max:255'],
             'price_per_session' => ['required', 'integer', 'min:0'],
             'max_players' => ['required', 'integer', 'min:1', 'max:200'],
+            'max_waiting_players' => ['required', 'integer', 'min:0', 'max:200'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

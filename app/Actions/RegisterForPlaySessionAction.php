@@ -26,8 +26,10 @@ class RegisterForPlaySessionAction
                     throw ValidationException::withMessages(['account' => 'Akun ini sudah terdaftar pada sesi tersebut.']);
                 }
 
-                if ($lockedSession->registrations()->count() >= $lockedSession->max_players) {
-                    throw ValidationException::withMessages(['session' => 'Daftar pemain untuk sesi ini sudah penuh.']);
+                $totalCapacity = $lockedSession->max_players + $lockedSession->max_waiting_players;
+
+                if ($lockedSession->registrations()->count() >= $totalCapacity) {
+                    throw ValidationException::withMessages(['session' => 'Slot utama dan waiting list sudah penuh.']);
                 }
 
                 $noShowCount = SessionRegistration::query()

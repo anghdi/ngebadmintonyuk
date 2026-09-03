@@ -60,6 +60,33 @@ test('absent attendance keeps membership credit', function () {
     expect($membership->transactions()->sum('quantity'))->toBe(4);
 });
 
+test('administrator can reduce a member credit with an audited adjustment', function () {
+    $administrator = User::factory()->admin()->create();
+    $member = User::factory()->member()->create();
+    $membership = createMembership($member, $administrator, 4, today());
+
+    $this->actingAs($administrator)->post(route('memberships.credits.adjust', [$member, $membership]), [
+        'quantity' => 1,
+        'notes' => 'Koreksi kuota',
+    ])->assertRedirect()->assertSessionHasNoErrors();
+
+    expect($membership->transactions()->sum('quantity'))->toBe(3)
+        ->and($membership->transactions()->latest()->first()->type)->toBe('adjustment')
+        ->and($membership->transactions()->latest()->first()->notes)->toBe('Koreksi kuota');
+});
+
+test('credit adjustment cannot make a member balance negative', function () {
+    $administrator = User::factory()->admin()->create();
+    $member = User::factory()->member()->create();
+    $membership = createMembership($member, $administrator, 1, today());
+
+    $this->actingAs($administrator)->post(route('memberships.credits.adjust', [$member, $membership]), [
+        'quantity' => 2,
+    ])->assertSessionHasErrors('quantity');
+
+    expect($membership->transactions()->sum('quantity'))->toBe(1);
+});
+
 function createMembership(User $member, User $administrator, int $credits, mixed $startsOn): Membership
 {
     $membership = Membership::factory()->create([
