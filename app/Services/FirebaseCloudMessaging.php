@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Contracts\PushNotificationSender;
 use App\Models\PushSubscription;
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use Illuminate\Http\Client\ConnectionException;
@@ -56,11 +57,11 @@ class FirebaseCloudMessaging
             ]);
 
         if ($response->successful()) {
-            return self::Sent;
+            return PushNotificationSender::Sent;
         }
 
         if ($response->notFound()) {
-            return self::Invalid;
+            return PushNotificationSender::Invalid;
         }
 
         Log::warning('FCM menolak pengiriman push notification.', [
@@ -68,7 +69,7 @@ class FirebaseCloudMessaging
             'error_status' => $response->json('error.status'),
         ]);
 
-        return self::Failed;
+        return PushNotificationSender::Failed;
     }
 
     private function accessToken(): string

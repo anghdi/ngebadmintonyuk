@@ -6,6 +6,8 @@ use App\Models\PushNotification;
 use App\Models\PushSubscription;
 use App\Models\SessionRegistration;
 use App\Models\User;
+use App\Services\FirebaseCloudMessaging;
+use Illuminate\Support\Facades\Http;
 
 test('player can activate and deactivate notifications for a browser', function () {
     $player = User::factory()->member()->create();
@@ -112,6 +114,24 @@ test('administrator can send an important notification directly to all player de
         ->and($notification->failure_count)->toBe(0)
         ->and($sender->installationIds)->toHaveCount(3);
 });
+
+test('firebase sender returns the shared delivery result constants', function (int $status, string $expectedResult) {
+    Http::preventStrayRequests();
+    Http::fake([
+        'https://fcm.googleapis.com/*' => Http::response([], $status),
+    ]);
+
+    $sender = new FirebaseCloudMessaging;
+    $accessToken = new ReflectionProperty($sender, 'accessToken');
+    $accessToken->setValue($sender, 'test-access-token');
+    $subscription = new PushSubscription(['installation_id' => 'test-fcm-token']);
+
+    expect($sender->send($subscription, 'Judul', 'Isi', route('dashboard')))->toBe($expectedResult);
+})->with([
+    'successful response' => [200, PushNotificationSender::Sent],
+    'expired token' => [404, PushNotificationSender::Invalid],
+    'provider failure' => [400, PushNotificationSender::Failed],
+]);
 
 test('session audience only receives devices belonging to listed players', function () {
     $administrator = User::factory()->admin()->create();
