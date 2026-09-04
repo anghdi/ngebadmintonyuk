@@ -24,8 +24,8 @@ class StorePushSubscriptionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'driver' => ['required', Rule::in(['fcm', 'webpush'])],
-            'installation_id' => ['required_if:driver,fcm', 'nullable', 'string', 'max:191'],
+            'driver' => ['required', Rule::in(['webpush'])],
+            'installation_id' => ['nullable', 'string', 'max:191'],
             'endpoint' => ['required_if:driver,webpush', 'nullable', 'url', 'max:2048'],
             'public_key' => ['required_if:driver,webpush', 'nullable', 'string', 'max:1000'],
             'auth_token' => ['required_if:driver,webpush', 'nullable', 'string', 'max:1000'],

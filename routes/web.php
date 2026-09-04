@@ -18,6 +18,7 @@ use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\TopUpRequestController;
 use App\Http\Controllers\TopUpSettingController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Middleware\RequireCurrentPushSetup;
 use App\Models\Expense;
 use App\Models\Income;
 use Illuminate\Support\Facades\Route;
@@ -40,7 +41,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::bind('transaction', fn ($id) => request()->routeIs('incomes.*') ? Income::findOrFail($id) : Expense::findOrFail($id));
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', RequireCurrentPushSetup::class])->group(function () {
     Route::post('/jadwal/{playSession}/daftar', [SessionRegistrationController::class, 'store'])->middleware('throttle:5,1')->name('public-sessions.register');
     Route::delete('/jadwal/{playSession}/daftar/{registration}', [SessionRegistrationController::class, 'cancel'])->scopeBindings()->name('public-sessions.cancel');
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');

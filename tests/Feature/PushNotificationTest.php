@@ -28,23 +28,37 @@ test('PWA manifest uses resized variants of the community logo', function () {
 
 test('player can activate and deactivate notifications for a browser', function () {
     $player = User::factory()->member()->create();
+    $endpoint = 'https://push.example.test/subscriptions/browser-one';
 
     $this->actingAs($player)->postJson(route('push-subscriptions.store'), [
-        'driver' => 'fcm',
-        'installation_id' => 'firebase-installation-one',
+        'driver' => 'webpush',
+        'endpoint' => $endpoint,
+        'public_key' => 'browser-public-key',
+        'auth_token' => 'browser-auth-token',
         'user_agent' => 'Mobile browser',
     ])->assertSuccessful()->assertJson(['active' => true]);
 
     $subscription = PushSubscription::firstOrFail();
 
     expect($subscription->user_id)->toBe($player->id)
-        ->and($subscription->installation_id)->toBe('firebase-installation-one');
+        ->and($subscription->installation_id)->toBe(hash('sha256', $endpoint));
 
     $this->actingAs($player)->deleteJson(route('push-subscriptions.destroy'), [
-        'installation_id' => 'firebase-installation-one',
+        'installation_id' => hash('sha256', $endpoint),
     ])->assertNoContent();
 
     $this->assertModelMissing($subscription);
+});
+
+test('legacy Firebase notification registration is rejected', function () {
+    $player = User::factory()->member()->create();
+
+    $this->actingAs($player)->postJson(route('push-subscriptions.store'), [
+        'driver' => 'fcm',
+        'installation_id' => 'firebase-installation-one',
+    ])->assertUnprocessable()->assertJsonValidationErrors('driver');
+
+    expect(PushSubscription::query()->count())->toBe(0);
 });
 
 test('player can activate standard web push for Safari', function () {
@@ -129,6 +143,58 @@ test('member is offered notification permission after login', function () {
         ->assertSee('Aktifkan notifikasi?');
 });
 
+test('member with legacy Firebase notification must reinstall before logging in again', function () {
+    $player = User::factory()->member()->create();
+    $legacySubscription = PushSubscription::factory()->for($player)->create(['driver' => 'fcm']);
+
+    $this->post(route('login.store'), [
+        'email' => $player->email,
+        'password' => 'password',
+    ])->assertRedirect(route('login'))
+        ->assertSessionHas('legacy_push_reset', true);
+
+    $this->assertGuest();
+    $this->assertModelMissing($legacySubscription);
+
+    $this->get(route('login'))
+        ->assertSuccessful()
+        ->assertSee('Versi aplikasi lama sudah dinonaktifkan')
+        ->assertSee('Tambahkan ke layar utama');
+
+    $this->post(route('login.store'), [
+        'email' => $player->email,
+        'password' => 'password',
+    ])->assertRedirect(route('dashboard'));
+
+    $this->assertAuthenticatedAs($player);
+});
+
+test('authenticated member with legacy Firebase notification is logged out', function () {
+    $player = User::factory()->member()->create();
+    $legacySubscription = PushSubscription::factory()->for($player)->create(['driver' => 'fcm']);
+
+    $this->actingAs($player)
+        ->get(route('dashboard'))
+        ->assertRedirect(route('login'))
+        ->assertSessionHas('legacy_push_reset', true);
+
+    $this->assertGuest();
+    $this->assertModelMissing($legacySubscription);
+});
+
+test('member with current Web Push notification can log in normally', function () {
+    $player = User::factory()->member()->create();
+    $currentSubscription = PushSubscription::factory()->for($player)->create(['driver' => 'webpush']);
+
+    $this->post(route('login.store'), [
+        'email' => $player->email,
+        'password' => 'password',
+    ])->assertRedirect(route('dashboard'));
+
+    $this->assertAuthenticatedAs($player);
+    $this->assertModelExists($currentSubscription);
+});
+
 test('joining and cancelling a session notifies every subscribed player device', function () {
     $this->travelTo('2026-09-04 10:00:00');
 
@@ -138,8 +204,8 @@ test('joining and cancelling a session notifies every subscribed player device',
         'scheduled_at' => '2026-09-20 19:00:00',
         'venue_name' => 'GOR Tempat A',
     ]);
-    PushSubscription::factory()->for($joiningPlayer)->create();
-    PushSubscription::factory()->for($otherPlayer)->create();
+    PushSubscription::factory()->for($joiningPlayer)->create(['driver' => 'webpush']);
+    PushSubscription::factory()->for($otherPlayer)->create(['driver' => 'webpush']);
     $sender = new class implements PushNotificationSender
     {
         /** @var list<array{title: string, body: string, url: string}> */

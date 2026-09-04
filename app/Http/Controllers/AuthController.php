@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\ResetLegacyPushSubscriptionsAction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,7 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, ResetLegacyPushSubscriptionsAction $resetLegacyPushSubscriptions): RedirectResponse
     {
         $credentials = $request->validate(['email' => ['required', 'email'], 'password' => ['required']]);
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
@@ -22,7 +23,17 @@ class AuthController extends Controller
         }
         $request->session()->regenerate();
 
-        if (! $request->user()->isAdmin()) {
+        $user = $request->user();
+
+        if (! $user->isAdmin() && $resetLegacyPushSubscriptions->handle($user)) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login')->with('legacy_push_reset', true);
+        }
+
+        if (! $user->isAdmin()) {
             $request->session()->put('offer_push_notifications', true);
         }
 

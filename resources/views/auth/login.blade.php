@@ -17,6 +17,17 @@
     <span class="eyebrow">NGE BADMINTON YUK</span>
     <h1>Masuk ke akun</h1>
     <p>Akses jadwal, kuota, dan informasi komunitas.</p>
+    @if(session('legacy_push_reset'))
+        <section class="legacy-push-reset" role="alert">
+            <strong>Versi aplikasi lama sudah dinonaktifkan</strong>
+            <p>Data notifikasi lama sudah kami hapus. Supaya notifikasi baru bekerja, pasang ulang aplikasi lalu masuk dari awal.</p>
+            <ol>
+                <li><b>Android:</b> hapus/uninstall NgeBadmintonYuk, lalu buka situs ini di Chrome dan pilih <em>Install aplikasi</em> atau <em>Tambahkan ke layar utama</em>.</li>
+                <li><b>iPhone/iPad:</b> hapus NgeBadmintonYuk dari Home Screen, lalu buka situs ini di Safari dan pilih <em>Add to Home Screen</em>.</li>
+                <li>Buka aplikasi yang baru dipasang, login lagi, lalu pilih <b>Aktifkan notifikasi</b>.</li>
+            </ol>
+        </section>
+    @endif
     @if($errors->any())
         <div class="alert">{{ $errors->first() }}</div>
     @endif
