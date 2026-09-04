@@ -1,13 +1,3 @@
-import { initializeApp } from 'firebase/app';
-import {
-    getMessaging,
-    isSupported,
-    onMessage,
-    onRegistered,
-    onUnregistered,
-    register as registerForPush,
-    unregister as unregisterFromPush,
-} from 'firebase/messaging';
 import { addBadmintonPoint } from './scoreboard.js';
 import { isIosDevice, resolvePwaInstallMode } from './pwa-install.js';
 
@@ -158,18 +148,39 @@ document.querySelectorAll('[data-copy-text]').forEach((button) => {
     });
 });
 
+document.querySelectorAll('[data-usage-guide]').forEach((guide) => {
+    const dialog = guide.querySelector('[data-usage-guide-dialog]');
+
+    guide.querySelector('[data-usage-guide-open]')?.addEventListener('click', () => {
+        if (typeof dialog?.showModal === 'function') {
+            dialog.showModal();
+        } else {
+            dialog?.setAttribute('open', '');
+        }
+    });
+    guide.querySelectorAll('[data-usage-guide-close]').forEach((button) => {
+        button.addEventListener('click', () => dialog?.close());
+    });
+    dialog?.addEventListener('click', (event) => {
+        if (event.target === dialog) {
+            dialog.close();
+        }
+    });
+});
+
 const pushClient = document.querySelector('[data-push-client]');
 
 if (pushClient) {
     const pushCard = document.querySelector('[data-push-opt-in]');
     const pushButton = pushCard?.querySelector('[data-push-toggle]');
     const pushStatus = pushCard?.querySelector('[data-push-status]');
+    const permissionDialog = document.querySelector('[data-push-permission-dialog]');
+    const permissionAllowButton = permissionDialog?.querySelector('[data-push-permission-allow]');
+    const permissionLaterButton = permissionDialog?.querySelector('[data-push-permission-later]');
     const installationStorageKey = 'ngebadmintonyuk-push-installation-id';
     const legacyInstallationStorageKey = 'ngebadmintonyuk-firebase-installation-id';
     const driverStorageKey = 'ngebadmintonyuk-push-driver';
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-    let messaging;
-    let pushDriver;
     let serviceWorkerRegistration;
 
     const setPushState = (state, message) => {
@@ -219,7 +230,7 @@ if (pushClient) {
         setPushState('active', 'Notifikasi aktif pada perangkat ini.');
     };
 
-    const removeInstallation = async (installationId) => {
+    const deleteInstallation = async (installationId) => {
         if (!installationId) {
             return;
         }
@@ -234,6 +245,10 @@ if (pushClient) {
             },
             body: JSON.stringify({ installation_id: installationId }),
         });
+    };
+
+    const removeInstallation = async (installationId) => {
+        await deleteInstallation(installationId);
         localStorage.removeItem(installationStorageKey);
         localStorage.removeItem(legacyInstallationStorageKey);
         localStorage.removeItem(driverStorageKey);
@@ -259,30 +274,11 @@ if (pushClient) {
         };
     };
 
-    const showForegroundNotification = (payload) => {
-        const title = payload.notification?.title;
-
-        if (!title) {
-            return;
-        }
-
-        const toast = document.createElement(payload.data?.url ? 'a' : 'div');
-        toast.className = 'push-toast';
-        toast.textContent = title;
-
-        if (payload.data?.url) {
-            toast.href = payload.data.url;
-        }
-
-        const body = document.createElement('small');
-        body.textContent = payload.notification?.body ?? '';
-        toast.append(body);
-        document.body.append(toast);
-        window.setTimeout(() => toast.remove(), 7000);
-    };
-
     const enablePush = async () => {
         setPushState('loading', 'Memproses permintaan...');
+        const previousInstallationId = localStorage.getItem(installationStorageKey)
+            ?? localStorage.getItem(legacyInstallationStorageKey);
+        const previousDriver = localStorage.getItem(driverStorageKey);
 
         const permission = await Notification.requestPermission();
 
@@ -296,15 +292,6 @@ if (pushClient) {
             pushClient.dataset.firebaseServiceWorkerUrl,
         );
 
-        if (pushDriver === 'fcm') {
-            await registerForPush(messaging, {
-                vapidKey: pushClient.dataset.firebaseVapidKey,
-                serviceWorkerRegistration,
-            });
-
-            return;
-        }
-
         if (!pushClient.dataset.webpushVapidKey) {
             throw new Error('Konfigurasi Web Push belum tersedia.');
         }
@@ -313,22 +300,22 @@ if (pushClient) {
             ?? await serviceWorkerRegistration.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: base64UrlToUint8Array(pushClient.dataset.webpushVapidKey),
-            });
+        });
 
         await storeSubscription(serializeWebPushSubscription(subscription));
+
+        if (previousInstallationId && previousDriver !== 'webpush') {
+            await deleteInstallation(previousInstallationId);
+        }
     };
 
     const disablePush = async () => {
         setPushState('loading', 'Memproses permintaan...');
         const installationId = localStorage.getItem(installationStorageKey);
 
-        if (localStorage.getItem(driverStorageKey) === 'webpush') {
-            serviceWorkerRegistration ??= await navigator.serviceWorker.ready;
-            const subscription = await serviceWorkerRegistration.pushManager.getSubscription();
-            await subscription?.unsubscribe();
-        } else {
-            await unregisterFromPush(messaging);
-        }
+        serviceWorkerRegistration ??= await navigator.serviceWorker.ready;
+        const subscription = await serviceWorkerRegistration.pushManager.getSubscription();
+        await subscription?.unsubscribe();
 
         await removeInstallation(installationId);
         setPushState('inactive', 'Notifikasi dinonaktifkan pada perangkat ini.');
@@ -341,30 +328,12 @@ if (pushClient) {
             return;
         }
 
-        const supportsFirebase = await isSupported().catch(() => false);
         const supportsWebPush = 'PushManager' in window && Boolean(pushClient.dataset.webpushVapidKey);
 
-        if (!supportsFirebase && !supportsWebPush) {
+        if (!supportsWebPush) {
             setPushState('unsupported', 'Notifikasi tidak tersedia pada browser ini.');
 
             return;
-        }
-
-        pushDriver = supportsFirebase ? 'fcm' : 'webpush';
-
-        if (pushDriver === 'fcm') {
-            const firebaseConfig = JSON.parse(pushClient.dataset.firebaseConfig);
-            messaging = getMessaging(initializeApp(firebaseConfig));
-
-            onRegistered(messaging, (installationId) => {
-                storeSubscription({ driver: 'fcm', installation_id: installationId }).catch(() => {
-                    setPushState('inactive', 'Aktivasi gagal. Silakan coba kembali.');
-                });
-            });
-            onUnregistered(messaging, (installationId) => {
-                removeInstallation(installationId).catch(() => {});
-            });
-            onMessage(messaging, showForegroundNotification);
         }
 
         pushButton?.addEventListener('click', () => {
@@ -381,15 +350,36 @@ if (pushClient) {
         if (Notification.permission === 'denied') {
             setPushState('denied', 'Izin notifikasi dinonaktifkan pada browser.');
         } else if (Notification.permission === 'granted') {
-            if (installationId && localStorage.getItem(driverStorageKey) === pushDriver) {
+            if (installationId && localStorage.getItem(driverStorageKey) === 'webpush') {
                 setPushState('active', 'Notifikasi aktif pada perangkat ini.');
             }
 
             await enablePush();
         } else {
-            setPushState('inactive', 'Terima pembaruan jadwal, ketersediaan slot, dan informasi penting.');
+            setPushState('inactive', 'Terima kabar pemain yang ikut atau batal dan informasi penting.');
+
+            if (pushClient.dataset.pushAutoPrompt === 'true' && permissionDialog) {
+                if (typeof permissionDialog.showModal === 'function') {
+                    permissionDialog.showModal();
+                } else {
+                    permissionDialog.setAttribute('open', '');
+                }
+            }
         }
     };
+
+    permissionAllowButton?.addEventListener('click', async () => {
+        permissionAllowButton.disabled = true;
+
+        try {
+            await enablePush();
+            permissionDialog?.close();
+        } catch {
+            setPushState('inactive', 'Aktivasi gagal. Silakan coba kembali.');
+            permissionAllowButton.disabled = false;
+        }
+    });
+    permissionLaterButton?.addEventListener('click', () => permissionDialog?.close());
 
     initializePush().catch(() => {
         setPushState('inactive', 'Layanan notifikasi belum tersedia. Silakan coba kembali.');

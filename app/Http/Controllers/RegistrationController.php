@@ -20,6 +20,7 @@ class RegistrationController extends Controller
         $member = User::create($request->validated());
         Auth::login($member);
         $request->session()->regenerate();
+        $request->session()->put('offer_push_notifications', true);
 
         return redirect()->route('dashboard')->with('success', 'Akun kamu sudah aktif. Selamat bergabung!');
     }

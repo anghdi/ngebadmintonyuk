@@ -88,11 +88,96 @@ test('only administrator can open notification management', function () {
     $this->actingAs($administrator)
         ->get(route('push-notifications.index'))
         ->assertSuccessful()
-        ->assertSee('Kirim pemberitahuan');
+        ->assertSee('Kirim notifikasi');
 
     $this->actingAs($player)
         ->get(route('push-notifications.index'))
         ->assertForbidden();
+});
+
+test('administrator can see members with active notification devices', function () {
+    $administrator = User::factory()->admin()->create();
+    $activeMember = User::factory()->member()->create(['name' => 'Made Aktif']);
+    $inactiveMember = User::factory()->member()->create(['name' => 'Kadek Belum Aktif']);
+    PushSubscription::factory()->count(2)->for($activeMember)->create(['driver' => 'webpush']);
+
+    $this->actingAs($administrator)
+        ->get(route('push-notifications.subscribers'))
+        ->assertSuccessful()
+        ->assertSee('Member aktif')
+        ->assertSee('Made Aktif')
+        ->assertSee('2 perangkat')
+        ->assertDontSee('Kadek Belum Aktif');
+
+    $this->actingAs($inactiveMember)
+        ->get(route('push-notifications.subscribers'))
+        ->assertForbidden();
+});
+
+test('member is offered notification permission after login', function () {
+    $player = User::factory()->member()->create();
+
+    $this->post(route('login.store'), [
+        'email' => $player->email,
+        'password' => 'password',
+    ])->assertRedirect(route('dashboard'));
+
+    $this->get(route('dashboard'))
+        ->assertSuccessful()
+        ->assertSee('data-push-auto-prompt="true"', escape: false)
+        ->assertSee('data-push-permission-dialog', escape: false)
+        ->assertSee('Aktifkan notifikasi?');
+});
+
+test('joining and cancelling a session notifies every subscribed player device', function () {
+    $this->travelTo('2026-09-04 10:00:00');
+
+    $joiningPlayer = User::factory()->member()->create(['name' => 'Angga']);
+    $otherPlayer = User::factory()->member()->create();
+    $playSession = PlaySession::factory()->create([
+        'scheduled_at' => '2026-09-20 19:00:00',
+        'venue_name' => 'GOR Tempat A',
+    ]);
+    PushSubscription::factory()->for($joiningPlayer)->create();
+    PushSubscription::factory()->for($otherPlayer)->create();
+    $sender = new class implements PushNotificationSender
+    {
+        /** @var list<array{title: string, body: string, url: string}> */
+        public array $messages = [];
+
+        public function send(PushSubscription $subscription, string $title, string $body, string $url): string
+        {
+            $this->messages[] = compact('title', 'body', 'url');
+
+            return self::Sent;
+        }
+    };
+    $this->app->instance(PushNotificationSender::class, $sender);
+
+    $this->actingAs($joiningPlayer)->post(route('public-sessions.register', $playSession), [
+        'payment_method' => 'cash',
+    ])->assertRedirect(route('public-sessions.show', $playSession));
+
+    $joinedNotification = PushNotification::query()->latest()->firstOrFail();
+
+    expect($joinedNotification->type)->toBe('session_joined')
+        ->and($joinedNotification->audience)->toBe('all')
+        ->and($joinedNotification->body)->toBe('Angga ikut pada sesi tanggal 20/09/2026 pukul 19:00 WITA di GOR Tempat A.')
+        ->and($joinedNotification->success_count)->toBe(2)
+        ->and($sender->messages)->toHaveCount(2);
+
+    $registration = $playSession->registrations()->whereBelongsTo($joiningPlayer)->sole();
+
+    $this->actingAs($joiningPlayer)
+        ->delete(route('public-sessions.cancel', [$playSession, $registration]))
+        ->assertRedirect(route('public-sessions.show', $playSession));
+
+    $cancelledNotification = PushNotification::query()->latest('id')->firstOrFail();
+
+    expect($cancelledNotification->type)->toBe('session_cancelled')
+        ->and($cancelledNotification->body)->toBe('Angga batal ikut pada sesi tanggal 20/09/2026 pukul 19:00 WITA di GOR Tempat A.')
+        ->and($cancelledNotification->success_count)->toBe(2)
+        ->and($sender->messages)->toHaveCount(4);
 });
 
 test('administrator can send an important notification directly to all player devices', function () {
@@ -212,10 +297,11 @@ test('invalid Firebase installation is removed after a failed delivery', functio
     expect(PushNotification::firstOrFail()->failure_count)->toBe(1);
 });
 
-test('service worker exposes the configured Firebase web application', function () {
+test('service worker handles standard web push notifications without Firebase', function () {
     $this->get(route('firebase.service-worker'))
         ->assertSuccessful()
         ->assertHeader('Content-Type', 'application/javascript')
-        ->assertSee('ngebadmintonyuk', escape: false)
+        ->assertSee("payload?.source !== 'webpush'", escape: false)
+        ->assertDontSee('firebase.initializeApp', escape: false)
         ->assertSee('/notification-icon.png', escape: false);
 });

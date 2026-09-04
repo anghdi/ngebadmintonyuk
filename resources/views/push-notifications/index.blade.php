@@ -12,6 +12,8 @@
         <span class="notification-device-count"><b>{{ $subscriptionCount }}</b> perangkat aktif</span>
     </div>
 
+    <x-push-notification-navigation />
+
     <div class="admin-split notification-layout">
         <section class="card notification-form-card">
             <span class="eyebrow">PESAN BARU</span>

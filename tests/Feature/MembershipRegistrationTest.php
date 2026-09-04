@@ -24,6 +24,7 @@ test('new member is activated and signed in immediately', function () {
     $member = User::where('email', 'made@example.com')->firstOrFail();
 
     $response->assertRedirect(route('dashboard'));
+    $response->assertSessionHas('offer_push_notifications', true);
     $this->assertAuthenticatedAs($member);
     expect($member->role)->toBe('member')
         ->and($member->phone)->toBeNull();

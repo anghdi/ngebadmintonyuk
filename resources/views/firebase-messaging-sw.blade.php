@@ -34,13 +34,3 @@ self.addEventListener('notificationclick', (event) => {
         return openWindow ? openWindow.focus() : clients.openWindow(targetUrl);
     }));
 });
-
-importScripts('https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/12.18.0/firebase-messaging-compat.js');
-
-try {
-    firebase.initializeApp(@json($firebaseConfig));
-    firebase.messaging();
-} catch {
-    // Safari menggunakan Web Push standar melalui listener di atas.
-}

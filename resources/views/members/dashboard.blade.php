@@ -13,23 +13,6 @@
     </div>
 </div>
 
-<x-usage-guide />
-
-<x-push-notification-opt-in />
-
-<section class="quota-hero">
-    <div>
-        <small>KUOTA SIAP PAKAI</small>
-        <strong>{{ $remainingCredits }}</strong>
-        <span>kali main</span>
-    </div>
-    <div class="quota-meta">
-        <span><b>{{ $memberships->count() }}</b> paket aktif</span>
-        <span><b>{{ $usedCredits }}</b> kali digunakan</span>
-        <span>Kuota tersedia sesuai paket aktif.</span>
-    </div>
-</section>
-
 <section class="dashboard-bank-section" aria-labelledby="dashboard-bank-title">
     <div>
         <span class="eyebrow">REKENING PEMBAYARAN</span>
@@ -47,6 +30,23 @@
             <strong>036801013857535</strong>
             <button type="button" class="btn soft copy-bank-button" data-copy-text="036801013857535" data-copy-label="Salin BRI">Salin</button>
         </article>
+    </div>
+</section>
+
+<x-usage-guide />
+
+<x-push-notification-opt-in />
+
+<section class="quota-hero">
+    <div>
+        <small>KUOTA SIAP PAKAI</small>
+        <strong>{{ $remainingCredits }}</strong>
+        <span>kali main</span>
+    </div>
+    <div class="quota-meta">
+        <span><b>{{ $memberships->count() }}</b> paket aktif</span>
+        <span><b>{{ $usedCredits }}</b> kali digunakan</span>
+        <span>Kuota tersedia sesuai paket aktif.</span>
     </div>
 </section>
 
@@ -69,11 +69,11 @@
 
 <div class="member-columns">
     <section class="card schedule-card">
-        <div class="card-head"><div><span class="eyebrow">JADWAL</span><h2>Sesi berikutnya</h2></div></div>
+        <div class="card-head"><div><span class="eyebrow">JADWAL SAYA</span><h2>Sesi yang kamu ikuti</h2></div></div>
         @forelse($upcomingSessions as $session)
             <div class="schedule-row"><time><b>{{ $session->scheduled_at->format('d') }}</b>{{ $session->scheduled_at->translatedFormat('M') }}</time><span><strong>{{ $session->venue_name }}</strong><small>{{ $session->court_name }} · {{ $session->scheduled_at->format('H:i') }} WITA</small></span><b>{{ rupiah($session->price_per_session) }}</b></div>
         @empty
-            <div class="empty">Belum ada jadwal berikutnya.</div>
+            <div class="empty">Kamu belum mengikuti sesi mendatang.</div>
         @endforelse
     </section>
 

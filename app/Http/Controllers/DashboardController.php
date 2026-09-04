@@ -48,6 +48,9 @@ class DashboardController extends Controller
         $upcomingSessions = PlaySession::query()
             ->where('scheduled_at', '>=', now())
             ->where('status', 'scheduled')
+            ->whereHas('registrations', fn ($query) => $query
+                ->whereBelongsTo($member)
+                ->where('attendance_status', 'listed'))
             ->oldest('scheduled_at')
             ->limit(6)
             ->get();

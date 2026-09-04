@@ -259,9 +259,26 @@ test('no show blocking follows the account when whatsapp is empty', function () 
 test('member dashboard exposes copy controls for both bank accounts', function () {
     $account = User::factory()->member()->create();
 
-    $this->actingAs($account)->get(route('dashboard'))
+    $joinedSession = PlaySession::factory()->create([
+        'scheduled_at' => now()->addDays(2),
+        'venue_name' => 'GOR Saya Ikuti',
+    ]);
+    $otherSession = PlaySession::factory()->create([
+        'scheduled_at' => now()->addDays(3),
+        'venue_name' => 'GOR Tidak Diikuti',
+    ]);
+    SessionRegistration::factory()->for($joinedSession)->for($account)->create();
+
+    $response = $this->actingAs($account)->get(route('dashboard'))
         ->assertSuccessful()
-        ->assertSee('Cara menggunakan website')
+        ->assertSee('Lihat panduan')
+        ->assertSee('data-usage-guide-dialog', escape: false)
         ->assertSee('data-copy-text="6690685688"', false)
-        ->assertSee('data-copy-text="036801013857535"', false);
+        ->assertSee('data-copy-text="036801013857535"', false)
+        ->assertSee('Sesi yang kamu ikuti')
+        ->assertSee('GOR Saya Ikuti')
+        ->assertDontSee('GOR Tidak Diikuti');
+
+    expect(strpos($response->getContent(), 'dashboard-bank-section'))
+        ->toBeLessThan(strpos($response->getContent(), 'usage-guide'));
 });

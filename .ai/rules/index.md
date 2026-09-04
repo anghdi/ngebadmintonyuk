@@ -8,5 +8,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/{Actions,Models,Http}/** | .ai/rules/actions-models-http.md |
 | app/{Actions,Models,Services,Http}/** | .ai/rules/actions-models-services-http.md |
 | app/{Actions,Models}/** | .ai/rules/actions-models.md |
-| app/Http/Controllers/*PlaySessionController.php | .ai/rules/controllers.md |
+| app/Http/Controllers/*PlaySessionController.php, app/Http/Controllers/** | .ai/rules/controllers.md |
 | resources/{js,views}/** | .ai/rules/jsviews.md |
+| resources/views/public-sessions/** | .ai/rules/public-sessions.md |
+| resources/views/push-notifications/** | .ai/rules/push-notifications.md |

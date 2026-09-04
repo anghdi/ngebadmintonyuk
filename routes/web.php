@@ -27,7 +27,7 @@ Route::get('/app.css', fn () => response()->file(resource_path('css/app.css'), [
 Route::get('/jadwal', [PublicPlaySessionController::class, 'index'])->name('public-sessions.index');
 Route::get('/jadwal/{playSession}', [PublicPlaySessionController::class, 'show'])->name('public-sessions.show');
 Route::get('/firebase-messaging-sw.js', fn () => response()
-    ->view('firebase-messaging-sw', ['firebaseConfig' => config('services.firebase.web')])
+    ->view('firebase-messaging-sw')
     ->header('Content-Type', 'application/javascript')
     ->header('Service-Worker-Allowed', '/')
     ->header('Cache-Control', 'no-cache, no-store, must-revalidate'))
@@ -62,6 +62,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports', ReportController::class)->name('reports.index');
         Route::get('/reports/pdf', [ReportController::class, 'download'])->name('reports.pdf');
         Route::get('/push-notifications', [PushNotificationController::class, 'index'])->name('push-notifications.index');
+        Route::get('/push-notifications/subscribers', [PushNotificationController::class, 'subscribers'])->name('push-notifications.subscribers');
         Route::post('/push-notifications', [PushNotificationController::class, 'store'])->middleware('throttle:10,1')->name('push-notifications.store');
         Route::resource('members', MemberController::class)->only(['index', 'show', 'update', 'destroy']);
         Route::post('/members/{member}/memberships', [MembershipController::class, 'store'])->name('memberships.store');

@@ -7,6 +7,7 @@ use App\Http\Requests\SendPushNotificationRequest;
 use App\Models\PlaySession;
 use App\Models\PushNotification;
 use App\Models\PushSubscription;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -50,5 +51,29 @@ class PushNotificationController extends Controller
         }
 
         return back()->with('success', $message);
+    }
+
+    public function subscribers(): View
+    {
+        $members = User::query()
+            ->where('role', 'member')
+            ->whereHas('pushSubscriptions')
+            ->withCount('pushSubscriptions')
+            ->withMax('pushSubscriptions', 'updated_at')
+            ->with(['pushSubscriptions' => fn ($query) => $query
+                ->select(['id', 'user_id', 'driver', 'user_agent', 'updated_at'])
+                ->latest('updated_at')])
+            ->orderByDesc('push_subscriptions_max_updated_at')
+            ->orderBy('name')
+            ->paginate(20);
+        $memberCount = User::query()
+            ->where('role', 'member')
+            ->whereHas('pushSubscriptions')
+            ->count();
+        $subscriptionCount = PushSubscription::query()
+            ->whereHas('user', fn ($query) => $query->where('role', 'member'))
+            ->count();
+
+        return view('push-notifications.subscribers', compact('members', 'memberCount', 'subscriptionCount'));
     }
 }

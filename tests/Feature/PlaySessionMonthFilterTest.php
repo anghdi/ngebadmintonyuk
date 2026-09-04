@@ -41,6 +41,22 @@ test('public schedule only shows sessions from the selected month', function () 
         ->assertDontSee('GOR Bulan Lain');
 });
 
+test('signed in member sees the application sidebar on schedule pages', function () {
+    $member = User::factory()->member()->create();
+    $scheduledAt = now()->addMonthNoOverflow()->startOfMonth()->addDays(5)->setTime(19, 0);
+    $playSession = PlaySession::factory()->create(['scheduled_at' => $scheduledAt]);
+
+    $this->actingAs($member)
+        ->get(route('public-sessions.index', ['month' => $scheduledAt->format('Y-m')]))
+        ->assertSuccessful()
+        ->assertSee('id="sidebar"', escape: false);
+
+    $this->actingAs($member)
+        ->get(route('public-sessions.show', $playSession))
+        ->assertSuccessful()
+        ->assertSee('id="sidebar"', escape: false);
+});
+
 test('administrator schedule includes past months and filters its session list', function () {
     $administrator = User::factory()->admin()->create();
     $pastDate = now()->subMonthsNoOverflow(2)->startOfMonth()->addDays(5)->setTime(19, 0);
