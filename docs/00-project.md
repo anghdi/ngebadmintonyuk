@@ -1,3 +1,29 @@
+# NgeBadmintonYuk ? overview proyek
+
+Diperbarui: **6 September 2026**.
+
+Aplikasi sudah berkembang dari MVP kas NgeKas menjadi aplikasi operasional komunitas badminton. Implementasi mencakup keuangan dan PDF, akun admin/member, membership dan kuota, top-up dengan verifikasi admin, jadwal dan waiting list, pembayaran sesi terhubung ke pemasukan, inventaris shuttlecock, Web Push, dan papan skor lokal.
+
+**Mulai membaca dari [status dan konteks proyek terbaru](10-project-status.md).** Dokumen tersebut memuat bukti kode, peta arsitektur, data utama, batas verifikasi, dan prioritas pekerjaan berikutnya.
+
+## Kondisi implementasi
+
+- Halaman menggunakan Controller + Blade; Actions menangani banyak proses bisnis. Laporan menggunakan Service + Repository.
+- Livewire tercantum dalam dependency, tetapi komponen/directive aplikasi belum ditemukan pada pemeriksaan kode.
+- Fitur inti sudah memiliki implementasi; kesiapan produksi belum terverifikasi.
+- Tujuh test JavaScript lulus. Test Laravel belum dapat dimulai karena dependency vendor belum tersedia.
+- Graphify yang ada masih snapshot versi awal; lihat [catatan Graphify](../graphify-out/README.md).
+
+## Membaca spesifikasi awal
+
+Dokumen 01?09 dan arsip di bawah adalah referensi rancangan awal, bukan checklist penyelesaian terkini. Asumsi satu admin, tanpa registrasi/member/jadwal, dan PDF sebagai fitur masa depan sudah berubah. Kesesuaian visual branding/UI belum diaudit pada pembaruan ini.
+
+## Arsip spesifikasi MVP awal
+
+Bagian berikut dipertahankan untuk konteks historis. Jika berbeda dengan snapshot terbaru, baca [10-project-status.md](10-project-status.md) dan kode terkait untuk memahami perilaku yang sekarang diimplementasikan.
+
+---
+
 # 00-project.md
 
 # Modul
