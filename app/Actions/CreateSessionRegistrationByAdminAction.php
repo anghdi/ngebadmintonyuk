@@ -17,6 +17,9 @@ class CreateSessionRegistrationByAdminAction
         try {
             return DB::transaction(function () use ($playSession, $data): SessionRegistration {
                 $lockedSession = PlaySession::query()->lockForUpdate()->findOrFail($playSession->id);
+                if ($lockedSession->status !== 'scheduled' || $lockedSession->scheduled_at->isPast()) {
+                    throw ValidationException::withMessages(['session' => 'Pendaftaran untuk sesi ini sudah ditutup.']);
+                }
                 [$member, $name, $phone] = $this->resolveIdentity($data);
 
                 if ($lockedSession->registrations()->where('user_id', $member->id)->exists()) {

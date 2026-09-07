@@ -35,4 +35,9 @@ class Income extends Model
     {
         return $this->hasOne(SessionRegistration::class);
     }
+
+    public function topUpRequest(): HasOne
+    {
+        return $this->hasOne(TopUpRequest::class);
+    }
 }

@@ -1,4 +1,16 @@
-> **Catatan status ? 6 September 2026:** Dokumen ini adalah spesifikasi/desain awal MVP, bukan laporan implementasi terkini. Scope, arsitektur, dan sebagian asumsi telah berubah. Baca [status proyek terbaru](10-project-status.md) untuk fitur yang sudah diimplementasikan, perbedaan dari rancangan ini, dan hasil verifikasi.
+# Laporan saat ini — 7 September 2026
+
+Sumber: [ReportController](../app/Http/Controllers/ReportController.php), [ReportService](../app/Services/ReportService.php), [ReportRepository](../app/Repositories/ReportRepository.php).
+
+Admin dapat melihat laporan periode serta mengunduh PDF A4 portrait melalui reports.pdf, memakai barryvdh/laravel-dompdf 3.1.2. PDF sudah tersedia dan bukan future improvement. Export Excel belum tersedia.
+
+Periode default awal bulan sampai hari ini. Total periode menjumlah detail dengan tanggal header di antara start/end secara inklusif. Selisih = pemasukan periode - pengeluaran periode. Saldo = seluruh pemasukan sampai end - seluruh pengeluaran sampai end. Transaksi sesudah end tidak dihitung. Ringkasan kategori dikelompokkan berdasarkan nama. Halaman memvalidasi tanggal opsional; unduhan PDF mewajibkan keduanya dan end >= start.
+
+Implementasi memakai Controller + Blade, bukan ReportIndex Livewire. Belum ada tes khusus perhitungan laporan, batas periode dan PDF. Lihat [matriks](10-current-features.md).
+
+## Arsip rancangan laporan awal
+
+> Status export PDF, nama komponen, dan checklist pengujian di bawah adalah historis dan digantikan oleh acuan saat ini.
 
 # 08-report.md
 

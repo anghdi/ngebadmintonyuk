@@ -80,7 +80,12 @@ class TransactionController extends Controller
 
     public function show(Request $request, Model $transaction)
     {
-        return view('transactions.show', ['type' => $this->type($request), 'transaction' => $transaction->load('category', 'details')]);
+        $transaction->load('category', 'details');
+        if ($transaction instanceof Income) {
+            $transaction->load('sessionRegistration', 'topUpRequest');
+        }
+
+        return view('transactions.show', ['type' => $this->type($request), 'transaction' => $transaction]);
     }
 
     public function destroy(Request $request, Model $transaction)

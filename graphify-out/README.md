@@ -1,7 +1,9 @@
-# Status snapshot Graphify
+# Status Graphify
 
-Diperiksa pada **6 September 2026**. Snapshot `graph.json` saat ini **belum mengikuti kode terbaru**: 305 node dan 394 relasi, tanpa modul Membership, TopUp, PlaySession, PushNotification, Shuttlecock, dan Scoreboard.
+Hasil regenerasi **7 September 2026** mencakup modul komunitas dan integrasi kas–kuota: **1.606 node, 2.441 relasi, 156 komunitas**. Lihat [laporan generator](GRAPH_REPORT.md), [graph JSON](graph.json), dan [navigasi visual](graph.html).
 
-Gunakan [status proyek terbaru](../docs/10-project-status.md) untuk konteks implementasi dan peta arsitektur Mermaid. Graph lama tetap disimpan sebagai hasil ekstraksi historis.
+Gunakan [konteks final proyek](../docs/11-final-context.md) untuk aturan aktif dan hasil verifikasi; [matriks fitur](../docs/10-current-features.md) menghubungkan fitur, kode, tes, dan backlog. [Pemeriksaan 6 September](../docs/10-project-status.md) merupakan arsip, bukan status graph terbaru.
 
-Regenerasi belum dilakukan karena CLI/MCP Graphify tidak tersedia pada sesi ini dan launcher `uv` lokal gagal dijalankan. Jangan menganggap perubahan dokumentasi sebagai regenerasi graph. Saat tooling tersedia, regenerasi dari sumber terbaru menggunakan prosedur resmi instalasi Graphify tersebut, termasuk manifest/cache/analisis yang konsisten, lalu periksa bahwa modul tambahan masuk hasilnya.
+Graph dibangun dengan `graphify update .` lalu `graphify cluster-only . --no-label`. Ekstraksi kode dilakukan secara lokal tanpa LLM/API, termasuk pembaruan manifest dan metadata analisis. Perintah ini tidak mengekstrak isi Markdown secara semantik; perubahan dokumentasi saja tidak memerlukan regenerasi graph kode.
+
+Validasi cakupan class aplikasi dan konsistensi graph/analisis tersedia melalui `php artisan test --compact tests/Unit/ProjectContextTest.php`. Angka dan status tooling pada catatan 6 September telah digantikan hasil regenerasi di atas.

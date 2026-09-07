@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\DeletePlaySessionAction;
+use App\Actions\UpdatePlaySessionAction;
 use App\Http\Requests\FilterPlaySessionsRequest;
 use App\Http\Requests\StorePlaySessionRequest;
 use App\Http\Requests\UpdatePlaySessionRequest;
@@ -62,9 +63,9 @@ class PlaySessionController extends Controller
         return view('play-sessions.edit', compact('playSession'));
     }
 
-    public function update(UpdatePlaySessionRequest $request, PlaySession $playSession): RedirectResponse
+    public function update(UpdatePlaySessionRequest $request, PlaySession $playSession, UpdatePlaySessionAction $updateSession): RedirectResponse
     {
-        $playSession->update($request->validated());
+        $updateSession->handle($playSession, $request->validated());
 
         return redirect()->route('play-sessions.show', $playSession)->with('success', 'Sesi bermain berhasil diperbarui.');
     }
@@ -98,11 +99,11 @@ class PlaySessionController extends Controller
         $compatibleBalances = $members->mapWithKeys(function (User $member) use ($playSession): array {
             $balance = $member->memberships
                 ->filter(fn (Membership $membership): bool => $membership->status === 'active'
-                    && $membership->venue_name === $playSession->venue_name
-                    && $membership->court_name === $playSession->court_name
-                    && $membership->price_per_session === $playSession->price_per_session
-                    && $membership->starts_on->lte($playSession->scheduled_at)
-                    && (! $membership->expires_on || $membership->expires_on->gte($playSession->scheduled_at)))
+                    && ($membership->isCommunityPackage() || ($membership->venue_name === $playSession->venue_name
+                        && $membership->court_name === $playSession->court_name
+                        && $membership->price_per_session === $playSession->price_per_session))
+                    && $membership->starts_on->toDateString() <= $playSession->scheduled_at->toDateString()
+                    && (! $membership->expires_on || $membership->expires_on->toDateString() >= $playSession->scheduled_at->toDateString()))
                 ->sum('balance');
 
             return [$member->id => (int) $balance];

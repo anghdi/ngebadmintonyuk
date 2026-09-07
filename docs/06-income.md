@@ -1,4 +1,16 @@
-> **Catatan status ? 6 September 2026:** Dokumen ini adalah spesifikasi/desain awal MVP, bukan laporan implementasi terkini. Scope, arsitektur, dan sebagian asumsi telah berubah. Baca [status proyek terbaru](10-project-status.md) untuk fitur yang sudah diimplementasikan, perbedaan dari rancangan ini, dan hasil verifikasi.
+# Pemasukan saat ini — 7 September 2026
+
+Sumber: [TransactionController](../app/Http/Controllers/TransactionController.php), [TransactionService](../app/Services/TransactionService.php), [Income](../app/Models/Income.php).
+
+CRUD admin menggunakan route incomes.* dan view transactions bersama pengeluaran. Daftar memakai filter tanggal/kategori, urutan tanggal dan ID terbaru, serta pagination 12. Validasi: tanggal wajib; kategori income; minimal satu detail; nama detail <=255; amount integer >=1; description/note opsional <=1000. Simpan/update header dan detail dalam DB transaction; update mengganti detail. Total berasal dari detail, bukan input header.
+
+Jalur otomatis: [RecordSessionRegistrationPaymentAction](../app/Actions/RecordSessionRegistrationPaymentAction.php) membuat satu income terkait peserta utama yang dibayar, berdasarkan harga dan tanggal sesi. Penandaan bayar ulang memakai income yang sama. Mengembalikan status unpaid melepas dan menghapus income. Pemasukan terkait pendaftaran tidak boleh diedit/dihapus melalui TransactionService; kelola dari daftar pemain.
+
+Persetujuan top-up baru membuat satu pemasukan Top Up Kuota pada tanggal persetujuan, menggunakan nominal pengajuan. Linked income top-up dilindungi dari edit/hapus manual. Pemakaian kuota dan pemberian paket manual tidak membuat pemasukan lagi. Tidak ada IncomeService/IncomeRepository terpisah. FinanceTest dan PlaySessionRegistrationTest menguji sebagian alur; lihat [matriks](10-current-features.md).
+
+## Arsip rancangan pemasukan awal
+
+> Rancangan komponen/layanan serta checklist berikut bukan laporan implementasi. Aturan penghapusan manual mempunyai pengecualian income peserta seperti dijelaskan di atas.
 
 # 06-income.md
 

@@ -16,12 +16,12 @@ class ReportRepository
 
     public function between(string $type, string $start, string $end)
     {
-        return $this->query($type)->whereBetween('date', [$start, $end])->latest('date')->latest('id')->get();
+        return $this->query($type)->whereDate('date', '>=', $start)->whereDate('date', '<=', $end)->latest('date')->latest('id')->get();
     }
 
     public function totalBetween(string $type, string $start, string $end): int
     {
-        return (int) $this->query($type)->whereBetween('date', [$start, $end])->get()->sum('details_sum_amount');
+        return (int) $this->query($type)->whereDate('date', '>=', $start)->whereDate('date', '<=', $end)->get()->sum('details_sum_amount');
     }
 
     public function totalUntil(string $type, string $end): int

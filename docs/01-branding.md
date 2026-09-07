@@ -1,4 +1,10 @@
-> **Catatan status ? 6 September 2026:** Dokumen ini adalah spesifikasi/desain awal MVP, bukan laporan implementasi terkini. Scope, arsitektur, dan sebagian asumsi telah berubah. Baca [status proyek terbaru](10-project-status.md) untuk fitur yang sudah diimplementasikan, perbedaan dari rancangan ini, dan hasil verifikasi.
+# Status branding — 7 September 2026
+
+Brand induk tetap NgeBadmintonYuk, dengan NgeKas sebagai fungsi keuangan. Sumber visual aktif: [app.css](../resources/css/app.css), [layout aplikasi](../resources/views/layouts/app.blade.php), dan [layout publik](../resources/views/layouts/public.blade.php). Warna utama #2455F5, #FFD23F, #FAF7F0, #171717; font aktif Plus Jakarta Sans. Logo juga digunakan pada ikon PWA. Baca [konteks final](11-final-context.md).
+
+## Referensi desain awal
+
+> Panduan di bawah adalah referensi desain; contoh tampilan bukan bukti bahwa semua variasi sudah diterapkan.
 
 # 01-branding.md
 

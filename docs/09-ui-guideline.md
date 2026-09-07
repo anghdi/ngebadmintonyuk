@@ -1,4 +1,10 @@
-> **Catatan status ? 6 September 2026:** Dokumen ini adalah spesifikasi/desain awal MVP, bukan laporan implementasi terkini. Scope, arsitektur, dan sebagian asumsi telah berubah. Baca [status proyek terbaru](10-project-status.md) untuk fitur yang sudah diimplementasikan, perbedaan dari rancangan ini, dan hasil verifikasi.
+# Status UI — 7 September 2026
+
+Sumber tampilan aktif adalah [CSS](../resources/css/app.css), [layout aplikasi](../resources/views/layouts/app.blade.php), [layout publik](../resources/views/layouts/public.blade.php), dan view setiap modul. Navigasi sudah mencakup fitur komunitas sesuai peran, bukan hanya menu keuangan MVP. Halaman jadwal member memakai layout aplikasi; guest memakai layout publik. PWA, opt-in notifikasi, dan papan skor juga sudah ada.
+
+Panduan berikut tetap menjadi referensi desain, tetapi contoh atau larangan desain tidak membuktikan kesesuaian visual seluruh halaman. Audit ini memeriksa sumber dan tes, tidak melakukan pemeriksaan visual lintas perangkat. Baca [konteks final](11-final-context.md).
+
+## Referensi UI awal
 
 # 09-ui-guideline.md
 

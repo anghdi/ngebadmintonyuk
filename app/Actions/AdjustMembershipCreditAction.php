@@ -13,6 +13,7 @@ class AdjustMembershipCreditAction
     public function handle(Membership $membership, int $quantity, ?string $notes, User $administrator): MembershipTransaction
     {
         return DB::transaction(function () use ($membership, $quantity, $notes, $administrator): MembershipTransaction {
+            User::query()->lockForUpdate()->findOrFail($membership->user_id);
             $lockedMembership = Membership::query()->lockForUpdate()->findOrFail($membership->id);
             $balance = (int) $lockedMembership->transactions()->sum('quantity');
 

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Absensi '.$playSession->scheduled_at->translatedFormat('d M Y'))
 @section('content')
-<div class="page-head session-head"><div><a class="back-link" href="{{ route('play-sessions.index') }}">← Semua sesi</a><span class="eyebrow">ABSENSI SESI</span><h1>{{ $playSession->venue_name }}</h1><p>{{ $playSession->court_name }} · {{ $playSession->scheduled_at->translatedFormat('l, d M Y') }} pukul {{ $playSession->scheduled_at->format('H:i') }} WITA</p></div><div class="session-head-actions"><div class="session-price"><small>HARGA SESI</small><strong>{{ rupiah($playSession->price_per_session) }}</strong></div><div class="actions"><a class="btn soft" href="{{ route('play-sessions.edit', $playSession) }}">Edit</a><form method="post" action="{{ route('play-sessions.destroy', $playSession) }}" onsubmit="return confirm('Hapus sesi ini? Absensi akan dihapus dan kuota yang terpakai akan dikembalikan.')">@csrf @method('delete')<button class="btn danger-bg">Hapus</button></form></div></div></div>
+<div class="page-head session-head"><div><a class="back-link" href="{{ route('play-sessions.index') }}">← Semua sesi</a><span class="eyebrow">ABSENSI SESI</span><h1>{{ $playSession->venue_name }}</h1><p>{{ $playSession->court_name }} · {{ $playSession->scheduled_at->translatedFormat('l, d M Y') }} pukul {{ $playSession->scheduled_at->format('H:i') }} WITA</p></div><div class="session-head-actions"><div class="session-price"><small>HARGA SESI</small><strong>{{ rupiah($playSession->price_per_session) }}</strong></div><div class="actions"><a class="btn soft" href="{{ route('play-sessions.edit', $playSession) }}">Edit</a><form method="post" action="{{ route('play-sessions.destroy', $playSession) }}" onsubmit="return confirm('Hapus sesi kosong ini? Sesi dengan peserta atau absensi tidak dapat dihapus.')">@csrf @method('delete')<button class="btn danger-bg">Hapus</button></form></div></div></div>
 
 <section class="card table-card registration-admin-card">
     <div class="card-head"><div><span class="eyebrow">DAFTAR PEMAIN</span><h2>{{ $confirmedRegistrations->count() }}/{{ $playSession->max_players }} pemain · {{ $waitingRegistrations->count() }}/{{ $playSession->max_waiting_players }} waiting</h2></div><a class="btn soft" href="{{ route('public-sessions.show', $playSession) }}" target="_blank" rel="noopener">Lihat halaman publik</a></div>
@@ -11,7 +11,7 @@
             <form method="post" action="{{ route('session-registrations.store', $playSession) }}" class="registration-create-form">
                 @csrf
                 <label>Akun pemain<select name="user_id" data-member-select required><option value="">Pilih akun</option>@foreach($members as $member)<option value="{{ $member->id }}" data-member-name="{{ $member->name }}" data-member-phone="{{ $member->phone }}">{{ $member->name }}{{ $member->phone ? ' · '.$member->phone : '' }}</option>@endforeach</select></label>
-                <label>Pembayaran<select name="payment_method" required><option value="transfer">Transfer</option><option value="cash">Tunai</option></select></label>
+                <label>Pembayaran<select name="payment_method" required><option value="transfer">Transfer</option><option value="cash">Tunai</option><option value="membership">Kuota membership</option></select></label>
                 <button class="btn primary">Tambahkan</button>
             </form>
             <small>Pemain harus mempunyai akun. Nama dan WhatsApp (jika ada) mengikuti data akun.</small>
@@ -30,9 +30,13 @@
             <td>
                 <form method="post" action="{{ route('session-registrations.payment', [$playSession, $registration]) }}" class="quick-payment-form">
                     @csrf @method('patch')
-                    <select name="payment_method" aria-label="Metode pembayaran {{ $registration->name }}"><option value="transfer" @selected($registration->payment_method === 'transfer')>Transfer</option><option value="cash" @selected($registration->payment_method === 'cash')>Tunai</option></select>
+                    <select name="payment_method" aria-label="Metode pembayaran {{ $registration->name }}"><option value="transfer" @selected($registration->payment_method === 'transfer')>Transfer</option><option value="cash" @selected($registration->payment_method === 'cash')>Tunai</option><option value="membership" @selected($registration->payment_method === 'membership')>Kuota membership</option></select>
                     <input type="hidden" name="is_paid" value="0">
-                    <label class="payment-check"><input type="checkbox" name="is_paid" value="1" @checked($registration->payment_status === 'paid') @disabled($isWaiting)><span>{{ $registration->payment_status === 'paid' ? 'Lunas' : 'Belum' }}</span></label>
+                    @if($registration->payment_method === 'membership')
+                        <small>{{ $registration->payment_status === 'paid' ? '1 kuota terpakai' : 'Kuota dipotong saat hadir' }}</small>
+                    @else
+                        <label class="payment-check"><input type="checkbox" name="is_paid" value="1" @checked($registration->payment_status === 'paid') @disabled($isWaiting)><span>{{ $registration->payment_status === 'paid' ? 'Lunas' : 'Belum' }}</span></label>
+                    @endif
                     <button class="quick-save" @disabled($isWaiting)>Simpan</button>
                     @if($isWaiting)<small>Aktif setelah masuk slot utama</small>@endif
                 </form>
@@ -63,7 +67,7 @@
     </tbody></table>
 </section>
 
-<div class="attendance-guide"><strong>KUOTA MEMBER</strong><span><i class="guide-dot present"></i> Hadir: potong 1 kuota</span><span><i class="guide-dot absent"></i> Tidak hadir: kuota tetap</span><span><i class="guide-dot charged"></i> Absen dipotong: potong 1 kuota</span></div>
+<div class="attendance-guide"><strong>ABSENSI DAN PEMBAYARAN</strong><span>Metode kuota: hadir memakai 1 kuota, tidak hadir tidak dipotong.</span><span>Tunai/transfer tidak memakai kuota. Koreksi ke Terdaftar mengembalikan kuota.</span></div>
 
 <section class="attendance-list">
     @forelse($members as $member)
@@ -76,7 +80,6 @@
                 <div class="attendance-actions">
                     <button name="status" value="present" @class(['selected' => $attendance?->status === 'present'])>Hadir</button>
                     <button name="status" value="absent" @class(['selected' => $attendance?->status === 'absent'])>Tidak hadir</button>
-                    <button name="status" value="charged_absent" @class(['selected' => $attendance?->status === 'charged_absent'])>Absen dipotong</button>
                 </div>
             </form>
         </article>

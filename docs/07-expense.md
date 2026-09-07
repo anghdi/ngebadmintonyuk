@@ -1,4 +1,14 @@
-> **Catatan status ? 6 September 2026:** Dokumen ini adalah spesifikasi/desain awal MVP, bukan laporan implementasi terkini. Scope, arsitektur, dan sebagian asumsi telah berubah. Baca [status proyek terbaru](10-project-status.md) untuk fitur yang sudah diimplementasikan, perbedaan dari rancangan ini, dan hasil verifikasi.
+# Pengeluaran saat ini — 7 September 2026
+
+Sumber: [TransactionController](../app/Http/Controllers/TransactionController.php), [TransactionService](../app/Services/TransactionService.php), [Expense](../app/Models/Expense.php).
+
+CRUD admin memakai route expenses.* dan view transactions bersama pemasukan. Filter tanggal/kategori, pagination 12, urutan tanggal/ID terbaru. Kategori harus expense; minimal satu detail; nominal integer >=1; nama <=255; description/note opsional <=1000. Nominal disimpan positif dan dikurangkan ketika menghitung saldo. Simpan/update atomik; detail diganti ketika update dan ikut terhapus bersama header.
+
+Mutasi stok shuttlecock belum otomatis membuat expense. Tidak ada ExpenseService/ExpenseRepository atau komponen Livewire terpisah. Belum ada tes khusus CRUD expense, cascade, dan pengaruhnya ke saldo. Lihat [matriks](10-current-features.md).
+
+## Arsip rancangan pengeluaran awal
+
+> Checklist penerimaan di bawah tetap merupakan target yang belum seluruhnya diuji; struktur class mengikuti implementasi saat ini.
 
 # 07-expense.md
 

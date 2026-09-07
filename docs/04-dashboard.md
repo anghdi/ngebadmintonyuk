@@ -1,4 +1,16 @@
-> **Catatan status ? 6 September 2026:** Dokumen ini adalah spesifikasi/desain awal MVP, bukan laporan implementasi terkini. Scope, arsitektur, dan sebagian asumsi telah berubah. Baca [status proyek terbaru](10-project-status.md) untuk fitur yang sudah diimplementasikan, perbedaan dari rancangan ini, dan hasil verifikasi.
+# Dashboard saat ini — 7 September 2026
+
+Sumber: [DashboardController](../app/Http/Controllers/DashboardController.php).
+
+Admin: saldo sampai hari ini, pemasukan/pengeluaran/selisih sejak awal bulan sampai hari ini, maksimal delapan transaksi terbaru dalam periode tersebut, jumlah member, sesi mendatang berstatus scheduled, serta jumlah item dengan stok <= minimum_stock. Data keuangan memakai ReportService → ReportRepository; tidak ada DashboardService atau DashboardRepository.
+
+Member: paket dengan saldo hasil agregasi, total saldo seluruh paket, jumlah kuota negatif yang pernah terpakai/disesuaikan, maksimal 15 transaksi kuota terakhir, dan maksimal enam sesi mendatang yang didaftarinya dengan status listed. Saldo ringkasan ini tidak memfilter masa aktif paket; kuota yang benar-benar bisa dipakai diperiksa oleh RecordAttendanceAction.
+
+Bukti tampilan: [admin](../resources/views/dashboard.blade.php), [member](../resources/views/members/dashboard.blade.php). Belum ada pengujian lengkap agregasi dashboard; tes tampilan rekening member ada dalam PlaySessionRegistrationTest. Lihat [matriks](10-current-features.md).
+
+## Arsip rancangan dashboard awal
+
+> Rumus dan contoh berikut adalah spesifikasi historis. Batas periode, komponen, serta daftar layanan mengikuti implementasi saat ini di atas.
 
 # 04-dashboard.md
 

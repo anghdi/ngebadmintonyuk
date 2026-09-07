@@ -1,4 +1,16 @@
-# Status dan konteks proyek NgeBadmintonYuk
+# Status proyek: rujukan dan arsip
+
+**Acuan aktif:** [konteks final proyek](11-final-context.md) dan [matriks fitur](10-current-features.md), diperbarui setelah integrasi kas–kuota pada 7 September 2026.
+
+Dokumen ini dipertahankan agar tautan dan catatan pemeriksaan 6 September tidak hilang. Seluruh bagian setelah batas arsip di bawah adalah snapshot historis. Pernyataan dependency belum tersedia, backend belum diuji, top-up belum mencatat income, charged_absent memotong kuota, dan Graphify belum diperbarui **tidak berlaku sebagai status terbaru**.
+
+Perubahan berikutnya dicatat pada konteks final dan matriks fitur, bukan pada snapshot arsip ini.
+
+## Arsip pemeriksaan 6 September 2026
+
+---
+
+# Status dan konteks proyek NgeBadmintonYuk — arsip
 
 Tanggal pemeriksaan: **6 September 2026**.
 

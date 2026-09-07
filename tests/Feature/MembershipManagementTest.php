@@ -71,8 +71,8 @@ test('administrator can reduce a member credit with an audited adjustment', func
     ])->assertRedirect()->assertSessionHasNoErrors();
 
     expect($membership->transactions()->sum('quantity'))->toBe(3)
-        ->and($membership->transactions()->latest()->first()->type)->toBe('adjustment')
-        ->and($membership->transactions()->latest()->first()->notes)->toBe('Koreksi kuota');
+        ->and($membership->transactions()->latest('id')->first()->type)->toBe('adjustment')
+        ->and($membership->transactions()->latest('id')->first()->notes)->toBe('Koreksi kuota');
 });
 
 test('credit adjustment cannot make a member balance negative', function () {

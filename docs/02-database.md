@@ -1,4 +1,27 @@
-> **Catatan status ? 6 September 2026:** Dokumen ini adalah spesifikasi/desain awal MVP, bukan laporan implementasi terkini. Scope, arsitektur, dan sebagian asumsi telah berubah. Baca [status proyek terbaru](10-project-status.md) untuk fitur yang sudah diimplementasikan, perbedaan dari rancangan ini, dan hasil verifikasi.
+# Database saat ini — 7 September 2026
+
+Sumber struktur adalah seluruh [migration](../database/migrations), bukan hanya enam tabel MVP. Audit ini memeriksa schema melalui migration, bukan membuktikan migration sudah diterapkan di server produksi.
+
+| Domain | Tabel aplikasi | Relasi dan batas utama |
+| --- | --- | --- |
+| Akun | users | Role admin/member; profil member tetap di users, tidak ada tabel members terpisah |
+| Keuangan | categories, incomes, income_details, expenses, expense_details | Header milik user dan kategori; detail milik header; total berasal dari SUM amount, tanpa kolom total/saldo manual |
+| Paket | memberships, membership_transactions | Paket milik user; saldo kuota = SUM quantity bertanda; creator dan riwayat penyesuaian |
+| Sesi dan absensi | play_sessions, attendances | Absensi terhubung ke sesi, user, serta membership bila memakai kuota |
+| Pendaftaran | session_registrations | Unik pasangan play_session_id + user_id; phone nullable; income_id nullable dan unik; kapasitas utama/waiting pada play_sessions |
+| Top-up | top_up_requests, top_up_settings | Pengajuan milik member/paket; bukti privat, status dan reviewer; income_id nullable/unik; harga dapat diatur, kredit tetap empat |
+| Inventori | shuttlecock_items, stock_movements | Stok = SUM quantity; mutasi dapat terkait sesi |
+| Notifikasi | push_subscriptions, push_notifications | Perangkat milik user; driver dan endpoint; riwayat pengiriman dan jumlah sukses/gagal |
+
+Tabel infrastruktur juga mencakup password_reset_tokens, sessions, cache, cache_locks, jobs, job_batches, failed_jobs. Keberadaan tabel reset password tidak berarti flow reset password sudah tersedia.
+
+Pemasukan peserta terhubung melalui session_registrations.income_id dengan restrictOnDelete. Pelepasan pembayaran dilakukan melalui action yang menghapus relasi sebelum income. Jangan menganggap semua data dapat dihapus dengan cascade: ikuti migration dan Actions penghapusan domain.
+
+Absensi peserta terhubung ke absensi membership: metode membership memakai satu kuota saat present, no_show/listed mengembalikannya. Tunai/transfer tidak memakai kuota. Persetujuan top-up baru membuat linked income satu kali; stok tetap tidak membuat expense otomatis. Detail lengkap: [matriks fitur](10-current-features.md).
+
+## Arsip schema MVP awal
+
+> Isi berikut terbatas pada keuangan awal. Contoh Livewire/Service/Repository dan checklist tes di bawah bukan inventaris kode saat ini.
 
 # 02-database.md
 

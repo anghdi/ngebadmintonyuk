@@ -37,6 +37,12 @@ class TransactionService
 
     private function ensureManualTransaction(?Model $transaction): void
     {
+        if ($transaction instanceof Income && $transaction->topUpRequest()->exists()) {
+            throw ValidationException::withMessages([
+                'transaction' => 'Pemasukan top up berasal dari persetujuan kuota dan tidak dapat diubah atau dihapus manual.',
+            ]);
+        }
+
         if ($transaction instanceof Income && $transaction->sessionRegistration()->exists()) {
             throw ValidationException::withMessages([
                 'transaction' => 'Pemasukan iuran lapangan dikelola dari daftar pemain.',

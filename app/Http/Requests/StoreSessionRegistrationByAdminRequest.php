@@ -26,7 +26,7 @@ class StoreSessionRegistrationByAdminRequest extends FormRequest
                 'integer',
                 Rule::exists(User::class, 'id')->where(fn ($query) => $query->where('role', 'member')),
             ],
-            'payment_method' => ['required', Rule::in(['transfer', 'cash'])],
+            'payment_method' => ['required', Rule::in(['transfer', 'cash', 'membership'])],
         ];
     }
 }

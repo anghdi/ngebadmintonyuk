@@ -18,6 +18,11 @@ class DeleteMemberAction
                 throw ValidationException::withMessages(['member' => 'Akun administrator tidak dapat dihapus.']);
             }
 
+            if ($lockedMember->topUpRequests()->exists() || $lockedMember->attendances()->exists()
+                || $lockedMember->sessionRegistrations()->where(fn ($query) => $query->where('payment_status', 'paid')->orWhere('attendance_status', '!=', 'listed'))->exists()) {
+                throw ValidationException::withMessages(['member' => 'Akun dengan riwayat top up, pembayaran atau absensi tidak dapat dihapus.']);
+            }
+
             $paths = $lockedMember->topUpRequests()->pluck('proof_path');
             $lockedMember->delete();
 

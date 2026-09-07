@@ -11,20 +11,38 @@ use Illuminate\Validation\ValidationException;
 
 class RecordAttendanceAction
 {
-    public function handle(PlaySession $playSession, User $member, string $status, ?string $notes, User $administrator): Attendance
+    public function handle(PlaySession $playSession, User $member, string $status, ?string $notes, User $administrator, bool $usesCredits = true): Attendance
     {
-        return DB::transaction(function () use ($playSession, $member, $status, $notes, $administrator): Attendance {
+        return DB::transaction(function () use ($playSession, $member, $status, $notes, $administrator, $usesCredits): Attendance {
+            $playSession = PlaySession::query()->lockForUpdate()->findOrFail($playSession->id);
+            User::query()->lockForUpdate()->findOrFail($member->id);
+
+            if ($status === 'present' && $playSession->status === 'cancelled') {
+                throw ValidationException::withMessages(['status' => 'Sesi yang dibatalkan tidak dapat mencatat kehadiran.']);
+            }
+
+            if (! in_array($status, ['present', 'absent'], true)) {
+                throw ValidationException::withMessages(['status' => 'Tidak hadir tidak boleh memotong kuota.']);
+            }
+
             $attendance = Attendance::query()
                 ->whereBelongsTo($playSession)
                 ->whereBelongsTo($member)
                 ->lockForUpdate()
                 ->first() ?? new Attendance(['play_session_id' => $playSession->id, 'user_id' => $member->id]);
 
+            $hasUsage = $attendance->exists && $attendance->transaction()->exists();
+            if ($attendance->exists && $attendance->status === $status && $hasUsage === ($usesCredits && $status === 'present')) {
+                $attendance->update(['notes' => $notes, 'recorded_by' => $administrator->id]);
+
+                return $attendance;
+            }
+
             if ($attendance->exists) {
                 $attendance->transaction()->delete();
             }
 
-            $membership = in_array($status, ['present', 'charged_absent'], true)
+            $membership = $usesCredits && $status === 'present'
                 ? $this->compatibleMembership($playSession, $member)
                 : null;
 
@@ -40,7 +58,7 @@ class RecordAttendanceAction
                     'attendance_id' => $attendance->id,
                     'type' => 'usage',
                     'quantity' => -1,
-                    'notes' => $status === 'present' ? 'Hadir bermain' : 'Tidak hadir, kuota tetap dipotong',
+                    'notes' => 'Hadir bermain',
                     'created_by' => $administrator->id,
                 ]);
             }

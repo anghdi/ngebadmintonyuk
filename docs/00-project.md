@@ -1,28 +1,16 @@
-# NgeBadmintonYuk ? overview proyek
+# Acuan proyek saat ini — 7 September 2026
 
-Diperbarui: **6 September 2026**.
+NgeBadmintonYuk sekarang mencakup operasional komunitas dan keuangan NgeKas, dengan akses admin dan member. Scope aktif meliputi registrasi akun, dashboard per peran, kategori, pemasukan/pengeluaran, laporan PDF, member, membership/kuota, top-up manual, jadwal publik, pendaftaran/waiting list, pembayaran peserta, absensi, inventori shuttlecock, push notification, PWA, dan papan skor.
 
-Aplikasi sudah berkembang dari MVP kas NgeKas menjadi aplikasi operasional komunitas badminton. Implementasi mencakup keuangan dan PDF, akun admin/member, membership dan kuota, top-up dengan verifikasi admin, jadwal dan waiting list, pembayaran sesi terhubung ke pemasukan, inventaris shuttlecock, Web Push, dan papan skor lokal.
+Baca [konteks final](11-final-context.md) sebagai titik masuk dan [matriks fitur](10-current-features.md) untuk bukti kode, pengujian, serta pekerjaan yang belum tercakup.
 
-**Mulai membaca dari [status dan konteks proyek terbaru](10-project-status.md).** Dokumen tersebut memuat bukti kode, peta arsitektur, data utama, batas verifikasi, dan prioritas pekerjaan berikutnya.
+Implementasi halaman memakai route → Controller → Blade. Mutasi domain memakai Actions; keuangan memakai TransactionService; laporan memakai ReportService → ReportRepository. Livewire terpasang, tetapi daftar komponen dan repository pada rancangan lama di bawah bukan struktur implementasi aktif.
 
-## Kondisi implementasi
+Registrasi, member, jadwal, kuota, status pembayaran, PDF, statistik operasional, dan bukti transfer top-up sudah tersedia. Payment gateway, Excel, pembukuan formal, ranking, turnamen, dan aplikasi native belum ditemukan. PWA bukan aplikasi native; audit kuota bukan audit log global.
 
-- Halaman menggunakan Controller + Blade; Actions menangani banyak proses bisnis. Laporan menggunakan Service + Repository.
-- Livewire tercantum dalam dependency, tetapi komponen/directive aplikasi belum ditemukan pada pemeriksaan kode.
-- Fitur inti sudah memiliki implementasi; kesiapan produksi belum terverifikasi.
-- Tujuh test JavaScript lulus. Test Laravel belum dapat dimulai karena dependency vendor belum tersedia.
-- Graphify yang ada masih snapshot versi awal; lihat [catatan Graphify](../graphify-out/README.md).
+## Arsip rancangan MVP awal
 
-## Membaca spesifikasi awal
-
-Dokumen 01?09 dan arsip di bawah adalah referensi rancangan awal, bukan checklist penyelesaian terkini. Asumsi satu admin, tanpa registrasi/member/jadwal, dan PDF sebagai fitur masa depan sudah berubah. Kesesuaian visual branding/UI belum diaudit pada pembaruan ini.
-
-## Arsip spesifikasi MVP awal
-
-Bagian berikut dipertahankan untuk konteks historis. Jika berbeda dengan snapshot terbaru, baca [10-project-status.md](10-project-status.md) dan kode terkait untuk memahami perilaku yang sekarang diimplementasikan.
-
----
+> Seluruh isi di bawah adalah rancangan historis, termasuk daftar scope, komponen, dan checklist testing. Jika berbeda, gunakan acuan saat ini di atas serta matriks fitur. Checklist lama adalah target penerimaan, bukan bukti tes sudah tersedia.
 
 # 00-project.md
 

@@ -18,11 +18,12 @@ use Illuminate\Support\Carbon;
  * @property string $proof_path
  * @property string $status
  * @property int|null $credits
+ * @property int|null $income_id
  * @property string|null $review_notes
  * @property int|null $reviewed_by
  * @property Carbon|null $reviewed_at
  */
-#[Fillable(['user_id', 'membership_id', 'amount', 'bank', 'proof_path', 'status', 'credits', 'review_notes', 'reviewed_by', 'reviewed_at'])]
+#[Fillable(['user_id', 'membership_id', 'amount', 'bank', 'proof_path', 'status', 'credits', 'review_notes', 'reviewed_by', 'reviewed_at', 'income_id'])]
 
 class TopUpRequest extends Model
 {
@@ -56,5 +57,11 @@ class TopUpRequest extends Model
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    /** @return BelongsTo<Income, $this> */
+    public function income(): BelongsTo
+    {
+        return $this->belongsTo(Income::class);
     }
 }

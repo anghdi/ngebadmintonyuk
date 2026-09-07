@@ -31,8 +31,8 @@
                 <span class="eyebrow">{{ $registrationIsWaiting ? 'WAITING LIST' : 'TERDAFTAR' }}</span>
                 <h2>{{ $registrationIsWaiting ? 'Anda masuk antrean' : 'Nama Anda sudah masuk' }}</h2>
                 <p>{{ $registrationIsWaiting ? 'Slot akan diberikan mengikuti urutan pendaftaran.' : 'Silakan hadir sesuai jadwal.' }}</p>
-                <div @class(['registration-confirmation', 'is-waiting' => $registrationIsWaiting])><strong>{{ $registration->name }}</strong><span>{{ $registrationIsWaiting ? 'Menunggu slot utama' : ($registration->payment_method === 'transfer' ? 'Transfer bank' : 'Bayar tunai') }}</span></div>
-                @if($registration->attendance_status === 'listed' && $registration->payment_status === 'unpaid')
+                <div @class(['registration-confirmation', 'is-waiting' => $registrationIsWaiting])><strong>{{ $registration->name }}</strong><span>{{ $registrationIsWaiting ? 'Menunggu slot utama' : ['transfer' => 'Transfer bank', 'cash' => 'Bayar tunai', 'membership' => 'Kuota membership'][$registration->payment_method] }}</span></div>
+                @if($registration->attendance_status === 'listed' && $registration->payment_status === 'unpaid' && $playSession->status === 'scheduled' && $playSession->scheduled_at->isFuture())
                     <form method="post" action="{{ route('public-sessions.cancel', [$playSession, $registration]) }}" class="registration-cancel" onsubmit="return confirm('Batalkan keikutsertaan dari sesi ini?')">
                         @csrf
                         @method('delete')
@@ -64,7 +64,9 @@
                         <legend>Pembayaran</legend>
                         <label><input type="radio" name="payment_method" value="transfer" @checked(old('payment_method') === 'transfer') required><span><b>Transfer</b><small>BCA atau BRI</small></span></label>
                         <label><input type="radio" name="payment_method" value="cash" @checked(old('payment_method') === 'cash') required><span><b>Tunai</b><small>Bayar di lokasi</small></span></label>
+                        <label><input type="radio" name="payment_method" value="membership" @checked(old('payment_method') === 'membership') required><span><b>Kuota membership</b><small>1 kuota saat hadir; tidak hadir tidak dipotong</small></span></label>
                     </fieldset>
+                    <p>Pastikan kuota aktif tersedia saat bermain. Pendaftaran dan waiting list belum memesan atau memotong kuota.</p>
                     <button class="btn primary full">{{ $mainListIsFull ? 'Masuk waiting list' : 'Masuk daftar' }}</button>
                 </form>
                 <div class="compact-bank-info"><span>BCA <b>6690685688</b></span><span>BRI <b>036801013857535</b></span><small>a.n. Angga Hadi Permana</small></div>
@@ -75,7 +77,7 @@
             <div class="card-head"><div><span class="eyebrow">PEMAIN</span><h2>{{ $confirmedRegistrations->count() }}/{{ $playSession->max_players }} slot utama</h2></div><span class="list-count-badge">{{ max(0, $playSession->max_players - $confirmedRegistrations->count()) }} tersedia</span></div>
             <ol class="participant-list">
                 @forelse($confirmedRegistrations as $participant)
-                    <li><span>{{ $loop->iteration }}</span><strong>{{ $participant->name }}</strong><small>{{ $participant->payment_method === 'transfer' ? 'Transfer' : 'Tunai' }}</small></li>
+                    <li><span>{{ $loop->iteration }}</span><strong>{{ $participant->name }}</strong><small>{{ ['transfer' => 'Transfer', 'cash' => 'Tunai', 'membership' => 'Kuota'][$participant->payment_method] }}</small></li>
                 @empty
                     <li class="empty">Belum ada pemain.</li>
                 @endforelse

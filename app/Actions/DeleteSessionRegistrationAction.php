@@ -11,6 +11,7 @@ class DeleteSessionRegistrationAction
     public function handle(SessionRegistration $registration): void
     {
         DB::transaction(function () use ($registration): void {
+            $registration->playSession()->lockForUpdate()->firstOrFail();
             $lockedRegistration = SessionRegistration::query()->lockForUpdate()->findOrFail($registration->id);
 
             if ($lockedRegistration->attendance_status !== 'listed' || $lockedRegistration->payment_status === 'paid') {

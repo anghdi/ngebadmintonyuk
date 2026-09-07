@@ -13,3 +13,6 @@ New player-device subscriptions use standard VAPID Web Push for Android browsers
 
 ## Session activity uses standard Web Push
 This supersedes the earlier manual-only FCM rule. New player-device subscriptions use standard VAPID Web Push for Android browsers and installed iOS PWAs. Joining or cancelling a play session sends synchronously to all subscribed member devices; admin manual broadcasts remain available. Keep FCM delivery only for legacy stored FCM subscriptions.
+
+## Top up cash and session quota settle without duplicate income
+Approved top ups atomically grant exactly four ledger credits and create one linked Top Up Kuota income using the submitted amount and approval date. Old approvals are not backfilled automatically. Protect linked income from manual edits/deletion. Membership session payment creates no income; consume one credit only on present attendance, and restore it when corrected to no_show or listed. No-show never consumes credits. This supersedes the older rule separating registration attendance from the membership ledger; cash/transfer attendance does not consume quota. Keep legacy standalone membership attendance compatible.

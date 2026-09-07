@@ -1,4 +1,14 @@
-> **Catatan status ? 6 September 2026:** Dokumen ini adalah spesifikasi/desain awal MVP, bukan laporan implementasi terkini. Scope, arsitektur, dan sebagian asumsi telah berubah. Baca [status proyek terbaru](10-project-status.md) untuk fitur yang sudah diimplementasikan, perbedaan dari rancangan ini, dan hasil verifikasi.
+# Kategori saat ini — 7 September 2026
+
+Sumber: [CategoryController](../app/Http/Controllers/CategoryController.php), [Category](../app/Models/Category.php), [halaman kategori](../resources/views/categories/index.blade.php).
+
+Admin dapat membuat, mengubah, menghapus, dan memfilter kategori menurut type. Nama wajib maksimal 255 karakter dan unik per type (income/expense). Kategori yang sudah digunakan boleh diganti namanya, tetapi tidak boleh diubah tipenya atau dihapus. Pembayaran peserta membuat kategori Iuran Lapangan bertipe income bila belum ada.
+
+Implementasi memakai Controller + Eloquent + Blade; CategoryService, CategoryRepository dan komponen Livewire pada rancangan lama belum ada. FinanceTest menguji penolakan kategori expense pada income, belum seluruh CRUD kategori. Lihat [matriks](10-current-features.md).
+
+## Arsip rancangan kategori awal
+
+> Nama class dan checklist di bawah adalah rancangan, bukan daftar implementasi/tes yang telah selesai.
 
 # 05-category.md
 

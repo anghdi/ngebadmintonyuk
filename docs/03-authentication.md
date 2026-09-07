@@ -1,4 +1,19 @@
-> **Catatan status ? 6 September 2026:** Dokumen ini adalah spesifikasi/desain awal MVP, bukan laporan implementasi terkini. Scope, arsitektur, dan sebagian asumsi telah berubah. Baca [status proyek terbaru](10-project-status.md) untuk fitur yang sudah diimplementasikan, perbedaan dari rancangan ini, dan hasil verifikasi.
+# Autentikasi saat ini — 7 September 2026
+
+- Guest dapat melihat jadwal publik, login, dan registrasi melalui /daftar.
+- Registrasi membuat akun member aktif dan langsung login; bukan sistem satu admin.
+- Login memakai AuthController dan session guard, remember me, regenerasi session. Logout mengakhiri session dan memperbarui token CSRF.
+- Gate admin didefinisikan di AppServiceProvider menggunakan User::isAdmin(). Halaman administrasi memakai auth + can:admin; Form Requests juga melakukan otorisasi.
+- Dashboard bercabang menurut peran. Member hanya melihat data paket/top-up miliknya; bukti transfer hanya dapat dibuka pemilik atau admin.
+- RequireCurrentPushSetup dan ResetLegacyPushSubscriptionsAction menghapus subscription FCM lama dan meminta login ulang. Member tanpa subscription tetap dapat menggunakan aplikasi; aktivasi notifikasi ditawarkan setelah login.
+- Registrasi dibatasi 10 permintaan/menit. Tidak ada throttle eksplisit pada route login saat audit.
+- Flow reset password, verifikasi email, OAuth, dan role/permission granular belum ditemukan.
+
+Bukti: [routes](../routes/web.php), [AuthController](../app/Http/Controllers/AuthController.php), [RegistrationController](../app/Http/Controllers/RegistrationController.php). Tes: MembershipRegistrationTest, PushNotificationTest, FinanceTest. Lihat [matriks](10-current-features.md).
+
+## Arsip rancangan autentikasi awal
+
+> Pernyataan single admin, registrasi dinonaktifkan, dan komponen Livewire di bawah telah digantikan oleh implementasi di atas. Checklist testing lama tetap menjadi referensi penerimaan, bukan laporan hasil tes.
 
 # 03-authentication.md
 

@@ -14,10 +14,34 @@ class RecordSessionRegistrationPaymentAction
     public function handle(SessionRegistration $registration, string $paymentMethod, bool $isPaid, User $administrator): SessionRegistration
     {
         return DB::transaction(function () use ($registration, $paymentMethod, $isPaid, $administrator): SessionRegistration {
+            $registration->playSession()->lockForUpdate()->firstOrFail();
             $lockedRegistration = SessionRegistration::query()
                 ->with(['income', 'playSession'])
                 ->lockForUpdate()
                 ->findOrFail($registration->id);
+
+            if ($lockedRegistration->attendance_status !== 'listed'
+                && ($paymentMethod !== $lockedRegistration->payment_method || $paymentMethod === 'membership')) {
+                throw ValidationException::withMessages(['payment' => 'Kembalikan kehadiran ke Terdaftar sebelum mengubah metode atau pemakaian kuota.']);
+            }
+
+            if ($paymentMethod === 'membership') {
+                if ($isPaid || $lockedRegistration->income_id !== null) {
+                    throw ValidationException::withMessages(['payment' => 'Batalkan pembayaran uang terlebih dahulu. Kuota dipotong otomatis saat ditandai hadir.']);
+                }
+
+                if ($lockedRegistration->user_id === null) {
+                    throw ValidationException::withMessages(['payment' => 'Pembayaran kuota membutuhkan akun member.']);
+                }
+
+                $lockedRegistration->update(['payment_method' => 'membership', 'payment_status' => 'unpaid']);
+
+                return $lockedRegistration->refresh();
+            }
+
+            if ($isPaid && $lockedRegistration->playSession->status === 'cancelled') {
+                throw ValidationException::withMessages(['payment' => 'Sesi yang dibatalkan tidak dapat menerima pembayaran.']);
+            }
 
             $position = SessionRegistration::query()
                 ->where('play_session_id', $lockedRegistration->play_session_id)

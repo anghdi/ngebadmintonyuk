@@ -22,7 +22,7 @@ class StoreSessionRegistrationRequest extends FormRequest
     {
         return [
             'phone' => ['nullable', 'regex:/^[0-9]{10,15}$/'],
-            'payment_method' => ['required', Rule::in(['transfer', 'cash'])],
+            'payment_method' => ['required', Rule::in(['transfer', 'cash', 'membership'])],
         ];
     }
 

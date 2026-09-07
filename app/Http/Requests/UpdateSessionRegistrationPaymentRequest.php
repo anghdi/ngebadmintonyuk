@@ -26,7 +26,7 @@ class UpdateSessionRegistrationPaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_method' => ['required', Rule::in(['transfer', 'cash'])],
+            'payment_method' => ['required', Rule::in(['transfer', 'cash', 'membership'])],
             'is_paid' => ['required', 'boolean'],
         ];
     }

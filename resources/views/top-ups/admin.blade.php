@@ -7,7 +7,7 @@
         <div>
             <span class="eyebrow">PEMBAYARAN</span>
             <h1>Verifikasi top up</h1>
-            <p>Periksa dana dan bukti transfer member.</p>
+            <p>Periksa dana dan bukti transfer member. Persetujuan menambahkan 4 kuota dan mencatat pemasukan satu kali pada tanggal persetujuan.</p>
         </div>
     </div>
 
@@ -47,6 +47,11 @@
                             </form>
                         @else
                             <span>{{ $topUpRequest->status === 'approved' ? $topUpRequest->credits.' kuota' : 'Tidak diberikan' }}</span>
+                            @if($topUpRequest->income_id)
+                                <a class="link" href="{{ route('incomes.show', $topUpRequest->income_id) }}">Lihat pemasukan</a>
+                            @elseif($topUpRequest->status === 'approved')
+                                <small>Persetujuan lama: belum ditautkan ke kas otomatis.</small>
+                            @endif
                             @if($topUpRequest->review_notes)<small>{{ $topUpRequest->review_notes }}</small>@endif
                         @endif
                     </td>
