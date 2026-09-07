@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\MembershipController;
+use App\Http\Controllers\NotificationSetupController;
 use App\Http\Controllers\PlaySessionController;
 use App\Http\Controllers\PublicPlaySessionController;
 use App\Http\Controllers\PushNotificationController;
@@ -19,14 +20,15 @@ use App\Http\Controllers\TopUpRequestController;
 use App\Http\Controllers\TopUpSettingController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Middleware\RequireCurrentPushSetup;
+use App\Http\Middleware\RequireMemberNotifications;
 use App\Models\Expense;
 use App\Models\Income;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard')->name('home');
 Route::get('/app.css', fn () => response()->file(resource_path('css/app.css'), ['Content-Type' => 'text/css']))->name('app.css');
-Route::get('/jadwal', [PublicPlaySessionController::class, 'index'])->name('public-sessions.index');
-Route::get('/jadwal/{playSession}', [PublicPlaySessionController::class, 'show'])->name('public-sessions.show');
+Route::get('/jadwal', [PublicPlaySessionController::class, 'index'])->middleware([RequireCurrentPushSetup::class, RequireMemberNotifications::class])->name('public-sessions.index');
+Route::get('/jadwal/{playSession}', [PublicPlaySessionController::class, 'show'])->middleware([RequireCurrentPushSetup::class, RequireMemberNotifications::class])->name('public-sessions.show');
 Route::get('/firebase-messaging-sw.js', fn () => response()
     ->view('firebase-messaging-sw')
     ->header('Content-Type', 'application/javascript')
@@ -41,7 +43,8 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::bind('transaction', fn ($id) => request()->routeIs('incomes.*') ? Income::findOrFail($id) : Expense::findOrFail($id));
-Route::middleware(['auth', RequireCurrentPushSetup::class])->group(function () {
+Route::middleware(['auth', RequireCurrentPushSetup::class, RequireMemberNotifications::class])->group(function () {
+    Route::get('/aktifkan-notifikasi', NotificationSetupController::class)->name('notifications.setup');
     Route::post('/jadwal/{playSession}/daftar', [SessionRegistrationController::class, 'store'])->middleware('throttle:5,1')->name('public-sessions.register');
     Route::delete('/jadwal/{playSession}/daftar/{registration}', [SessionRegistrationController::class, 'cancel'])->scopeBindings()->name('public-sessions.cancel');
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
@@ -53,7 +56,7 @@ Route::middleware(['auth', RequireCurrentPushSetup::class])->group(function () {
     Route::post('/top-ups', [TopUpRequestController::class, 'store'])->middleware('throttle:5,1')->name('top-ups.store');
     Route::get('/top-ups/{topUpRequest}/proof', [TopUpRequestController::class, 'proof'])->name('top-ups.proof');
 
-    Route::middleware('can:admin')->group(function () {
+    Route::middleware('can:admin')->withoutMiddleware(RequireMemberNotifications::class)->group(function () {
         Route::put('/top-up-settings', [TopUpSettingController::class, 'update'])->name('top-up-settings.update');
         Route::put('/top-ups/{topUpRequest}', [TopUpRequestController::class, 'update'])->name('top-ups.update');
         Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);

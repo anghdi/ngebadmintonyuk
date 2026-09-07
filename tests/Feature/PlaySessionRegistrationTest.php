@@ -24,7 +24,7 @@ test('account without whatsapp or membership can join a play session', function 
     $account = User::factory()->member()->create(['phone' => null]);
     $playSession = PlaySession::factory()->create();
 
-    $this->actingAs($account)->post(route('public-sessions.register', $playSession), [
+    $this->actingAsNotifiedMember($account)->post(route('public-sessions.register', $playSession), [
         'phone' => null,
         'payment_method' => 'cash',
     ])->assertRedirect(route('public-sessions.show', $playSession));
@@ -41,8 +41,8 @@ test('an account can only join the same play session once', function () {
     $playSession = PlaySession::factory()->create();
     $payload = ['phone' => null, 'payment_method' => 'transfer'];
 
-    $this->actingAs($account)->post(route('public-sessions.register', $playSession), $payload)->assertRedirect();
-    $this->actingAs($account)->post(route('public-sessions.register', $playSession), $payload)->assertSessionHasErrors('account');
+    $this->actingAsNotifiedMember($account)->post(route('public-sessions.register', $playSession), $payload)->assertRedirect();
+    $this->actingAsNotifiedMember($account)->post(route('public-sessions.register', $playSession), $payload)->assertSessionHasErrors('account');
 
     expect($playSession->registrations()->count())->toBe(1);
 });
@@ -56,25 +56,25 @@ test('registrations continue into waiting list and promote automatically', funct
         'max_waiting_players' => 1,
     ]);
 
-    $this->actingAs($firstPlayer)->post(route('public-sessions.register', $playSession), [
+    $this->actingAsNotifiedMember($firstPlayer)->post(route('public-sessions.register', $playSession), [
         'payment_method' => 'cash',
     ])->assertSessionHas('success', 'Nama Anda berhasil masuk daftar bermain.');
 
-    $this->actingAs($waitingPlayer)->post(route('public-sessions.register', $playSession), [
+    $this->actingAsNotifiedMember($waitingPlayer)->post(route('public-sessions.register', $playSession), [
         'payment_method' => 'cash',
     ])->assertSessionHas('success', 'Nama Anda berhasil masuk waiting list.');
 
-    $this->actingAs($blockedPlayer)->post(route('public-sessions.register', $playSession), [
+    $this->actingAsNotifiedMember($blockedPlayer)->post(route('public-sessions.register', $playSession), [
         'payment_method' => 'cash',
     ])->assertSessionHasErrors('session');
 
     $firstRegistration = $playSession->registrations()->whereBelongsTo($firstPlayer)->sole();
 
-    $this->actingAs($firstPlayer)
+    $this->actingAsNotifiedMember($firstPlayer)
         ->delete(route('public-sessions.cancel', [$playSession, $firstRegistration]))
         ->assertRedirect();
 
-    $this->actingAs($waitingPlayer)
+    $this->actingAsNotifiedMember($waitingPlayer)
         ->get(route('public-sessions.show', $playSession))
         ->assertSuccessful()
         ->assertSee('Nama Anda sudah masuk')
@@ -173,12 +173,12 @@ test('player can cancel their own unpaid listed registration before the session'
         'attendance_status' => 'listed',
     ]);
 
-    $this->actingAs($account)
+    $this->actingAsNotifiedMember($account)
         ->get(route('public-sessions.show', $playSession))
         ->assertSuccessful()
         ->assertSee('Batalkan keikutsertaan');
 
-    $this->actingAs($account)
+    $this->actingAsNotifiedMember($account)
         ->delete(route('public-sessions.cancel', [$playSession, $registration]))
         ->assertRedirect(route('public-sessions.show', $playSession));
 
@@ -194,7 +194,7 @@ test('player cannot cancel another accounts registration', function () {
         'user_id' => $otherAccount->id,
     ]);
 
-    $this->actingAs($account)
+    $this->actingAsNotifiedMember($account)
         ->delete(route('public-sessions.cancel', [$playSession, $registration]))
         ->assertForbidden();
 
@@ -211,7 +211,7 @@ test('player cannot cancel a paid registration', function () {
         'attendance_status' => 'listed',
     ]);
 
-    $this->actingAs($account)
+    $this->actingAsNotifiedMember($account)
         ->delete(route('public-sessions.cancel', [$playSession, $registration]))
         ->assertSessionHasErrors('registration');
 
@@ -226,7 +226,7 @@ test('player cannot cancel a registration after the session time', function () {
         'user_id' => $account->id,
     ]);
 
-    $this->actingAs($account)
+    $this->actingAsNotifiedMember($account)
         ->delete(route('public-sessions.cancel', [$playSession, $registration]))
         ->assertForbidden();
 
@@ -248,7 +248,7 @@ test('no show blocking follows the account when whatsapp is empty', function () 
 
     $playSession = PlaySession::factory()->create();
 
-    $this->actingAs($account)->post(route('public-sessions.register', $playSession), [
+    $this->actingAsNotifiedMember($account)->post(route('public-sessions.register', $playSession), [
         'phone' => null,
         'payment_method' => 'cash',
     ])->assertSessionHasErrors('account');
@@ -269,7 +269,7 @@ test('member dashboard exposes copy controls for both bank accounts', function (
     ]);
     SessionRegistration::factory()->for($joinedSession)->for($account)->create();
 
-    $response = $this->actingAs($account)->get(route('dashboard'))
+    $response = $this->actingAsNotifiedMember($account)->get(route('dashboard'))
         ->assertSuccessful()
         ->assertSee('Lihat panduan')
         ->assertSee('data-usage-guide-dialog', escape: false)

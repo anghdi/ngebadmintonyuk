@@ -46,12 +46,12 @@ test('signed in member sees the application sidebar on schedule pages', function
     $scheduledAt = now()->addMonthNoOverflow()->startOfMonth()->addDays(5)->setTime(19, 0);
     $playSession = PlaySession::factory()->create(['scheduled_at' => $scheduledAt]);
 
-    $this->actingAs($member)
+    $this->actingAsNotifiedMember($member)
         ->get(route('public-sessions.index', ['month' => $scheduledAt->format('Y-m')]))
         ->assertSuccessful()
         ->assertSee('id="sidebar"', escape: false);
 
-    $this->actingAs($member)
+    $this->actingAsNotifiedMember($member)
         ->get(route('public-sessions.show', $playSession))
         ->assertSuccessful()
         ->assertSee('id="sidebar"', escape: false);

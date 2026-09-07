@@ -205,7 +205,7 @@ test('session cancellation is blocked while quota is used and succeeds after cor
 
 test('member may select quota and cancel before attendance without changing balances', function () {
     $session = PlaySession::factory()->create();
-    $this->actingAs($this->member)->post(route('public-sessions.register', $session), ['payment_method' => 'membership'])
+    $this->actingAsNotifiedMember($this->member)->post(route('public-sessions.register', $session), ['payment_method' => 'membership'])
         ->assertSessionHasNoErrors();
     $registration = $session->registrations()->sole();
     $this->delete(route('public-sessions.cancel', [$session, $registration]))->assertSessionHasNoErrors();
@@ -227,6 +227,6 @@ test('quota controls and recorded top up income are visible in the existing page
     $this->actingAs($this->administrator)->get(route('play-sessions.show', $this->playSession))
         ->assertSuccessful()->assertSee('Kuota membership')->assertDontSee('Absen dipotong');
     $this->get(route('top-ups.index'))->assertSuccessful()->assertSee('Lihat pemasukan');
-    $this->actingAs($this->member)->get(route('public-sessions.show', $this->playSession))
+    $this->actingAsNotifiedMember($this->member)->get(route('public-sessions.show', $this->playSession))
         ->assertSuccessful()->assertSee('Kuota membership');
 });

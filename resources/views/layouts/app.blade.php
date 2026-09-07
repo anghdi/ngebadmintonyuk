@@ -21,11 +21,12 @@
 <body
     @if(! auth()->user()->isAdmin())
         data-push-client
+        data-push-setup-url="{{ route('notifications.setup') }}"
+        data-push-current-installation="{{ session('push_installation_id') }}"
         data-webpush-vapid-key="{{ config('services.webpush.public_key') }}"
         data-firebase-service-worker-url="{{ route('firebase.service-worker') }}"
         data-push-store-url="{{ route('push-subscriptions.store') }}"
         data-push-delete-url="{{ route('push-subscriptions.destroy') }}"
-        data-push-auto-prompt="{{ session()->pull('offer_push_notifications', false) ? 'true' : 'false' }}"
     @endif
 >
 <div class="shell">
@@ -102,20 +103,9 @@
     <button type="button" class="btn primary full" data-pwa-guide-close>Mengerti</button>
 </dialog>
 
-@if(! auth()->user()->isAdmin())
-    <dialog class="pwa-install-dialog push-permission-dialog" data-push-permission-dialog aria-labelledby="push-permission-title">
-        <span class="push-permission-icon" aria-hidden="true">◉</span>
-        <span class="eyebrow">NOTIFIKASI KOMUNITAS</span>
-        <h2 id="push-permission-title">Aktifkan notifikasi?</h2>
-        <p>Dapatkan kabar saat pemain ikut atau batal dari sesi, serta pengumuman penting dari admin.</p>
-        <div class="push-permission-actions">
-            <button type="button" class="btn soft" data-push-permission-later>Nanti saja</button>
-            <button type="button" class="btn primary" data-push-permission-allow>Aktifkan</button>
-        </div>
-        <small>Di iPhone, pasang aplikasi ke Home Screen terlebih dahulu agar notifikasi tersedia.</small>
-    </dialog>
-@endif
+
 
 @stack('scripts')
+<x-server-loading />
 </body>
 </html>

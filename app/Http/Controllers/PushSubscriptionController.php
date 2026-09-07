@@ -30,10 +30,18 @@ class PushSubscriptionController extends Controller
             ],
         );
 
+        $request->session()->put('push_installation_id', $installationId);
+        $intendedUrl = $request->session()->pull('push_intended_url');
+        $redirectUrl = is_string($intendedUrl) && str_starts_with($intendedUrl, '/')
+            && ! str_starts_with($intendedUrl, '//') && ! str_contains($intendedUrl, '\\')
+            ? url($intendedUrl)
+            : route('dashboard');
+
         return response()->json([
             'active' => true,
             'id' => $subscription->id,
             'installation_id' => $subscription->installation_id,
+            'redirect_url' => $redirectUrl,
         ]);
     }
 
@@ -43,6 +51,10 @@ class PushSubscriptionController extends Controller
             ->whereBelongsTo($request->user())
             ->where('installation_id', $request->validated('installation_id'))
             ->delete();
+
+        if ($request->session()->get('push_installation_id') === $request->validated('installation_id')) {
+            $request->session()->forget('push_installation_id');
+        }
 
         return response()->noContent();
     }

@@ -7,7 +7,7 @@
     <title>Buat Akun — NgeBadmintonYuk</title>
     <link rel="icon" href="{{ asset('pwa-icon-192.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" sizes="180x180">
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ route('app.css') }}">
 </head>
 <body class="login-page">
@@ -34,5 +34,6 @@
     </form>
     <small>KOMUNITAS BADMINTON</small>
 </main>
+<x-server-loading />
 </body>
 </html>

@@ -2,6 +2,33 @@
 
 Snapshot audit: **7 September 2026**. Dokumen ini adalah konteks serah-terima keadaan repository, bukan pernyataan bahwa semua backlog atau deployment selesai.
 
+## Pembaruan terbaru: notifikasi wajib bagi member
+
+- [RequireMemberNotifications](../app/Http/Middleware/RequireMemberNotifications.php) memblokir fitur member sampai session memiliki push_installation_id yang cocok dengan subscription Web Push milik member. Perangkat/browser baru harus aktivasi; subscription akun di perangkat lain tidak membuka akses.
+- Halaman `/aktifkan-notifikasi` memakai [NotificationSetupController](../app/Http/Controllers/NotificationSetupController.php) dan [view aktivasi](../resources/views/auth/notifications.blade.php). Tidak ada pilihan lewati; logout dan endpoint subscription tetap bisa digunakan. Admin serta jadwal publik untuk guest tidak dibatasi.
+- [member-notifications.js](../resources/js/member-notifications.js) meminta izin setelah klik. Izin yang sudah granted dapat didaftarkan ulang otomatis untuk session baru. Akses baru dibuka setelah penyimpanan server berhasil; kegagalan menyediakan tombol coba lagi.
+- Izin denied memerlukan perubahan pengaturan browser. iPhone/iPad memerlukan iOS/iPadOS 16.4+ dan aplikasi terpasang ke Layar Utama. Browser tanpa dukungan, origin tidak aman, atau konfigurasi VAPID belum tersedia tetap di halaman aktivasi dengan petunjuk. Pastikan HTTPS dan konfigurasi Web Push tersedia pada server aplikasi.
+- Halaman member memeriksa izin/subscription saat dibuka, kembali ke tab, kembali dari riwayat browser, dan saat Permissions API melaporkan perubahan. Izin dicabut atau subscription hilang menghapus pendaftaran perangkat saat ini dan mengarahkan ke aktivasi. Tidak ada tombol opt-out dalam aplikasi.
+- Tujuan GET sebelumnya dikembalikan setelah aktivasi. POST yang terblokir tidak dijalankan atau dikirim ulang otomatis; respons JSON ditolak dengan 403 dan redirect_url. Reset FCM lama tetap menghapus subscription legacy dan logout sekali.
+- Server memvalidasi pendaftaran perangkat/session, bukan menjamin notifikasi benar-benar ditampilkan OS. Izin tidak bisa disetujui otomatis oleh aplikasi; pengiriman nyata Android/iOS belum diuji pada tahap ini.
+
+Verifikasi: seluruh **83 tes fitur lulus (437 assertions)**. [MemberNotificationRequirementTest](../tests/Feature/MemberNotificationRequirementTest.php) mencakup pembatasan route, kepemilikan perangkat, aktivasi, penghapusan subscription, tujuan navigasi, serta pengecualian admin/guest/logout. Delapan tes JavaScript baru lulus (21 total termasuk loading/PWA/papan skor), Pint lulus, dan build Vite berhasil memakai Node 24.13.0. Tes bisnis member memakai fixture subscription/session aktif dengan sender palsu; middleware tetap dijalankan. Graphify telah diregenerasi setelah perubahan notifikasi wajib.
+
+## Pembaruan antarmuka: indikator proses server
+
+Indikator loading bersama tersedia pada layout admin/member, publik, login dan registrasi. Komponen [server-loading](../resources/views/components/server-loading.blade.php) dikendalikan [server-loading.js](../resources/js/server-loading.js) melalui entry app.js.
+
+- Muncul setelah 160 ms saat navigasi internal, submit form yang tidak dibatalkan, pemuatan awal halaman, dan request simpan/hapus notifikasi. Form invalid tetap memakai validasi browser tanpa loading.
+- Submit ganda dicegah tanpa menonaktifkan tombol sehingga nilai tombol seperti status approved tetap terkirim. Filter kategori memakai requestSubmit agar mengikuti proses yang sama.
+- Request async memakai controller.run dan finally; permintaan bersamaan ditunggu sampai selesai. pageshow/pagehide membersihkan indikator agar tidak tertinggal saat tombol Back/Forward.
+- Anchor, tautan eksternal/tab baru dan unduhan PDF dikecualikan. Gunakan data-no-loading untuk navigasi yang tidak mengganti halaman, dan controller.run untuk pekerjaan async baru.
+- Pesan tambahan muncul setelah 10 detik. Tombol Tutup indikator hanya menyembunyikan overlay, tidak membatalkan request atau mengirim ulang data. Animasi menghormati reduced motion.
+- Tes JavaScript dan build frontend berhasil memakai Node 24.13.0 yang sudah terpasang; Node default 14 bukan runtime yang dipakai untuk build ini.
+
+Verifikasi pembaruan loading: 13 tes JavaScript lulus, 25 tes fitur terkait (ServerLoadingTest, MembershipRegistrationTest, PushNotificationTest) lulus, dan 2 tes integritas docs/graph lulus. Build Vite berhasil; aset public/build sudah diperbarui.
+
+**Keputusan bisnis:** tidak ada refund. paid→unpaid adalah koreksi pencatatan, bukan alur pengembalian uang atau backlog fitur refund.
+
 ## Tahap terbaru: kas–kuota dan siklus peserta
 
 Poin 1–2 telah diimplementasikan sesuai keputusan pengguna: persetujuan top-up mencatat pemasukan sekali; pemakaian kuota tidak membuat pemasukan baru; no-show tidak memotong kuota.
@@ -19,7 +46,7 @@ Poin 1–2 telah diimplementasikan sesuai keputusan pengguna: persetujuan top-up
 
 **Penerapan belum selesai di database lokal:** MySQL 127.0.0.1:3306 menolak koneksi saat migrate:status. Migration [penautan income top-up](../database/migrations/2026_09_07_143625_add_income_id_to_top_up_requests_table.php) sudah teruji dalam SQLite in-memory tetapi belum diterapkan ke MySQL aplikasi. Setelah MySQL tersedia, jalankan `php artisan migrate --no-interaction` sebelum menggunakan perubahan ini.
 
-Persetujuan top-up lama tidak di-backfill otomatis karena bisa sudah dicatat manual dalam kas. Registrasi/absensi dan potongan charged_absent historis juga tidak diubah massal. Refund uang nyata dilakukan admin di luar aplikasi; perubahan paid→unpaid mengoreksi catatan, bukan mentransfer uang. Pembatalan/refund top-up approved belum tersedia. Integrasi stok→expense tetap di luar tahap ini.
+Persetujuan top-up lama tidak di-backfill otomatis karena bisa sudah dicatat manual dalam kas. Registrasi/absensi dan potongan charged_absent historis juga tidak diubah massal. Tidak ada refund; perubahan paid→unpaid hanya mengoreksi catatan pembayaran. Integrasi stok→expense tetap di luar tahap ini.
 
 ## Identitas dan scope
 

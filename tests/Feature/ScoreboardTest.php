@@ -5,7 +5,7 @@ use App\Models\User;
 test('authenticated players can open the badminton scoreboard', function () {
     $player = User::factory()->member()->create();
 
-    $this->actingAs($player)
+    $this->actingAsNotifiedMember($player)
         ->get(route('scoreboard'))
         ->assertSuccessful()
         ->assertViewIs('scoreboard')

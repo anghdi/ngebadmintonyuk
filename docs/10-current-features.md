@@ -25,11 +25,12 @@ Tanggal audit: 7 September 2026. Status **ada** berarti ditemukan di kode/route,
 | Batal main / pemilik member | CancelSessionRegistrationRequest + DeleteSessionRegistrationAction; milik sendiri, sebelum sesi, listed dan unpaid | PlaySessionRegistrationTest: sukses, bukan pemilik, sudah bayar, sesi lewat |
 | Blok no-show / member | RegisterForPlaySessionAction menolak akun dengan >=3 no_show lintas sesi | PlaySessionRegistrationTest |
 | Inventori / admin | ShuttlecockInventoryController + StockMovementController; item, mutasi purchase/usage/adjustment dan batas stok | ShuttlecockInventoryTest: tambah stok, stok tidak negatif; update/delete belum lengkap |
-| Push / member | PushSubscriptionController; opt-in/out per browser, standard Web Push; reset subscription FCM lama | PushNotificationTest |
+| Push / member | RequireMemberNotifications mewajibkan aktivasi per perangkat/session sebelum akses fitur; NotificationSetupController dan member-notifications.js menangani izin, pendaftaran Web Push, serta pemeriksaan izin dicabut; reset FCM lama tetap berlaku | MemberNotificationRequirementTest, PushNotificationTest dan tests/JavaScript/member-notifications.test.js |
 | Broadcast dan pelanggan push / admin | PushNotificationController; semua member/per sesi, riwayat pengiriman, daftar perangkat | PushNotificationTest; pengiriman nyata ke perangkat belum diuji pada audit ini |
 | Notifikasi aktivitas / otomatis | SendSessionRegistrationNotificationAction; daftar/batal mengirim sinkron ke semua perangkat member berlangganan | PushNotificationTest |
 | PWA / browser yang mendukung | Manifest, service worker dan panduan instalasi/aktivasi push | PushNotificationTest dan tests/JavaScript/pwa-install.test.js; instalasi nyata lintas perangkat belum diverifikasi |
 | Papan skor / akun login | Route scoreboard, view scoreboard, resources/js/scoreboard.js; skor 21, deuce sampai 30, dua kemenangan game | ScoreboardTest dan tests/JavaScript/scoreboard.test.js; tidak ada model/route simpan pertandingan ke server |
+| Indikator loading / semua peran | Komponen server-loading dan resources/js/server-loading.js; navigasi internal, submit form, pemuatan awal dan request notifikasi; reset saat kembali browser; PDF/tab baru/anchor dikecualikan | ServerLoadingTest dan tests/JavaScript/server-loading.test.js |
 
 ## Aturan operasional yang tidak boleh terlewat
 
@@ -43,7 +44,7 @@ Tanggal audit: 7 September 2026. Status **ada** berarti ditemukan di kode/route,
 | Membership present/no_show → listed | Tidak berubah | Absensi dihapus, usage bila ada dikembalikan, payment unpaid |
 | Cash/transfer dikonfirmasi paid | Satu income peserta | Tidak memotong kredit |
 | Cash/transfer hadir/no_show | Catatan pembayaran tetap | Absensi tersinkron, tanpa usage |
-| Cash/transfer paid → unpaid | Linked income dihapus | Refund uang nyata tetap dilakukan admin di luar aplikasi |
+| Cash/transfer paid → unpaid | Linked income dihapus | Hanya koreksi pencatatan pembayaran; tidak ada refund |
 | Ubah metode setelah absensi | Ditolak | Koreksi ke listed dahulu |
 | Hapus peserta | Hanya listed + unpaid | Waiting berikutnya naik menurut ID; pembatalan mandiri hanya sesi scheduled yang belum mulai |
 | Batalkan sesi dengan paid/usage | Ditolak | Selesaikan koreksi pembayaran/kuota dahulu |
@@ -73,7 +74,7 @@ Data top-up approved dan charged_absent lama tidak diproses ulang secara massal.
 
 - Stok = jumlah quantity bertanda. Purchase dan adjustment menambah; usage mengurangi. Input quantity positif; hasil akhir tidak boleh negatif. Unit cost hanya atribut mutasi, tidak otomatis menjadi expense.
 - Push dikirim sinkron; belum ada jobs/scheduler notifikasi domain. Gagal mengirim notifikasi aktivitas dilaporkan tanpa membatalkan pendaftaran yang berhasil.
-- Subscription baru menggunakan Web Push VAPID; kode sender FCM masih ada untuk kompatibilitas. Reset subscription lama saat login/request adalah perilaku yang diuji, bukan kewajiban semua member mengaktifkan notifikasi.
+- Subscription baru menggunakan Web Push VAPID; kode sender FCM masih ada untuk kompatibilitas. Member wajib mengaktifkan notifikasi di perangkat/session yang dipakai sebelum membuka fitur. Subscription milik akun yang sama di perangkat lain tidak cukup. Admin dan jadwal publik untuk guest dikecualikan; logout serta endpoint aktivasi/penghapusan subscription tetap tersedia. Izin browser tetap harus disetujui sendiri oleh member.
 - Member tidak boleh mengakses administrasi. Registrasi, daftar main, upload top-up, subscription dan broadcast memiliki throttle route; login belum memiliki throttle eksplisit.
 
 ## Perbedaan dengan dokumen lama yang diselesaikan
@@ -96,7 +97,7 @@ Bagian awal docs 00–09 sekarang menjelaskan status aktual. Isi lama tetap dibe
 1. Terapkan migration penautan income top-up setelah MySQL lokal tersedia. Rekonsiliasi persetujuan top-up dan absensi historis secara manual sebelum memilih backfill; jangan mencatat uang atau mengembalikan kuota lama secara massal tanpa pemeriksaan.
 2. Tambahkan coverage keuangan: kategori CRUD, update/delete income/expense, cascade, saldo, batas periode, PDF, serta proteksi income peserta.
 3. Lengkapi coverage file privat, gangguan simpan, edit/hapus paket/item dan kombinasi kompatibilitas paket. Approval top-up, review duplikat, koreksi absensi, kuota habis dan beberapa proteksi penghapusan sudah diuji.
-4. Integrasi stok→expense tetap belum dikerjakan. Pengembalian uang nyata juga tetap proses admin: koreksi status pembayaran hanya mengoreksi catatan kas, tidak mengirim transfer. Jika diperlukan, rancang pembatalan/refund top-up approved sebagai fitur tersendiri dengan jejak audit.
+4. Integrasi stok→expense tetap belum dikerjakan. Sesuai keputusan pengguna, tidak ada refund dan tidak ada backlog refund. Koreksi status pembayaran hanya mengoreksi salah pencatatan kas.
 5. Verifikasi produksi: migration aktual, konfigurasi VAPID, HTTPS/PWA, pengiriman push nyata, layout perangkat, dan runtime frontend yang sesuai. Audit ini bukan verifikasi deployment.
 6. Fitur yang belum ditemukan: reset password/email verification, payment gateway, Excel, role/permission granular, multi-kas, audit log global, jurnal/COA/neraca/laba-rugi formal, ranking, turnamen, aplikasi native. Keberadaan paket atau tabel pendukung tidak menandakan fitur ini tersedia.
 

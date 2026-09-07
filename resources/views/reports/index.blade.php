@@ -2,7 +2,7 @@
 @section('title', 'Laporan')
 @section('content')
 <div class="actions report-download">
-    <a class="btn dark" href="{{ route('reports.pdf', ['start_date' => $start, 'end_date' => $end]) }}">Unduh PDF</a>
+    <a class="btn dark" data-no-loading href="{{ route('reports.pdf', ['start_date' => $start, 'end_date' => $end]) }}">Unduh PDF</a>
 </div>
 <div class="page-head"><div><h1>Laporan</h1><p>Ringkasan keuangan berdasarkan periode.</p></div></div>
 <div class="card filters"><form><label>Dari<input type="date" name="start_date" value="{{ $start }}" required></label><label>Sampai<input type="date" name="end_date" value="{{ $end }}" required></label><button class="btn primary">Tampilkan</button></form></div>

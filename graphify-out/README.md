@@ -1,6 +1,6 @@
 # Status Graphify
 
-Hasil regenerasi **7 September 2026** mencakup modul komunitas dan integrasi kas–kuota: **1.606 node, 2.441 relasi, 156 komunitas**. Lihat [laporan generator](GRAPH_REPORT.md), [graph JSON](graph.json), dan [navigasi visual](graph.html).
+Hasil regenerasi **7 September 2026** mencakup modul komunitas, integrasi kas–kuota dan indikator loading. Jumlah node, relasi dan komunitas terbaru ada di [laporan generator](GRAPH_REPORT.md). Lihat juga [graph JSON](graph.json) dan [navigasi visual](graph.html).
 
 Gunakan [konteks final proyek](../docs/11-final-context.md) untuk aturan aktif dan hasil verifikasi; [matriks fitur](../docs/10-current-features.md) menghubungkan fitur, kode, tes, dan backlog. [Pemeriksaan 6 September](../docs/10-project-status.md) merupakan arsip, bukan status graph terbaru.
 

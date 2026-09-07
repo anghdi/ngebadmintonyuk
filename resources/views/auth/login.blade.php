@@ -7,7 +7,7 @@
     <title>Masuk — NgeKas</title>
     <link rel="icon" href="{{ asset('pwa-icon-192.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" sizes="180x180">
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ route('app.css') }}">
 </head>
 <body class="login-page">
@@ -43,5 +43,6 @@
     <a class="btn dark full" href="{{ route('register') }}">Buat akun pemain</a>
     <small>KOMUNITAS BADMINTON</small>
 </main>
+<x-server-loading />
 </body>
 </html>

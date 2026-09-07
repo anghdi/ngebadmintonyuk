@@ -33,10 +33,6 @@ class AuthController extends Controller
             return redirect()->route('login')->with('legacy_push_reset', true);
         }
 
-        if (! $user->isAdmin()) {
-            $request->session()->put('offer_push_notifications', true);
-        }
-
         return redirect()->intended(route('dashboard'));
     }
 

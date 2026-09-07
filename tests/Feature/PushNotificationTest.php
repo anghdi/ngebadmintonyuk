@@ -128,7 +128,7 @@ test('administrator can see members with active notification devices', function 
         ->assertForbidden();
 });
 
-test('member is offered notification permission after login', function () {
+test('member must activate notification permission after login', function () {
     $player = User::factory()->member()->create();
 
     $this->post(route('login.store'), [
@@ -137,10 +137,10 @@ test('member is offered notification permission after login', function () {
     ])->assertRedirect(route('dashboard'));
 
     $this->get(route('dashboard'))
-        ->assertSuccessful()
-        ->assertSee('data-push-auto-prompt="true"', escape: false)
-        ->assertSee('data-push-permission-dialog', escape: false)
-        ->assertSee('Aktifkan notifikasi?');
+        ->assertRedirect(route('notifications.setup'));
+    $this->get(route('notifications.setup'))
+        ->assertSuccessful()->assertSee('data-push-setup="true"', escape: false)
+        ->assertSee('Aktifkan notifikasi dulu')->assertDontSee('Nanti saja');
 });
 
 test('member with legacy Firebase notification must reinstall before logging in again', function () {
@@ -204,7 +204,8 @@ test('joining and cancelling a session notifies every subscribed player device',
         'scheduled_at' => '2026-09-20 19:00:00',
         'venue_name' => 'GOR Tempat A',
     ]);
-    PushSubscription::factory()->for($joiningPlayer)->create(['driver' => 'webpush']);
+    $joiningSubscription = PushSubscription::factory()->for($joiningPlayer)->create(['driver' => 'webpush']);
+    $this->withSession(['push_installation_id' => $joiningSubscription->installation_id]);
     PushSubscription::factory()->for($otherPlayer)->create(['driver' => 'webpush']);
     $sender = new class implements PushNotificationSender
     {

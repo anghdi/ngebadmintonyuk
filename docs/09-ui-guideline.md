@@ -1,10 +1,14 @@
 # Status UI — 7 September 2026
 
-Sumber tampilan aktif adalah [CSS](../resources/css/app.css), [layout aplikasi](../resources/views/layouts/app.blade.php), [layout publik](../resources/views/layouts/public.blade.php), dan view setiap modul. Navigasi sudah mencakup fitur komunitas sesuai peran, bukan hanya menu keuangan MVP. Halaman jadwal member memakai layout aplikasi; guest memakai layout publik. PWA, opt-in notifikasi, dan papan skor juga sudah ada.
+Sumber tampilan aktif adalah [CSS](../resources/css/app.css), [layout aplikasi](../resources/views/layouts/app.blade.php), [layout publik](../resources/views/layouts/public.blade.php), dan view setiap modul. Navigasi sudah mencakup fitur komunitas sesuai peran, bukan hanya menu keuangan MVP. Halaman jadwal member memakai layout aplikasi; guest memakai layout publik. PWA, aktivasi notifikasi wajib bagi member, dan papan skor juga sudah ada.
+
+Member tanpa aktivasi pada perangkat/session saat ini diarahkan ke [halaman aktivasi](../resources/views/auth/notifications.blade.php), tanpa sidebar atau tombol lewati. Sediakan petunjuk izin ditolak, pemasangan iPhone/iPad ke Layar Utama, browser yang mendukung Web Push, dan tombol keluar akun. Setelah aktif, kartu notifikasi menampilkan status aktif tanpa tombol menonaktifkan. Permintaan izin browser harus mengikuti tindakan member.
 
 Panduan berikut tetap menjadi referensi desain, tetapi contoh atau larangan desain tidak membuktikan kesesuaian visual seluruh halaman. Audit ini memeriksa sumber dan tes, tidak melakukan pemeriksaan visual lintas perangkat. Baca [konteks final](11-final-context.md).
 
 ## Referensi UI awal
+
+Indikator loading bersama tersedia saat navigasi/submit/request notifikasi. Gunakan komponen server-loading dan pengendali server-loading.js yang sama di semua layout; lihat perilaku dan batasnya dalam [konteks final](11-final-context.md). Catatan ini menggantikan contoh loading pada referensi awal di bawah.
 
 # 09-ui-guideline.md
 

@@ -35,6 +35,25 @@
 }
 
 @layer components {
+    .server-loading { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; padding: 1.25rem; background: rgb(250 247 240 / 84%); backdrop-filter: blur(7px); }
+    .server-loading[hidden] { display: none; }
+    .server-loading-card { width: min(100%, 360px); padding: 2rem 1.5rem 1.35rem; border: 1px solid rgb(36 85 245 / 12%); border-radius: 24px; background: #fffdfa; text-align: center; box-shadow: 0 24px 80px rgb(23 42 99 / 14%); }
+    .server-loading-emblem { position: relative; display: grid; place-items: center; width: 92px; height: 92px; margin: 0 auto 1.25rem; }
+    .server-loading-emblem img { width: 64px; height: 64px; border-radius: 18px; }
+    .server-loading-ring { position: absolute; inset: 0; border: 3px solid #e6ebff; border-top-color: #2455f5; border-right-color: #ffd23f; border-radius: 50%; animation: server-loading-spin .9s linear infinite; }
+    .server-loading-card .eyebrow { font-size: .6rem; letter-spacing: .16em; }
+    .server-loading-card h2 { margin: .65rem 0 .5rem; color: #172a63; font-size: 1.15rem; }
+    .server-loading-card p { font-size: .85rem; line-height: 1.65; }
+    .server-loading-dismiss { width: auto; margin: 1.25rem auto .45rem; padding: .6rem .9rem; border: 0; border-radius: 10px; background: #edf1ff; color: #2455f5; font-size: .75rem; font-weight: 700; cursor: pointer; }
+    .server-loading-dismiss:focus-visible { outline: 2px solid #2455f5; outline-offset: 3px; }
+    .server-loading-card > small { display: block; color: #6f7280; font-size: .65rem; line-height: 1.5; }
+    .server-is-loading { cursor: progress; }
+}
+
+@keyframes server-loading-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .server-loading-ring { animation: none; } }
+
+@layer components {
     .shell { display: grid; grid-template-columns: 272px minmax(0, 1fr); min-height: 100vh; min-height: 100dvh; }
     aside { position: sticky; top: 0; z-index: 30; display: flex; height: 100vh; height: 100dvh; min-height: 0; flex-direction: column; overflow: hidden; background: linear-gradient(180deg, #1d3b8d 0%, #172a63 50%, #111b3f 100%); color: white; padding: 1.15rem 1.1rem max(1rem, env(safe-area-inset-bottom)); }
     aside::after { position: absolute; right: -5rem; bottom: 4rem; width: 11rem; height: 11rem; border: 2.2rem solid rgb(255 255 255 / 4%); border-radius: 50%; content: ''; pointer-events: none; }
