@@ -96,6 +96,7 @@ class PlaySessionController extends Controller
             ->with(['memberships' => fn ($query) => $query->withSum('transactions as balance', 'quantity')])
             ->orderBy('name')
             ->get();
+        $availableMembers = $members->whereNotIn('id', $registrations->pluck('user_id')->filter());
         $compatibleBalances = $members->mapWithKeys(function (User $member) use ($playSession): array {
             $balance = $member->memberships
                 ->filter(fn (Membership $membership): bool => $membership->status === 'active'
@@ -109,6 +110,6 @@ class PlaySessionController extends Controller
             return [$member->id => (int) $balance];
         });
 
-        return view('play-sessions.show', compact('playSession', 'members', 'attendances', 'compatibleBalances', 'registrations', 'confirmedRegistrations', 'waitingRegistrations', 'noShowCounts'));
+        return view('play-sessions.show', compact('playSession', 'members', 'availableMembers', 'attendances', 'compatibleBalances', 'registrations', 'confirmedRegistrations', 'waitingRegistrations', 'noShowCounts'));
     }
 }

@@ -163,6 +163,45 @@ test('administrator must select a player account when adding a registration', fu
         ->and($registration->phone)->toBeNull();
 });
 
+test('administrator can only add registered members to a session listing', function () {
+    $administrator = User::factory()->admin()->create();
+    $listedMember = User::factory()->member()->create(['name' => 'Member Sudah Masuk']);
+    $availableMember = User::factory()->member()->create(['name' => 'Member Tersedia']);
+    $playSession = PlaySession::factory()->create(['created_by' => $administrator->id]);
+    SessionRegistration::factory()->for($playSession)->for($listedMember)->create();
+
+    $this->actingAs($administrator)
+        ->get(route('play-sessions.show', $playSession))
+        ->assertSuccessful()
+        ->assertSee('Masukkan member ke listing')
+        ->assertSee('Member Tersedia')
+        ->assertSee('Keluarkan dari listing');
+
+    $this->actingAs($administrator)->post(route('session-registrations.store', $playSession), [
+        'user_id' => $administrator->id,
+        'payment_method' => 'cash',
+    ])->assertSessionHasErrors('user_id');
+
+    expect($playSession->registrations()->count())->toBe(1)
+        ->and($availableMember->role)->toBe('member');
+});
+
+test('administrator can remove an unpaid listed member from a session listing', function () {
+    $administrator = User::factory()->admin()->create();
+    $playSession = PlaySession::factory()->create(['created_by' => $administrator->id]);
+    $registration = SessionRegistration::factory()->member()->create([
+        'play_session_id' => $playSession->id,
+        'payment_status' => 'unpaid',
+        'attendance_status' => 'listed',
+    ]);
+
+    $this->actingAs($administrator)
+        ->delete(route('session-registrations.destroy', [$playSession, $registration]))
+        ->assertRedirect();
+
+    $this->assertModelMissing($registration);
+});
+
 test('player can cancel their own unpaid listed registration before the session', function () {
     $account = User::factory()->member()->create();
     $playSession = PlaySession::factory()->create();

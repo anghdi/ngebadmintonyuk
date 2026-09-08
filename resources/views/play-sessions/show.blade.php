@@ -5,17 +5,19 @@
 
 <section class="card table-card registration-admin-card">
     <div class="card-head"><div><span class="eyebrow">DAFTAR PEMAIN</span><h2>{{ $confirmedRegistrations->count() }}/{{ $playSession->max_players }} pemain · {{ $waitingRegistrations->count() }}/{{ $playSession->max_waiting_players }} waiting</h2></div><a class="btn soft" href="{{ route('public-sessions.show', $playSession) }}" target="_blank" rel="noopener">Lihat halaman publik</a></div>
-    @if($registrations->count() < $playSession->max_players + $playSession->max_waiting_players)
+    @if($registrations->count() < $playSession->max_players + $playSession->max_waiting_players && $availableMembers->isNotEmpty())
         <details class="registration-create-panel">
-            <summary>+ Tambah pemain</summary>
+            <summary>+ Masukkan member ke listing</summary>
             <form method="post" action="{{ route('session-registrations.store', $playSession) }}" class="registration-create-form">
                 @csrf
-                <label>Akun pemain<select name="user_id" data-member-select required><option value="">Pilih akun</option>@foreach($members as $member)<option value="{{ $member->id }}" data-member-name="{{ $member->name }}" data-member-phone="{{ $member->phone }}">{{ $member->name }}{{ $member->phone ? ' · '.$member->phone : '' }}</option>@endforeach</select></label>
+                <label>Member terdaftar<select name="user_id" data-member-select required><option value="">Pilih member</option>@foreach($availableMembers as $member)<option value="{{ $member->id }}" data-member-name="{{ $member->name }}" data-member-phone="{{ $member->phone }}">{{ $member->name }}{{ $member->phone ? ' · '.$member->phone : '' }}</option>@endforeach</select></label>
                 <label>Pembayaran<select name="payment_method" required><option value="transfer">Transfer</option><option value="cash">Tunai</option><option value="membership">Kuota membership</option></select></label>
                 <button class="btn primary">Tambahkan</button>
             </form>
-            <small>Pemain harus mempunyai akun. Nama dan WhatsApp (jika ada) mengikuti data akun.</small>
+            <small>Hanya member yang sudah terdaftar dan belum masuk listing ini yang dapat dipilih.</small>
         </details>
+    @elseif($availableMembers->isEmpty())
+        <div class="capacity-full-note">Semua member terdaftar sudah masuk listing sesi ini.</div>
     @else
         <div class="capacity-full-note">Slot utama dan waiting list sudah penuh.</div>
     @endif
@@ -56,7 +58,7 @@
                         <button class="btn primary">Simpan</button>
                     </form>
                     @if($registration->attendance_status === 'listed' && $registration->payment_status === 'unpaid')
-                        <form method="post" action="{{ route('session-registrations.destroy', [$playSession, $registration]) }}" class="registration-delete" onsubmit="return confirm('Hapus pemain ini dari daftar?')">@csrf @method('delete')<button class="link danger">Hapus dari daftar</button></form>
+                        <form method="post" action="{{ route('session-registrations.destroy', [$playSession, $registration]) }}" class="registration-delete" onsubmit="return confirm('Keluarkan member ini dari listing?')">@csrf @method('delete')<button class="link danger">Keluarkan dari listing</button></form>
                     @endif
                 </details>
             </td>
