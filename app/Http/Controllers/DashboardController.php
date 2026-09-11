@@ -15,7 +15,7 @@ class DashboardController extends Controller
     public function __invoke(Request $request, ReportService $reports): View
     {
         if (! $request->user()->isAdmin()) {
-            return $this->memberDashboard($request);
+            return $this->memberDashboard($request, $reports);
         }
 
         $now = today();
@@ -32,15 +32,17 @@ class DashboardController extends Controller
         return view('dashboard', $data + compact('latest', 'memberCount', 'upcomingSessionCount', 'lowStockCount'));
     }
 
-    private function memberDashboard(Request $request): View
+    private function memberDashboard(Request $request, ReportService $reports): View
     {
         $member = $request->user();
+        $today = today();
         $memberships = $member->memberships()->withSum('transactions as balance', 'quantity')->latest()->get();
         $memberTransactions = MembershipTransaction::query()
             ->whereHas('membership', fn ($query) => $query->whereBelongsTo($member));
         $remainingCredits = (int) $memberships->sum('balance');
         $usedCredits = abs((int) (clone $memberTransactions)->where('quantity', '<', 0)->sum('quantity'));
         $attendanceCount = $member->attendances()->where('status', 'present')->count();
+        $currentCashReport = $reports->make($today->copy()->startOfMonth()->toDateString(), $today->toDateString());
         $transactions = $memberTransactions
             ->with(['membership', 'attendance.playSession'])
             ->latest()
@@ -56,6 +58,6 @@ class DashboardController extends Controller
             ->limit(6)
             ->get();
 
-        return view('members.dashboard', compact('member', 'memberships', 'transactions', 'upcomingSessions', 'remainingCredits', 'usedCredits', 'attendanceCount'));
+        return view('members.dashboard', compact('member', 'memberships', 'transactions', 'upcomingSessions', 'remainingCredits', 'usedCredits', 'attendanceCount', 'currentCashReport', 'today'));
     }
 }

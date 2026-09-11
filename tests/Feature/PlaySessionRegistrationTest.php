@@ -4,6 +4,7 @@ use App\Models\Attendance;
 use App\Models\Income;
 use App\Models\Membership;
 use App\Models\PlaySession;
+use App\Models\PushNotification;
 use App\Models\SessionRegistration;
 use App\Models\User;
 
@@ -416,7 +417,7 @@ test('no show blocking follows the account when whatsapp is empty', function () 
     expect($playSession->registrations()->count())->toBe(0);
 });
 
-test('member dashboard exposes copy controls for both bank accounts', function () {
+test('member dashboard presents compact activity cash and relevant notification summaries', function () {
     $account = User::factory()->member()->create();
     Attendance::factory()->count(2)->for($account)->create(['status' => 'present']);
     Attendance::factory()->for($account)->create(['status' => 'absent']);
@@ -430,19 +431,36 @@ test('member dashboard exposes copy controls for both bank accounts', function (
         'venue_name' => 'GOR Tidak Diikuti',
     ]);
     SessionRegistration::factory()->for($joinedSession)->for($account)->create();
+    PushNotification::factory()->create([
+        'audience' => 'all',
+        'title' => 'Informasi komunitas',
+        'body' => 'Jadwal latihan minggu ini sudah tersedia.',
+        'success_count' => 1,
+    ]);
+    PushNotification::factory()->create([
+        'audience' => 'session',
+        'play_session_id' => $otherSession->id,
+        'title' => 'Notifikasi sesi lain',
+        'success_count' => 1,
+    ]);
+    PushNotification::factory()->create([
+        'audience' => 'all',
+        'title' => 'Pengiriman gagal',
+        'success_count' => 0,
+    ]);
 
     $response = $this->actingAsNotifiedMember($account)->get(route('dashboard'))
         ->assertSuccessful()
-        ->assertSee('Lihat panduan')
-        ->assertSee('data-usage-guide-dialog', escape: false)
-        ->assertSee('data-copy-text="6690685688"', false)
-        ->assertSee('data-copy-text="036801013857535"', false)
+        ->assertSee('Ringkasan aktivitas komunitasmu')
+        ->assertSee('Laporan bulan berjalan')
+        ->assertSee('Saldo saat ini')
         ->assertSee('Sesi yang kamu ikuti')
-        ->assertSee('2</b> kali hadir bermain', escape: false)
+        ->assertSee('2</strong><span>kali bermain', escape: false)
         ->assertViewHas('attendanceCount', 2)
+        ->assertSee('Riwayat notifikasi terkirim')
+        ->assertSee('Informasi komunitas')
+        ->assertDontSee('Notifikasi sesi lain')
+        ->assertDontSee('Pengiriman gagal')
         ->assertSee('GOR Saya Ikuti')
         ->assertDontSee('GOR Tidak Diikuti');
-
-    expect(strpos($response->getContent(), 'dashboard-bank-section'))
-        ->toBeLessThan(strpos($response->getContent(), 'usage-guide'));
 });

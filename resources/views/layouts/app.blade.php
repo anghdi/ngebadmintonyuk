@@ -77,9 +77,31 @@
                 <img src="{{ asset('pwa-icon-192.png') }}" alt="">
                 <strong>NgeBadmintonYuk</strong>
             </a>
-            <div class="user-summary">
+            <div class="header-actions">
+                <details class="notification-bell">
+                    <summary aria-label="Riwayat notifikasi terkirim">
+                        <x-nav-icon name="bell" />
+                        @if($headerNotifications->isNotEmpty())
+                            <span>{{ $headerNotifications->count() }}</span>
+                        @endif
+                    </summary>
+                    <div class="notification-bell-panel">
+                        <div class="notification-bell-head"><strong>Notifikasi terkirim</strong><small>{{ $headerNotifications->count() }} terbaru</small></div>
+                        @forelse($headerNotifications as $notification)
+                            <a href="{{ $notification->url }}">
+                                <strong>{{ $notification->title }}</strong>
+                                <span>{{ str($notification->body)->limit(95) }}</span>
+                                <small>{{ $notification->created_at->diffForHumans() }}</small>
+                            </a>
+                        @empty
+                            <p>Belum ada notifikasi yang berhasil dikirim.</p>
+                        @endforelse
+                    </div>
+                </details>
+                <div class="user-summary">
                 <span class="user-avatar"><img src="{{ asset('pwa-icon-192.png') }}" alt=""></span>
                 <span><b>{{ auth()->user()->name }}</b><small>{{ auth()->user()->isAdmin() ? 'Administrator' : 'Akun pemain' }}</small></span>
+                </div>
             </div>
         </header>
         <section class="content">

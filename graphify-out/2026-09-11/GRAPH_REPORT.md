@@ -1,11 +1,11 @@
 # Graph Report - ngebadmintonyuk  (2026-09-11)
 
 ## Corpus Check
-- 265 files · ~137,998 words
+- 265 files · ~138,113 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1664 nodes · 2563 edges · 173 communities (134 shown, 39 thin omitted)
+- 1665 nodes · 2568 edges · 179 communities (144 shown, 35 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
@@ -19,22 +19,22 @@
 - laravel-best-practices/SKILL.md
 - Illuminate\Database\Migrations\Migration
 - require-dev
-- SendPushNotificationRequest
+- Illuminate\Foundation\Http\FormRequest
 - command
 - psr-4
-- UpdateMemberRequest
+- User
 - logging.php
 - console.php
 - app.js
-- Category
+- Illuminate\Database\Seeder
 - Modul
-- StoreSessionRegistrationByAdminRequest
+- .storeByAdmin
 - Modul
 - Database
 - Modul
 - Modul
 - Modul
-- Illuminate\Foundation\Http\FormRequest
+- StoreStockMovementRequest
 - Modul
 - 09-ui-guideline.md
 - web.php
@@ -42,7 +42,7 @@
 - AGENTS.md
 - Livewire Development
 - Illuminate\Database\Eloquent\Relations\HasMany
-- User
+- Illuminate\Database\Eloquent\Factories\Factory
 - Modul
 - Illuminate\Validation\ValidationException
 - PushNotification
@@ -61,7 +61,7 @@
 - Actions Models Http
 - Laravel Boost Guidelines
 - Illuminate\Validation\Rule
-- CreateTopUpRequestAction.php
+- SendSessionRegistrationNotificationAction
 - ReportService
 - Laravel Boost
 - Advanced Query Patterns
@@ -69,6 +69,7 @@
 - Events & Notifications Best Practices
 - Queue & Job Best Practices
 - Income
+- AppServiceProvider.php
 - Illuminate\View\View
 - ResetLegacyPushSubscriptionsAction
 - Caching Best Practices
@@ -80,7 +81,7 @@
 - Task Scheduling Best Practices
 - Testing Best Practices
 - ShuttlecockItem
-- TransactionController.php
+- FirebaseCloudMessaging.php
 - Collection Best Practices
 - HTTP Client Best Practices
 - Mail Best Practices
@@ -115,7 +116,7 @@
 - Button
 - NgeKas — UI Guideline
 - TopUpSetting
-- Membership
+- Illuminate\Http\RedirectResponse
 - Aturan operasional yang tidak boleh terlewat
 - Konteks final proyek NgeBadmintonYuk
 - Http
@@ -125,19 +126,24 @@
 - Database saat ini — 7 September 2026
 - Status proyek: rujukan dan arsip
 - Pemasukan saat ini — 7 September 2026
-- SessionRegistrationFactory.php
+- UpdateSessionRegistrationAction
 - 07-expense.md
 - Status UI — 7 September 2026
-- ReviewTopUpRequest
+- MembershipTransaction
 - StoreSessionRegistrationRequest
-- StoreShuttlecockItemRequest
+- Category
 - UpdateAttendanceRequest
-- UpdateMembershipRequest
+- FinanceTest.php
 - UpdatePlaySessionRequest
-- UpdateSessionRegistrationPaymentRequest
-- UpdateShuttlecockItemRequest
+- CreateTopUpRequestAction.php
+- PushNotificationManager
 - Auth
-- DeleteMemberAction
+- StockMovement
+- RegisterMemberRequest
+- RecordStockMovementAction
+- AdjustMembershipCreditRequest
+- FirebaseCloudMessaging
+- bootstrap/app.php
 
 ## God Nodes (most connected - your core abstractions)
 1. `User` - 119 edges
@@ -166,11 +172,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (173 total, 39 thin omitted)
+## Communities (179 total, 35 thin omitted)
 
 ### Community 0 - "Illuminate\Http\Request"
-Cohesion: 0.20
-Nodes (5): TransactionController, Illuminate\Foundation\Application, Illuminate\Foundation\Configuration\Exceptions, Illuminate\Foundation\Configuration\Middleware, Illuminate\Http\Request
+Cohesion: 0.22
+Nodes (3): TransactionController, TransactionService, Illuminate\Http\Request
 
 ### Community 1 - "scripts"
 Cohesion: 0.06
@@ -181,12 +187,12 @@ Cohesion: 0.25
 Nodes (7): description, license, minimum-stability, name, prefer-stable, $schema, type
 
 ### Community 3 - "PlaySession"
-Cohesion: 0.17
-Nodes (7): DeletePlaySessionAction, SendSessionRegistrationNotificationAction, UpdatePlaySessionAction, PlaySessionController, SessionRegistrationController, PlaySession, Illuminate\Http\RedirectResponse
+Cohesion: 0.16
+Nodes (5): DeletePlaySessionAction, UpdatePlaySessionAction, PlaySessionController, StorePlaySessionRequest, PlaySession
 
 ### Community 4 - "Illuminate\Database\Eloquent\Model"
-Cohesion: 0.28
-Nodes (6): Illuminate\Database\Eloquent\Attributes\Fillable, Illuminate\Database\Eloquent\Attributes\Hidden, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Database\Eloquent\Model, Illuminate\Notifications\Notifiable, Illuminate\Support\Carbon
+Cohesion: 0.31
+Nodes (5): Illuminate\Database\Eloquent\Attributes\Fillable, Illuminate\Database\Eloquent\Attributes\Hidden, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Database\Eloquent\Model, Illuminate\Support\Carbon
 
 ### Community 5 - "package.json"
 Cohesion: 0.06
@@ -204,9 +210,9 @@ Nodes (3): Illuminate\Database\Migrations\Migration, Illuminate\Database\Schema\
 Cohesion: 0.17
 Nodes (12): require-dev, fakerphp/faker, larastan/larastan, laravel/boost, laravel/pail, laravel/pao, laravel/pint, laravel/sail (+4 more)
 
-### Community 9 - "SendPushNotificationRequest"
-Cohesion: 0.17
-Nodes (3): CancelSessionRegistrationRequest, SendPushNotificationRequest, Illuminate\Contracts\Validation\ValidationRule
+### Community 9 - "Illuminate\Foundation\Http\FormRequest"
+Cohesion: 0.27
+Nodes (3): StoreMembershipRequest, Illuminate\Contracts\Validation\ValidationRule, Illuminate\Foundation\Http\FormRequest
 
 ### Community 10 - "command"
 Cohesion: 0.20
@@ -216,6 +222,10 @@ Nodes (9): command, enabled, type, mcp, laravel-boost, $schema, artisan, boost:m
 Cohesion: 0.29
 Nodes (7): autoload, files, psr-4, App\\, Database\\Factories\\, Database\\Seeders\\, app/helpers.php
 
+### Community 12 - "User"
+Cohesion: 0.12
+Nodes (7): DeleteMemberAction, MemberController, UpdateMemberRequest, User, MembershipSeeder, Illuminate\Foundation\Auth\User, Illuminate\Notifications\Notifiable
+
 ### Community 13 - "logging.php"
 Cohesion: 0.40
 Nodes (4): Monolog\Handler\NullHandler, Monolog\Handler\StreamHandler, Monolog\Handler\SyslogUdpHandler, Monolog\Processor\PsrLogMessageProcessor
@@ -224,9 +234,9 @@ Nodes (4): Monolog\Handler\NullHandler, Monolog\Handler\StreamHandler, Monolog\H
 Cohesion: 0.11
 Nodes (18): installButton, installGuide, menu, scoreboard, serverLoading, sidebar, installMemberNotifications(), isIosDevice() (+10 more)
 
-### Community 36 - "Category"
-Cohesion: 0.06
-Nodes (14): CategoryController, Category, AttendanceSeeder, DatabaseSeeder, MembershipSeeder, MembershipTransactionSeeder, PlaySessionSeeder, ShuttlecockItemSeeder (+6 more)
+### Community 36 - "Illuminate\Database\Seeder"
+Cohesion: 0.20
+Nodes (6): DatabaseSeeder, PlaySessionSeeder, ShuttlecockItemSeeder, TopUpRequestSeeder, Illuminate\Database\Console\Seeds\WithoutModelEvents, Illuminate\Database\Seeder
 
 ### Community 37 - "Modul"
 Cohesion: 0.04
@@ -252,10 +262,6 @@ Nodes (34): Business Rule, Category Type, CategoryForm, CategoryIndex, Database,
 Cohesion: 0.06
 Nodes (32): Business Rule, Dashboard Read Only, Database, Empty State, Flow, Future Improvement, Header, Livewire Component (+24 more)
 
-### Community 44 - "Illuminate\Foundation\Http\FormRequest"
-Cohesion: 0.15
-Nodes (5): MarkSessionRegistrationPresentRequest, StoreMembershipRequest, StorePlaySessionRequest, StoreStockMovementRequest, Illuminate\Foundation\Http\FormRequest
-
 ### Community 45 - "Modul"
 Cohesion: 0.07
 Nodes (30): Accent, Background, Brand Utama, Business Rule, Button, Card, Color Palette, Currency (+22 more)
@@ -265,8 +271,8 @@ Cohesion: 0.06
 Nodes (30): Border, Border Radius, Brand Personality, Dashboard Layout, Design Direction, Design Test, Destructive Action, Dynamic Detail (+22 more)
 
 ### Community 47 - "web.php"
-Cohesion: 0.13
-Nodes (8): RecordStockMovementAction, Controller, NotificationSetupController, RegistrationController, StockMovementController, TopUpSettingController, Illuminate\Contracts\View\View, Illuminate\Support\Facades\Route
+Cohesion: 0.20
+Nodes (5): AuthController, Controller, NotificationSetupController, Illuminate\Contracts\View\View, Illuminate\Support\Facades\Route
 
 ### Community 48 - "Expense"
 Cohesion: 0.21
@@ -280,36 +286,44 @@ Nodes (12): APIs & Eloquent Resources, Deployment, Do Things the Laravel Way, La
 Cohesion: 0.08
 Nodes (24): Component-Scoped Interceptors, Intercept Messages, Intercept Requests, Interceptor System (v4), Livewire 4 JavaScript Integration, Magic Properties, Alpine & JavaScript, Basic Usage (+16 more)
 
-### Community 52 - "User"
+### Community 52 - "Illuminate\Database\Eloquent\Factories\Factory"
 Cohesion: 0.08
-Nodes (13): User, AttendanceFactory, MembershipFactory, MembershipTransactionFactory, PlaySessionFactory, PushNotificationFactory, PushSubscriptionFactory, ShuttlecockItemFactory (+5 more)
+Nodes (12): AttendanceFactory, MembershipFactory, PlaySessionFactory, PushNotificationFactory, PushSubscriptionFactory, static, SessionRegistrationFactory, ShuttlecockItemFactory (+4 more)
 
 ### Community 53 - "Modul"
 Cohesion: 0.10
 Nodes (21): Business Rule, Database, Flow, Future Improvement, Livewire Component, Modul, Pemasukan, Pengeluaran (+13 more)
 
 ### Community 54 - "Illuminate\Validation\ValidationException"
-Cohesion: 0.14
-Nodes (5): ReviewTopUpRequestAction, MembershipTransaction, Illuminate\Database\QueryException, Illuminate\Support\Facades\DB, Illuminate\Validation\ValidationException
+Cohesion: 0.24
+Nodes (3): Illuminate\Database\QueryException, Illuminate\Support\Facades\DB, Illuminate\Validation\ValidationException
+
+### Community 55 - "PushNotification"
+Cohesion: 0.18
+Nodes (3): PushNotificationController, SendPushNotificationRequest, PushNotification
 
 ### Community 56 - "Pest 5 Features"
 Cohesion: 0.10
 Nodes (19): Architecture Testing, Assertions, Basic Test Structure, Basic Usage, Browser Test Example, Common Pitfalls, Creating Tests, Datasets (+11 more)
 
 ### Community 57 - "Illuminate\Database\Eloquent\Relations\BelongsTo"
-Cohesion: 0.10
-Nodes (5): ExpenseDetail, IncomeDetail, StockMovement, TopUpRequest, Illuminate\Database\Eloquent\Relations\BelongsTo
+Cohesion: 0.17
+Nodes (4): ExpenseDetail, IncomeDetail, TopUpRequest, Illuminate\Database\Eloquent\Relations\BelongsTo
+
+### Community 58 - "TopUpRequestController.php"
+Cohesion: 0.18
+Nodes (4): TopUpRequestController, ReviewTopUpRequest, StoreTopUpRequest, Symfony\Component\HttpFoundation\StreamedResponse
 
 ### Community 59 - "PushSubscription"
-Cohesion: 0.05
-Nodes (29): PushNotificationSender, SendPushNotificationAction, send(), RegisterMemberRequest, PushSubscription, AppServiceProvider, FirebaseCloudMessaging, PushNotificationManager (+21 more)
+Cohesion: 0.18
+Nodes (7): PushNotificationSender, SendPushNotificationAction, send(), PushSubscription, Illuminate\Http\Client\Request, Illuminate\Support\Facades\Http, send()
 
 ### Community 60 - "Tailwind CSS Development"
 Cohesion: 0.14
 Nodes (13): Basic Usage, Common Patterns, Common Pitfalls, CSS-First Configuration, Dark Mode, Documentation, Flexbox Layout, Grid Layout (+5 more)
 
 ### Community 61 - "StorePushSubscriptionRequest"
-Cohesion: 0.19
+Cohesion: 0.21
 Nodes (5): PushSubscriptionController, DeletePushSubscriptionRequest, StorePushSubscriptionRequest, Illuminate\Http\JsonResponse, Illuminate\Http\Response
 
 ### Community 62 - "Status dan konteks proyek NgeBadmintonYuk — arsip"
@@ -346,14 +360,14 @@ Nodes (9): Application Structure & Architecture, Conventions, Documentation File
 
 ### Community 70 - "Illuminate\Validation\Rule"
 Cohesion: 0.28
-Nodes (3): StoreTopUpRequest, Illuminate\Validation\Rule, Illuminate\Validation\Validator
+Nodes (3): UpdateMembershipRequest, Illuminate\Validation\Rule, Illuminate\Validation\Validator
 
-### Community 71 - "CreateTopUpRequestAction.php"
-Cohesion: 0.32
-Nodes (4): CreateTopUpRequestAction, Illuminate\Http\UploadedFile, Illuminate\Support\Facades\Storage, Throwable
+### Community 71 - "SendSessionRegistrationNotificationAction"
+Cohesion: 0.28
+Nodes (3): RegisterForPlaySessionAction, SendSessionRegistrationNotificationAction, Throwable
 
 ### Community 72 - "ReportService"
-Cohesion: 0.21
+Cohesion: 0.22
 Nodes (4): DashboardController, ReportController, ReportService, Barryvdh\DomPDF\Facade\Pdf
 
 ### Community 73 - "Laravel Boost"
@@ -376,13 +390,17 @@ Nodes (9): Always Queue Notifications, Events & Notifications Best Practices, Im
 Cohesion: 0.18
 Nodes (10): Always Implement `failed()`, Batch Related Jobs, Implement `ShouldBeUnique`, Queue & Job Best Practices, Rate Limit External API Calls in Jobs, `retryUntil()` Needs `$tries = 0`, Set `retry_after` Greater Than `timeout`, Use Exponential Backoff (+2 more)
 
+### Community 79 - "AppServiceProvider.php"
+Cohesion: 0.22
+Nodes (6): AppServiceProvider, Carbon\CarbonImmutable, Illuminate\Support\Facades\Date, Illuminate\Support\Facades\Gate, Illuminate\Support\Facades\View, Illuminate\Support\ServiceProvider
+
 ### Community 80 - "Illuminate\View\View"
-Cohesion: 0.13
-Nodes (6): MemberController, PublicPlaySessionController, PushNotificationController, FilterPlaySessionsRequest, Illuminate\Support\Facades\Date, Illuminate\View\View
+Cohesion: 0.22
+Nodes (4): PublicPlaySessionController, RegistrationController, FilterPlaySessionsRequest, Illuminate\View\View
 
 ### Community 81 - "ResetLegacyPushSubscriptionsAction"
-Cohesion: 0.17
-Nodes (7): ResetLegacyPushSubscriptionsAction, AuthController, RequireCurrentPushSetup, RequireMemberNotifications, Closure, Illuminate\Support\Facades\Auth, Symfony\Component\HttpFoundation\Response
+Cohesion: 0.21
+Nodes (6): ResetLegacyPushSubscriptionsAction, RequireCurrentPushSetup, RequireMemberNotifications, Closure, Illuminate\Support\Facades\Auth, Symfony\Component\HttpFoundation\Response
 
 ### Community 82 - "Caching Best Practices"
 Cohesion: 0.22
@@ -417,8 +435,12 @@ Cohesion: 0.25
 Nodes (7): Call `Event::fake()` After Factory Setup, Testing Best Practices, Use `Exceptions::fake()` to Assert Exception Reporting, Use Factory States and Sequences, Use `LazilyRefreshDatabase` Over `RefreshDatabase`, Use Model Assertions Over Raw Database Assertions, Use `recycle()` to Share Relationship Instances Across Factories
 
 ### Community 90 - "ShuttlecockItem"
-Cohesion: 0.31
-Nodes (3): DeleteShuttlecockItemAction, ShuttlecockInventoryController, ShuttlecockItem
+Cohesion: 0.13
+Nodes (5): DeleteShuttlecockItemAction, ShuttlecockInventoryController, StoreShuttlecockItemRequest, UpdateShuttlecockItemRequest, ShuttlecockItem
+
+### Community 91 - "FirebaseCloudMessaging.php"
+Cohesion: 0.20
+Nodes (9): Google\Auth\Credentials\ServiceAccountCredentials, Illuminate\Http\Client\ConnectionException, Illuminate\Http\Client\PendingRequest, Illuminate\Http\Client\RequestException, Illuminate\Support\Arr, Illuminate\Support\Facades\Log, JsonException, Minishlink\WebPush\Subscription (+1 more)
 
 ### Community 92 - "Collection Best Practices"
 Cohesion: 0.29
@@ -465,8 +487,8 @@ Cohesion: 0.29
 Nodes (6): Actions Models Services Http, No refund workflow, Push notifications are manual and synchronous, Session activity uses standard Web Push, Session activity uses standard Web Push, Top up cash and session quota settle without duplicate income
 
 ### Community 108 - "SessionRegistration"
-Cohesion: 0.14
-Nodes (9): CreateSessionRegistrationByAdminAction, DeleteSessionRegistrationAction, MarkSessionRegistrationPresentAction, RecordAttendanceAction, RecordSessionRegistrationPaymentAction, RegisterForPlaySessionAction, UpdateSessionRegistrationAction, AttendanceController (+1 more)
+Cohesion: 0.11
+Nodes (8): DeleteSessionRegistrationAction, MarkSessionRegistrationPresentAction, RecordSessionRegistrationPaymentAction, SessionRegistrationController, CancelSessionRegistrationRequest, MarkSessionRegistrationPresentRequest, UpdateSessionRegistrationPaymentRequest, SessionRegistration
 
 ### Community 109 - "Actions Http"
 Cohesion: 0.50
@@ -508,9 +530,13 @@ Nodes (3): keywords, framework, laravel
 Cohesion: 0.15
 Nodes (3): Project Rules Index, Arsip rancangan autentikasi awal, Autentikasi saat ini — 7 September 2026
 
-### Community 148 - "Membership"
-Cohesion: 0.14
-Nodes (7): AdjustMembershipCreditAction, DeleteMembershipAction, GrantMembershipAction, MembershipController, AdjustMembershipCreditRequest, Membership, createMembership()
+### Community 147 - "TopUpSetting"
+Cohesion: 0.25
+Nodes (3): TopUpSetting, TopUpSettingSeeder, self
+
+### Community 148 - "Illuminate\Http\RedirectResponse"
+Cohesion: 0.15
+Nodes (8): AdjustMembershipCreditAction, DeleteMembershipAction, GrantMembershipAction, MembershipController, Membership, MembershipTransactionFactory, Illuminate\Http\RedirectResponse, createMembership()
 
 ### Community 150 - "Aturan operasional yang tidak boleh terlewat"
 Cohesion: 0.22
@@ -524,19 +550,39 @@ Nodes (11): Alur dan batas integrasi, Identitas dan scope, Konteks final proyek 
 Cohesion: 0.19
 Nodes (5): static, UserFactory, Illuminate\Support\Facades\Hash, Illuminate\Support\Str, Pdo\Mysql
 
+### Community 160 - "UpdateSessionRegistrationAction"
+Cohesion: 0.33
+Nodes (3): RecordAttendanceAction, UpdateSessionRegistrationAction, AttendanceController
+
+### Community 164 - "MembershipTransaction"
+Cohesion: 0.22
+Nodes (3): ReviewTopUpRequestAction, MembershipTransaction, MembershipTransactionSeeder
+
+### Community 168 - "FinanceTest.php"
+Cohesion: 0.22
+Nodes (4): Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Foundation\Testing\TestCase, static, TestCase
+
+### Community 170 - "CreateTopUpRequestAction.php"
+Cohesion: 0.38
+Nodes (4): CreateTopUpRequestAction, Illuminate\Http\UploadedFile, Illuminate\Support\Facades\Storage, RuntimeException
+
+### Community 178 - "bootstrap/app.php"
+Cohesion: 0.40
+Nodes (3): Illuminate\Foundation\Application, Illuminate\Foundation\Configuration\Exceptions, Illuminate\Foundation\Configuration\Middleware
+
 ## Knowledge Gaps
 - **707 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+702 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **39 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **35 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `User` to `PlaySession`, `Illuminate\Database\Eloquent\Model`, `UpdateMemberRequest`, `Membership`, `Illuminate\Support\Str`, `SessionRegistrationFactory.php`, `Category`, `StoreSessionRegistrationByAdminRequest`, `DeleteMemberAction`, `web.php`, `Illuminate\Database\Eloquent\Relations\HasMany`, `Illuminate\Validation\ValidationException`, `PushSubscription`, `Illuminate\Validation\Rule`, `CreateTopUpRequestAction.php`, `ReportService`, `Illuminate\View\View`, `ResetLegacyPushSubscriptionsAction`, `UpdateSessionRegistrationRequest`, `SessionRegistration`?**
-  _High betweenness centrality (0.058) - this node is a cross-community bridge._
+- **Why does `User` connect `User` to `PlaySession`, `Illuminate\Database\Eloquent\Model`, `TopUpSetting`, `Illuminate\Http\RedirectResponse`, `Illuminate\Support\Str`, `UpdateSessionRegistrationAction`, `MembershipTransaction`, `Illuminate\Database\Seeder`, `.storeByAdmin`, `FinanceTest.php`, `CreateTopUpRequestAction.php`, `RegisterMemberRequest`, `RecordStockMovementAction`, `AdjustMembershipCreditRequest`, `Illuminate\Database\Eloquent\Relations\HasMany`, `Illuminate\Database\Eloquent\Factories\Factory`, `Illuminate\Validation\ValidationException`, `PushNotification`, `PushSubscription`, `Illuminate\Validation\Rule`, `SendSessionRegistrationNotificationAction`, `ReportService`, `AppServiceProvider.php`, `Illuminate\View\View`, `ResetLegacyPushSubscriptionsAction`, `ShuttlecockItem`, `Attendance`, `UpdateSessionRegistrationRequest`, `SessionRegistration`?**
+  _High betweenness centrality (0.055) - this node is a cross-community bridge._
+- **Why does `PlaySession` connect `PlaySession` to `Illuminate\Database\Eloquent\Model`, `Illuminate\Foundation\Http\FormRequest`, `Illuminate\Http\RedirectResponse`, `UpdateSessionRegistrationAction`, `Illuminate\Database\Seeder`, `.storeByAdmin`, `Illuminate\Database\Eloquent\Relations\HasMany`, `Illuminate\Database\Eloquent\Factories\Factory`, `Illuminate\Validation\ValidationException`, `PushNotification`, `PushSubscription`, `Illuminate\Validation\Rule`, `SendSessionRegistrationNotificationAction`, `ReportService`, `Illuminate\View\View`, `ShuttlecockItem`, `Attendance`, `UpdateSessionRegistrationRequest`, `SessionRegistration`?**
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
 - **Why does `Modul` connect `Modul` to `07-expense.md`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
-- **Why does `Modul` connect `Modul` to `10-project-status.md`?**
   _High betweenness centrality (0.020) - this node is a cross-community bridge._
 - **What connects `$schema`, `name`, `type` to the rest of the system?**
   _707 weakly-connected nodes found - possible documentation gaps or missing edges._
