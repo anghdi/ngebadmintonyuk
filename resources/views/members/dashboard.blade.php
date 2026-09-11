@@ -44,6 +44,7 @@
         <span>kali main</span>
     </div>
     <div class="quota-meta">
+        <span><b>{{ $attendanceCount }}</b> kali hadir bermain</span>
         <span><b>{{ $memberships->count() }}</b> paket aktif</span>
         <span><b>{{ $usedCredits }}</b> kali digunakan</span>
         <span>Kuota tersedia sesuai paket aktif.</span>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Attendance;
 use App\Models\Income;
 use App\Models\Membership;
 use App\Models\PlaySession;
@@ -417,6 +418,8 @@ test('no show blocking follows the account when whatsapp is empty', function () 
 
 test('member dashboard exposes copy controls for both bank accounts', function () {
     $account = User::factory()->member()->create();
+    Attendance::factory()->count(2)->for($account)->create(['status' => 'present']);
+    Attendance::factory()->for($account)->create(['status' => 'absent']);
 
     $joinedSession = PlaySession::factory()->create([
         'scheduled_at' => now()->addDays(2),
@@ -435,6 +438,8 @@ test('member dashboard exposes copy controls for both bank accounts', function (
         ->assertSee('data-copy-text="6690685688"', false)
         ->assertSee('data-copy-text="036801013857535"', false)
         ->assertSee('Sesi yang kamu ikuti')
+        ->assertSee('2</b> kali hadir bermain', escape: false)
+        ->assertViewHas('attendanceCount', 2)
         ->assertSee('GOR Saya Ikuti')
         ->assertDontSee('GOR Tidak Diikuti');
 

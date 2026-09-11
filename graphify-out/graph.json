@@ -82,19 +82,6 @@
       "id": "app_actions_marksessionregistrationpresentaction_marksessionregistrationpresentaction"
     },
     {
-      "label": "RecordAttendanceAction",
-      "file_type": "code",
-      "source_file": "app/Actions/RecordAttendanceAction.php",
-      "source_location": "L12",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 108,
-      "community_name": "SessionRegistration",
-      "norm_label": "recordattendanceaction",
-      "id": "app_actions_recordattendanceaction_recordattendanceaction"
-    },
-    {
       "label": "RecordSessionRegistrationPaymentAction",
       "file_type": "code",
       "source_file": "app/Actions/RecordSessionRegistrationPaymentAction.php",
@@ -132,19 +119,6 @@
       "community_name": "SessionRegistration",
       "norm_label": "updatesessionregistrationaction",
       "id": "app_actions_updatesessionregistrationaction_updatesessionregistrationaction"
-    },
-    {
-      "label": "AttendanceController",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/AttendanceController.php",
-      "source_location": "L12",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 108,
-      "community_name": "SessionRegistration",
-      "norm_label": "attendancecontroller",
-      "id": "app_http_controllers_attendancecontroller_attendancecontroller"
     },
     {
       "label": "SessionRegistration",
@@ -197,6 +171,19 @@
       "community_name": "Membership",
       "norm_label": "adjustmembershipcreditaction",
       "id": "app_actions_adjustmembershipcreditaction_adjustmembershipcreditaction"
+    },
+    {
+      "label": "CreateTopUpRequestAction",
+      "file_type": "code",
+      "source_file": "app/Actions/CreateTopUpRequestAction.php",
+      "source_location": "L16",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 148,
+      "community_name": "Membership",
+      "norm_label": "createtopuprequestaction",
+      "id": "app_actions_createtopuprequestaction_createtopuprequestaction"
     },
     {
       "label": "DeleteMembershipAction",
@@ -264,6 +251,19 @@
       "id": "app_models_membership_membership"
     },
     {
+      "label": "TopUpRequestFactory",
+      "file_type": "code",
+      "source_file": "database/factories/TopUpRequestFactory.php",
+      "source_location": "L13",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 148,
+      "community_name": "Membership",
+      "norm_label": "topuprequestfactory",
+      "id": "database_factories_topuprequestfactory_topuprequestfactory"
+    },
+    {
       "label": "UserFactory",
       "file_type": "code",
       "source_file": "database/factories/UserFactory.php",
@@ -277,17 +277,30 @@
       "id": "database_factories_userfactory_userfactory"
     },
     {
-      "label": "SessionRegistrationFactory",
+      "label": "RecordAttendanceAction",
       "file_type": "code",
-      "source_file": "database/factories/SessionRegistrationFactory.php",
-      "source_location": "L13",
+      "source_file": "app/Actions/RecordAttendanceAction.php",
+      "source_location": "L12",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 160,
-      "community_name": "SessionRegistrationFactory.php",
-      "norm_label": "sessionregistrationfactory",
-      "id": "database_factories_sessionregistrationfactory_sessionregistrationfactory"
+      "community_name": "RecordAttendanceAction",
+      "norm_label": "recordattendanceaction",
+      "id": "app_actions_recordattendanceaction_recordattendanceaction"
+    },
+    {
+      "label": "AttendanceController",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/AttendanceController.php",
+      "source_location": "L12",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 160,
+      "community_name": "RecordAttendanceAction",
+      "norm_label": "attendancecontroller",
+      "id": "app_http_controllers_attendancecontroller_attendancecontroller"
     },
     {
       "label": "ReviewTopUpRequest",
@@ -394,17 +407,17 @@
       "id": "app_http_requests_updateshuttlecockitemrequest_updateshuttlecockitemrequest"
     },
     {
-      "label": "DeleteMemberAction",
+      "label": "StockMovement",
       "file_type": "code",
-      "source_file": "app/Actions/DeleteMemberAction.php",
-      "source_location": "L10",
+      "source_file": "app/Models/StockMovement.php",
+      "source_location": "L23",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 173,
-      "community_name": "DeleteMemberAction",
-      "norm_label": "deletememberaction",
-      "id": "app_actions_deletememberaction_deletememberaction"
+      "community_name": "StockMovement",
+      "norm_label": "stockmovement",
+      "id": "app_models_stockmovement_stockmovement"
     },
     {
       "label": "DeletePlaySessionAction",
@@ -418,19 +431,6 @@
       "community_name": "PlaySession",
       "norm_label": "deleteplaysessionaction",
       "id": "app_actions_deleteplaysessionaction_deleteplaysessionaction"
-    },
-    {
-      "label": "SendSessionRegistrationNotificationAction",
-      "file_type": "code",
-      "source_file": "app/Actions/SendSessionRegistrationNotificationAction.php",
-      "source_location": "L10",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "PlaySession",
-      "norm_label": "sendsessionregistrationnotificationaction",
-      "id": "app_actions_sendsessionregistrationnotificationaction_sendsessionregistrationnotificationaction"
     },
     {
       "label": "UpdatePlaySessionAction",
@@ -732,6 +732,19 @@
       "id": "app_http_controllers_notificationsetupcontroller_notificationsetupcontroller"
     },
     {
+      "label": "PushNotificationController",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/PushNotificationController.php",
+      "source_location": "L14",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 47,
+      "community_name": "web.php",
+      "norm_label": "pushnotificationcontroller",
+      "id": "app_http_controllers_pushnotificationcontroller_pushnotificationcontroller"
+    },
+    {
       "label": "RegistrationController",
       "file_type": "code",
       "source_file": "app/Http/Controllers/RegistrationController.php",
@@ -784,17 +797,17 @@
       "id": "app_models_expense_expense"
     },
     {
-      "label": "ReportRepository",
+      "label": "DeleteMemberAction",
       "file_type": "code",
-      "source_file": "app/Repositories/ReportRepository.php",
-      "source_location": "L9",
+      "source_file": "app/Actions/DeleteMemberAction.php",
+      "source_location": "L10",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 48,
-      "community_name": "Expense",
-      "norm_label": "reportrepository",
-      "id": "app_repositories_reportrepository_reportrepository"
+      "community": 52,
+      "community_name": "User",
+      "norm_label": "deletememberaction",
+      "id": "app_actions_deletememberaction_deletememberaction"
     },
     {
       "label": "User",
@@ -888,6 +901,19 @@
       "id": "database_factories_pushsubscriptionfactory_pushsubscriptionfactory"
     },
     {
+      "label": "SessionRegistrationFactory",
+      "file_type": "code",
+      "source_file": "database/factories/SessionRegistrationFactory.php",
+      "source_location": "L13",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "User",
+      "norm_label": "sessionregistrationfactory",
+      "id": "database_factories_sessionregistrationfactory_sessionregistrationfactory"
+    },
+    {
       "label": "ShuttlecockItemFactory",
       "file_type": "code",
       "source_file": "database/factories/ShuttlecockItemFactory.php",
@@ -912,19 +938,6 @@
       "community_name": "User",
       "norm_label": "stockmovementfactory",
       "id": "database_factories_stockmovementfactory_stockmovementfactory"
-    },
-    {
-      "label": "TopUpRequestFactory",
-      "file_type": "code",
-      "source_file": "database/factories/TopUpRequestFactory.php",
-      "source_location": "L13",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 52,
-      "community_name": "User",
-      "norm_label": "topuprequestfactory",
-      "id": "database_factories_topuprequestfactory_topuprequestfactory"
     },
     {
       "label": "TopUpSettingFactory",
@@ -1003,19 +1016,6 @@
       "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
       "norm_label": "incomedetail",
       "id": "app_models_incomedetail_incomedetail"
-    },
-    {
-      "label": "StockMovement",
-      "file_type": "code",
-      "source_file": "app/Models/StockMovement.php",
-      "source_location": "L23",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 57,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "norm_label": "stockmovement",
-      "id": "app_models_stockmovement_stockmovement"
     },
     {
       "label": "TopUpRequest",
@@ -1200,30 +1200,17 @@
       "id": "app_http_requests_storetopuprequest_storetopuprequest"
     },
     {
-      "label": "CreateTopUpRequestAction",
+      "label": "SendSessionRegistrationNotificationAction",
       "file_type": "code",
-      "source_file": "app/Actions/CreateTopUpRequestAction.php",
-      "source_location": "L16",
+      "source_file": "app/Actions/SendSessionRegistrationNotificationAction.php",
+      "source_location": "L10",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 71,
-      "community_name": "CreateTopUpRequestAction.php",
-      "norm_label": "createtopuprequestaction",
-      "id": "app_actions_createtopuprequestaction_createtopuprequestaction"
-    },
-    {
-      "label": "DashboardController",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/DashboardController.php",
-      "source_location": "L13",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 72,
-      "community_name": "ReportService",
-      "norm_label": "dashboardcontroller",
-      "id": "app_http_controllers_dashboardcontroller_dashboardcontroller"
+      "community_name": "SendSessionRegistrationNotificationAction",
+      "norm_label": "sendsessionregistrationnotificationaction",
+      "id": "app_actions_sendsessionregistrationnotificationaction_sendsessionregistrationnotificationaction"
     },
     {
       "label": "ReportController",
@@ -1237,6 +1224,19 @@
       "community_name": "ReportService",
       "norm_label": "reportcontroller",
       "id": "app_http_controllers_reportcontroller_reportcontroller"
+    },
+    {
+      "label": "ReportRepository",
+      "file_type": "code",
+      "source_file": "app/Repositories/ReportRepository.php",
+      "source_location": "L9",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "ReportService",
+      "norm_label": "reportrepository",
+      "id": "app_repositories_reportrepository_reportrepository"
     },
     {
       "label": "ReportService",
@@ -1289,19 +1289,6 @@
       "community_name": "Illuminate\\View\\View",
       "norm_label": "publicplaysessioncontroller",
       "id": "app_http_controllers_publicplaysessioncontroller_publicplaysessioncontroller"
-    },
-    {
-      "label": "PushNotificationController",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/PushNotificationController.php",
-      "source_location": "L14",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 80,
-      "community_name": "Illuminate\\View\\View",
-      "norm_label": "pushnotificationcontroller",
-      "id": "app_http_controllers_pushnotificationcontroller_pushnotificationcontroller"
     },
     {
       "label": "FilterPlaySessionsRequest",
@@ -1408,6 +1395,19 @@
       "id": "app_actions_deleteshuttlecockitemaction_deleteshuttlecockitemaction"
     },
     {
+      "label": "DashboardController",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/DashboardController.php",
+      "source_location": "L13",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 90,
+      "community_name": "ShuttlecockItem",
+      "norm_label": "dashboardcontroller",
+      "id": "app_http_controllers_dashboardcontroller_dashboardcontroller"
+    },
+    {
       "label": "ShuttlecockInventoryController",
       "file_type": "code",
       "source_file": "app/Http/Controllers/ShuttlecockInventoryController.php",
@@ -1442,7 +1442,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 91,
-      "community_name": "TransactionController.php",
+      "community_name": "TransactionService",
       "norm_label": "transactionservice",
       "id": "app_services_transactionservice_transactionservice"
     },
@@ -1772,18 +1772,6 @@
       "id": "app_actions_registerforplaysessionaction_registerforplaysessionaction_handle"
     },
     {
-      "label": ".__construct()",
-      "file_type": "code",
-      "source_file": "app/Actions/UpdateSessionRegistrationAction.php",
-      "source_location": "L14",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 108,
-      "community_name": "SessionRegistration",
-      "norm_label": ".__construct()",
-      "id": "app_actions_updatesessionregistrationaction_updatesessionregistrationaction_construct"
-    },
-    {
       "label": ".handle()",
       "file_type": "code",
       "source_file": "app/Actions/UpdateSessionRegistrationAction.php",
@@ -1806,18 +1794,6 @@
       "community_name": "SessionRegistration",
       "norm_label": ".resolveidentity()",
       "id": "app_actions_updatesessionregistrationaction_updatesessionregistrationaction_resolveidentity"
-    },
-    {
-      "label": ".update()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/AttendanceController.php",
-      "source_location": "L14",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 108,
-      "community_name": "SessionRegistration",
-      "norm_label": ".update()",
-      "id": "app_http_controllers_attendancecontroller_attendancecontroller_update"
     },
     {
       "label": ".casts()",
@@ -1938,6 +1914,30 @@
       "community_name": "Membership",
       "norm_label": ".handle()",
       "id": "app_actions_adjustmembershipcreditaction_adjustmembershipcreditaction_handle"
+    },
+    {
+      "label": ".communityMembership()",
+      "file_type": "code",
+      "source_file": "app/Actions/CreateTopUpRequestAction.php",
+      "source_location": "L57",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 148,
+      "community_name": "Membership",
+      "norm_label": ".communitymembership()",
+      "id": "app_actions_createtopuprequestaction_createtopuprequestaction_communitymembership"
+    },
+    {
+      "label": ".handle()",
+      "file_type": "code",
+      "source_file": "app/Actions/CreateTopUpRequestAction.php",
+      "source_location": "L18",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 148,
+      "community_name": "Membership",
+      "norm_label": ".handle()",
+      "id": "app_actions_createtopuprequestaction_createtopuprequestaction_handle"
     },
     {
       "label": ".handle()",
@@ -2072,6 +2072,18 @@
       "id": "app_models_membership_membership_iscommunitypackage"
     },
     {
+      "label": ".definition()",
+      "file_type": "code",
+      "source_file": "database/factories/TopUpRequestFactory.php",
+      "source_location": "L20",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 148,
+      "community_name": "Membership",
+      "norm_label": ".definition()",
+      "id": "database_factories_topuprequestfactory_topuprequestfactory_definition"
+    },
+    {
       "label": "createMembership()",
       "file_type": "code",
       "source_file": "tests/Feature/MembershipManagementTest.php",
@@ -2132,28 +2144,52 @@
       "id": "database_factories_userfactory_userfactory_unverified"
     },
     {
-      "label": ".definition()",
+      "label": ".compatibleMembership()",
       "file_type": "code",
-      "source_file": "database/factories/SessionRegistrationFactory.php",
-      "source_location": "L20",
+      "source_file": "app/Actions/RecordAttendanceAction.php",
+      "source_location": "L70",
       "_callable": true,
       "_origin": "ast",
       "community": 160,
-      "community_name": "SessionRegistrationFactory.php",
-      "norm_label": ".definition()",
-      "id": "database_factories_sessionregistrationfactory_sessionregistrationfactory_definition"
+      "community_name": "RecordAttendanceAction",
+      "norm_label": ".compatiblemembership()",
+      "id": "app_actions_recordattendanceaction_recordattendanceaction_compatiblemembership"
     },
     {
-      "label": ".member()",
+      "label": ".handle()",
       "file_type": "code",
-      "source_file": "database/factories/SessionRegistrationFactory.php",
-      "source_location": "L36",
+      "source_file": "app/Actions/RecordAttendanceAction.php",
+      "source_location": "L14",
       "_callable": true,
       "_origin": "ast",
       "community": 160,
-      "community_name": "SessionRegistrationFactory.php",
-      "norm_label": ".member()",
-      "id": "database_factories_sessionregistrationfactory_sessionregistrationfactory_member"
+      "community_name": "RecordAttendanceAction",
+      "norm_label": ".handle()",
+      "id": "app_actions_recordattendanceaction_recordattendanceaction_handle"
+    },
+    {
+      "label": ".__construct()",
+      "file_type": "code",
+      "source_file": "app/Actions/UpdateSessionRegistrationAction.php",
+      "source_location": "L14",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 160,
+      "community_name": "RecordAttendanceAction",
+      "norm_label": ".__construct()",
+      "id": "app_actions_updatesessionregistrationaction_updatesessionregistrationaction_construct"
+    },
+    {
+      "label": ".update()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/AttendanceController.php",
+      "source_location": "L14",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 160,
+      "community_name": "RecordAttendanceAction",
+      "norm_label": ".update()",
+      "id": "app_http_controllers_attendancecontroller_attendancecontroller_update"
     },
     {
       "label": ".authorize()",
@@ -2396,28 +2432,52 @@
       "id": "app_http_requests_updateshuttlecockitemrequest_updateshuttlecockitemrequest_rules"
     },
     {
-      "label": ".handle()",
+      "label": ".casts()",
       "file_type": "code",
-      "source_file": "app/Actions/DeleteMemberAction.php",
-      "source_location": "L12",
+      "source_file": "app/Models/StockMovement.php",
+      "source_location": "L29",
       "_callable": true,
       "_origin": "ast",
       "community": 173,
-      "community_name": "DeleteMemberAction",
-      "norm_label": ".handle()",
-      "id": "app_actions_deletememberaction_deletememberaction_handle"
+      "community_name": "StockMovement",
+      "norm_label": ".casts()",
+      "id": "app_models_stockmovement_stockmovement_casts"
     },
     {
-      "label": ".destroy()",
+      "label": ".creator()",
       "file_type": "code",
-      "source_file": "app/Http/Controllers/MemberController.php",
-      "source_location": "L46",
+      "source_file": "app/Models/StockMovement.php",
+      "source_location": "L47",
       "_callable": true,
       "_origin": "ast",
       "community": 173,
-      "community_name": "DeleteMemberAction",
-      "norm_label": ".destroy()",
-      "id": "app_http_controllers_membercontroller_membercontroller_destroy"
+      "community_name": "StockMovement",
+      "norm_label": ".creator()",
+      "id": "app_models_stockmovement_stockmovement_creator"
+    },
+    {
+      "label": ".item()",
+      "file_type": "code",
+      "source_file": "app/Models/StockMovement.php",
+      "source_location": "L35",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 173,
+      "community_name": "StockMovement",
+      "norm_label": ".item()",
+      "id": "app_models_stockmovement_stockmovement_item"
+    },
+    {
+      "label": ".playSession()",
+      "file_type": "code",
+      "source_file": "app/Models/StockMovement.php",
+      "source_location": "L41",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 173,
+      "community_name": "StockMovement",
+      "norm_label": ".playsession()",
+      "id": "app_models_stockmovement_stockmovement_playsession"
     },
     {
       "label": "toggleSidebar()",
@@ -2610,54 +2670,6 @@
       "community_name": "PlaySession",
       "norm_label": ".handle()",
       "id": "app_actions_deleteplaysessionaction_deleteplaysessionaction_handle"
-    },
-    {
-      "label": ".cancelled()",
-      "file_type": "code",
-      "source_file": "app/Actions/SendSessionRegistrationNotificationAction.php",
-      "source_location": "L25",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "PlaySession",
-      "norm_label": ".cancelled()",
-      "id": "app_actions_sendsessionregistrationnotificationaction_sendsessionregistrationnotificationaction_cancelled"
-    },
-    {
-      "label": ".__construct()",
-      "file_type": "code",
-      "source_file": "app/Actions/SendSessionRegistrationNotificationAction.php",
-      "source_location": "L12",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "PlaySession",
-      "norm_label": ".__construct()",
-      "id": "app_actions_sendsessionregistrationnotificationaction_sendsessionregistrationnotificationaction_construct"
-    },
-    {
-      "label": ".joined()",
-      "file_type": "code",
-      "source_file": "app/Actions/SendSessionRegistrationNotificationAction.php",
-      "source_location": "L14",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "PlaySession",
-      "norm_label": ".joined()",
-      "id": "app_actions_sendsessionregistrationnotificationaction_sendsessionregistrationnotificationaction_joined"
-    },
-    {
-      "label": ".send()",
-      "file_type": "code",
-      "source_file": "app/Actions/SendSessionRegistrationNotificationAction.php",
-      "source_location": "L36",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "PlaySession",
-      "norm_label": ".send()",
-      "id": "app_actions_sendsessionregistrationnotificationaction_sendsessionregistrationnotificationaction_send"
     },
     {
       "label": ".handle()",
@@ -3176,6 +3188,42 @@
       "id": "app_http_controllers_notificationsetupcontroller_notificationsetupcontroller_invoke"
     },
     {
+      "label": ".index()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/PushNotificationController.php",
+      "source_location": "L16",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 47,
+      "community_name": "web.php",
+      "norm_label": ".index()",
+      "id": "app_http_controllers_pushnotificationcontroller_pushnotificationcontroller_index"
+    },
+    {
+      "label": ".store()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/PushNotificationController.php",
+      "source_location": "L35",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 47,
+      "community_name": "web.php",
+      "norm_label": ".store()",
+      "id": "app_http_controllers_pushnotificationcontroller_pushnotificationcontroller_store"
+    },
+    {
+      "label": ".subscribers()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/PushNotificationController.php",
+      "source_location": "L56",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 47,
+      "community_name": "web.php",
+      "norm_label": ".subscribers()",
+      "id": "app_http_controllers_pushnotificationcontroller_pushnotificationcontroller_subscribers"
+    },
+    {
       "label": ".create()",
       "file_type": "code",
       "source_file": "app/Http/Controllers/RegistrationController.php",
@@ -3270,66 +3318,6 @@
       "community_name": "Expense",
       "norm_label": ".user()",
       "id": "app_models_expense_expense_user"
-    },
-    {
-      "label": ".between()",
-      "file_type": "code",
-      "source_file": "app/Repositories/ReportRepository.php",
-      "source_location": "L17",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "Expense",
-      "norm_label": ".between()",
-      "id": "app_repositories_reportrepository_reportrepository_between"
-    },
-    {
-      "label": ".byCategory()",
-      "file_type": "code",
-      "source_file": "app/Repositories/ReportRepository.php",
-      "source_location": "L32",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "Expense",
-      "norm_label": ".bycategory()",
-      "id": "app_repositories_reportrepository_reportrepository_bycategory"
-    },
-    {
-      "label": ".query()",
-      "file_type": "code",
-      "source_file": "app/Repositories/ReportRepository.php",
-      "source_location": "L11",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "Expense",
-      "norm_label": ".query()",
-      "id": "app_repositories_reportrepository_reportrepository_query"
-    },
-    {
-      "label": ".totalBetween()",
-      "file_type": "code",
-      "source_file": "app/Repositories/ReportRepository.php",
-      "source_location": "L22",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "Expense",
-      "norm_label": ".totalbetween()",
-      "id": "app_repositories_reportrepository_reportrepository_totalbetween"
-    },
-    {
-      "label": ".totalUntil()",
-      "file_type": "code",
-      "source_file": "app/Repositories/ReportRepository.php",
-      "source_location": "L27",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "Expense",
-      "norm_label": ".totaluntil()",
-      "id": "app_repositories_reportrepository_reportrepository_totaluntil"
     },
     {
       "label": ".attendances()",
@@ -3512,28 +3500,28 @@
       "id": "app_models_user_user_topuprequests"
     },
     {
-      "label": ".compatibleMembership()",
-      "file_type": "code",
-      "source_file": "app/Actions/RecordAttendanceAction.php",
-      "source_location": "L70",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 52,
-      "community_name": "User",
-      "norm_label": ".compatiblemembership()",
-      "id": "app_actions_recordattendanceaction_recordattendanceaction_compatiblemembership"
-    },
-    {
       "label": ".handle()",
       "file_type": "code",
-      "source_file": "app/Actions/RecordAttendanceAction.php",
-      "source_location": "L14",
+      "source_file": "app/Actions/DeleteMemberAction.php",
+      "source_location": "L12",
       "_callable": true,
       "_origin": "ast",
       "community": 52,
       "community_name": "User",
       "norm_label": ".handle()",
-      "id": "app_actions_recordattendanceaction_recordattendanceaction_handle"
+      "id": "app_actions_deletememberaction_deletememberaction_handle"
+    },
+    {
+      "label": ".destroy()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/MemberController.php",
+      "source_location": "L46",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "User",
+      "norm_label": ".destroy()",
+      "id": "app_http_controllers_membercontroller_membercontroller_destroy"
     },
     {
       "label": ".casts()",
@@ -3646,6 +3634,30 @@
     {
       "label": ".definition()",
       "file_type": "code",
+      "source_file": "database/factories/SessionRegistrationFactory.php",
+      "source_location": "L20",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "User",
+      "norm_label": ".definition()",
+      "id": "database_factories_sessionregistrationfactory_sessionregistrationfactory_definition"
+    },
+    {
+      "label": ".member()",
+      "file_type": "code",
+      "source_file": "database/factories/SessionRegistrationFactory.php",
+      "source_location": "L36",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "User",
+      "norm_label": ".member()",
+      "id": "database_factories_sessionregistrationfactory_sessionregistrationfactory_member"
+    },
+    {
+      "label": ".definition()",
+      "file_type": "code",
       "source_file": "database/factories/ShuttlecockItemFactory.php",
       "source_location": "L19",
       "_callable": true,
@@ -3666,18 +3678,6 @@
       "community_name": "User",
       "norm_label": ".definition()",
       "id": "database_factories_stockmovementfactory_stockmovementfactory_definition"
-    },
-    {
-      "label": ".definition()",
-      "file_type": "code",
-      "source_file": "database/factories/TopUpRequestFactory.php",
-      "source_location": "L20",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 52,
-      "community_name": "User",
-      "norm_label": ".definition()",
-      "id": "database_factories_topuprequestfactory_topuprequestfactory_definition"
     },
     {
       "label": ".definition()",
@@ -3906,54 +3906,6 @@
       "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
       "norm_label": ".creator()",
       "id": "app_models_shuttlecockitem_shuttlecockitem_creator"
-    },
-    {
-      "label": ".casts()",
-      "file_type": "code",
-      "source_file": "app/Models/StockMovement.php",
-      "source_location": "L29",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 57,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "norm_label": ".casts()",
-      "id": "app_models_stockmovement_stockmovement_casts"
-    },
-    {
-      "label": ".creator()",
-      "file_type": "code",
-      "source_file": "app/Models/StockMovement.php",
-      "source_location": "L47",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 57,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "norm_label": ".creator()",
-      "id": "app_models_stockmovement_stockmovement_creator"
-    },
-    {
-      "label": ".item()",
-      "file_type": "code",
-      "source_file": "app/Models/StockMovement.php",
-      "source_location": "L35",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 57,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "norm_label": ".item()",
-      "id": "app_models_stockmovement_stockmovement_item"
-    },
-    {
-      "label": ".playSession()",
-      "file_type": "code",
-      "source_file": "app/Models/StockMovement.php",
-      "source_location": "L41",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 57,
-      "community_name": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
-      "norm_label": ".playsession()",
-      "id": "app_models_stockmovement_stockmovement_playsession"
     },
     {
       "label": ".casts()",
@@ -4880,52 +4832,52 @@
       "id": "app_http_requests_storetopuprequest_storetopuprequest_rules"
     },
     {
-      "label": ".communityMembership()",
+      "label": ".cancelled()",
       "file_type": "code",
-      "source_file": "app/Actions/CreateTopUpRequestAction.php",
-      "source_location": "L57",
+      "source_file": "app/Actions/SendSessionRegistrationNotificationAction.php",
+      "source_location": "L25",
       "_callable": true,
       "_origin": "ast",
       "community": 71,
-      "community_name": "CreateTopUpRequestAction.php",
-      "norm_label": ".communitymembership()",
-      "id": "app_actions_createtopuprequestaction_createtopuprequestaction_communitymembership"
+      "community_name": "SendSessionRegistrationNotificationAction",
+      "norm_label": ".cancelled()",
+      "id": "app_actions_sendsessionregistrationnotificationaction_sendsessionregistrationnotificationaction_cancelled"
     },
     {
-      "label": ".handle()",
+      "label": ".__construct()",
       "file_type": "code",
-      "source_file": "app/Actions/CreateTopUpRequestAction.php",
-      "source_location": "L18",
+      "source_file": "app/Actions/SendSessionRegistrationNotificationAction.php",
+      "source_location": "L12",
       "_callable": true,
       "_origin": "ast",
       "community": 71,
-      "community_name": "CreateTopUpRequestAction.php",
-      "norm_label": ".handle()",
-      "id": "app_actions_createtopuprequestaction_createtopuprequestaction_handle"
+      "community_name": "SendSessionRegistrationNotificationAction",
+      "norm_label": ".__construct()",
+      "id": "app_actions_sendsessionregistrationnotificationaction_sendsessionregistrationnotificationaction_construct"
     },
     {
-      "label": ".__invoke()",
+      "label": ".joined()",
       "file_type": "code",
-      "source_file": "app/Http/Controllers/DashboardController.php",
-      "source_location": "L15",
+      "source_file": "app/Actions/SendSessionRegistrationNotificationAction.php",
+      "source_location": "L14",
       "_callable": true,
       "_origin": "ast",
-      "community": 72,
-      "community_name": "ReportService",
-      "norm_label": ".__invoke()",
-      "id": "app_http_controllers_dashboardcontroller_dashboardcontroller_invoke"
+      "community": 71,
+      "community_name": "SendSessionRegistrationNotificationAction",
+      "norm_label": ".joined()",
+      "id": "app_actions_sendsessionregistrationnotificationaction_sendsessionregistrationnotificationaction_joined"
     },
     {
-      "label": ".memberDashboard()",
+      "label": ".send()",
       "file_type": "code",
-      "source_file": "app/Http/Controllers/DashboardController.php",
-      "source_location": "L35",
+      "source_file": "app/Actions/SendSessionRegistrationNotificationAction.php",
+      "source_location": "L36",
       "_callable": true,
       "_origin": "ast",
-      "community": 72,
-      "community_name": "ReportService",
-      "norm_label": ".memberdashboard()",
-      "id": "app_http_controllers_dashboardcontroller_dashboardcontroller_memberdashboard"
+      "community": 71,
+      "community_name": "SendSessionRegistrationNotificationAction",
+      "norm_label": ".send()",
+      "id": "app_actions_sendsessionregistrationnotificationaction_sendsessionregistrationnotificationaction_send"
     },
     {
       "label": ".download()",
@@ -4950,6 +4902,66 @@
       "community_name": "ReportService",
       "norm_label": ".__invoke()",
       "id": "app_http_controllers_reportcontroller_reportcontroller_invoke"
+    },
+    {
+      "label": ".between()",
+      "file_type": "code",
+      "source_file": "app/Repositories/ReportRepository.php",
+      "source_location": "L17",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "ReportService",
+      "norm_label": ".between()",
+      "id": "app_repositories_reportrepository_reportrepository_between"
+    },
+    {
+      "label": ".byCategory()",
+      "file_type": "code",
+      "source_file": "app/Repositories/ReportRepository.php",
+      "source_location": "L32",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "ReportService",
+      "norm_label": ".bycategory()",
+      "id": "app_repositories_reportrepository_reportrepository_bycategory"
+    },
+    {
+      "label": ".query()",
+      "file_type": "code",
+      "source_file": "app/Repositories/ReportRepository.php",
+      "source_location": "L11",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "ReportService",
+      "norm_label": ".query()",
+      "id": "app_repositories_reportrepository_reportrepository_query"
+    },
+    {
+      "label": ".totalBetween()",
+      "file_type": "code",
+      "source_file": "app/Repositories/ReportRepository.php",
+      "source_location": "L22",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "ReportService",
+      "norm_label": ".totalbetween()",
+      "id": "app_repositories_reportrepository_reportrepository_totalbetween"
+    },
+    {
+      "label": ".totalUntil()",
+      "file_type": "code",
+      "source_file": "app/Repositories/ReportRepository.php",
+      "source_location": "L27",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "ReportService",
+      "norm_label": ".totaluntil()",
+      "id": "app_repositories_reportrepository_reportrepository_totaluntil"
     },
     {
       "label": ".__construct()",
@@ -5118,42 +5130,6 @@
       "community_name": "Illuminate\\View\\View",
       "norm_label": ".show()",
       "id": "app_http_controllers_publicplaysessioncontroller_publicplaysessioncontroller_show"
-    },
-    {
-      "label": ".index()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/PushNotificationController.php",
-      "source_location": "L16",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 80,
-      "community_name": "Illuminate\\View\\View",
-      "norm_label": ".index()",
-      "id": "app_http_controllers_pushnotificationcontroller_pushnotificationcontroller_index"
-    },
-    {
-      "label": ".store()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/PushNotificationController.php",
-      "source_location": "L35",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 80,
-      "community_name": "Illuminate\\View\\View",
-      "norm_label": ".store()",
-      "id": "app_http_controllers_pushnotificationcontroller_pushnotificationcontroller_store"
-    },
-    {
-      "label": ".subscribers()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/PushNotificationController.php",
-      "source_location": "L56",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 80,
-      "community_name": "Illuminate\\View\\View",
-      "norm_label": ".subscribers()",
-      "id": "app_http_controllers_pushnotificationcontroller_pushnotificationcontroller_subscribers"
     },
     {
       "label": ".attributes()",
@@ -5348,6 +5324,30 @@
       "id": "app_actions_deleteshuttlecockitemaction_deleteshuttlecockitemaction_handle"
     },
     {
+      "label": ".__invoke()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/DashboardController.php",
+      "source_location": "L15",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 90,
+      "community_name": "ShuttlecockItem",
+      "norm_label": ".__invoke()",
+      "id": "app_http_controllers_dashboardcontroller_dashboardcontroller_invoke"
+    },
+    {
+      "label": ".memberDashboard()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/DashboardController.php",
+      "source_location": "L35",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 90,
+      "community_name": "ShuttlecockItem",
+      "norm_label": ".memberdashboard()",
+      "id": "app_http_controllers_dashboardcontroller_dashboardcontroller_memberdashboard"
+    },
+    {
       "label": ".destroy()",
       "file_type": "code",
       "source_file": "app/Http/Controllers/ShuttlecockInventoryController.php",
@@ -5415,7 +5415,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 91,
-      "community_name": "TransactionController.php",
+      "community_name": "TransactionService",
       "norm_label": ".__construct()",
       "id": "app_http_controllers_transactioncontroller_transactioncontroller_construct"
     },
@@ -5427,7 +5427,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 91,
-      "community_name": "TransactionController.php",
+      "community_name": "TransactionService",
       "norm_label": ".delete()",
       "id": "app_services_transactionservice_transactionservice_delete"
     },
@@ -5439,7 +5439,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 91,
-      "community_name": "TransactionController.php",
+      "community_name": "TransactionService",
       "norm_label": ".ensuremanualtransaction()",
       "id": "app_services_transactionservice_transactionservice_ensuremanualtransaction"
     },
@@ -5451,7 +5451,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 91,
-      "community_name": "TransactionController.php",
+      "community_name": "TransactionService",
       "norm_label": ".save()",
       "id": "app_services_transactionservice_transactionservice_save"
     },
@@ -6427,15 +6427,26 @@
       "id": "docs_08_report_laporan_saat_ini_7_september_2026"
     },
     {
-      "label": "AttendanceController.php",
+      "label": "CreateSessionRegistrationByAdminAction.php",
       "file_type": "code",
-      "source_file": "app/Http/Controllers/AttendanceController.php",
+      "source_file": "app/Actions/CreateSessionRegistrationByAdminAction.php",
       "source_location": "L1",
       "_origin": "ast",
       "community": 108,
       "community_name": "SessionRegistration",
-      "norm_label": "attendancecontroller.php",
-      "id": "app_http_controllers_attendancecontroller"
+      "norm_label": "createsessionregistrationbyadminaction.php",
+      "id": "app_actions_createsessionregistrationbyadminaction"
+    },
+    {
+      "label": "UpdateSessionRegistrationAction.php",
+      "file_type": "code",
+      "source_file": "app/Actions/UpdateSessionRegistrationAction.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 108,
+      "community_name": "SessionRegistration",
+      "norm_label": "updatesessionregistrationaction.php",
+      "id": "app_actions_updatesessionregistrationaction"
     },
     {
       "label": "SessionRegistrationController.php",
@@ -6449,15 +6460,26 @@
       "id": "app_http_controllers_sessionregistrationcontroller"
     },
     {
-      "label": "PlaySessionRegistrationTest.php",
+      "label": "Illuminate\\Database\\QueryException",
       "file_type": "code",
-      "source_file": "tests/Feature/PlaySessionRegistrationTest.php",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "community": 108,
+      "community_name": "SessionRegistration",
+      "norm_label": "illuminate\\database\\queryexception",
+      "id": "illuminate_database_queryexception"
+    },
+    {
+      "label": "CashQuotaLifecycleTest.php",
+      "file_type": "code",
+      "source_file": "tests/Feature/CashQuotaLifecycleTest.php",
       "source_location": "L1",
       "_origin": "ast",
       "community": 108,
       "community_name": "SessionRegistration",
-      "norm_label": "playsessionregistrationtest.php",
-      "id": "tests_feature_playsessionregistrationtest"
+      "norm_label": "cashquotalifecycletest.php",
+      "id": "tests_feature_cashquotalifecycletest"
     },
     {
       "label": "actions-http.md",
@@ -7698,6 +7720,17 @@
       "id": "self"
     },
     {
+      "label": "CreateTopUpRequestAction.php",
+      "file_type": "code",
+      "source_file": "app/Actions/CreateTopUpRequestAction.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 148,
+      "community_name": "Membership",
+      "norm_label": "createtopuprequestaction.php",
+      "id": "app_actions_createtopuprequestaction"
+    },
+    {
       "label": "DeleteMembershipAction.php",
       "file_type": "code",
       "source_file": "app/Actions/DeleteMembershipAction.php",
@@ -7731,6 +7764,39 @@
       "id": "app_http_requests_adjustmembershipcreditrequest"
     },
     {
+      "label": "TopUpRequestFactory.php",
+      "file_type": "code",
+      "source_file": "database/factories/TopUpRequestFactory.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 148,
+      "community_name": "Membership",
+      "norm_label": "topuprequestfactory.php",
+      "id": "database_factories_topuprequestfactory"
+    },
+    {
+      "label": "Illuminate\\Http\\UploadedFile",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "community": 148,
+      "community_name": "Membership",
+      "norm_label": "illuminate\\http\\uploadedfile",
+      "id": "illuminate_http_uploadedfile"
+    },
+    {
+      "label": "Illuminate\\Support\\Facades\\Storage",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "community": 148,
+      "community_name": "Membership",
+      "norm_label": "illuminate\\support\\facades\\storage",
+      "id": "illuminate_support_facades_storage"
+    },
+    {
       "label": "MembershipManagementTest.php",
       "file_type": "code",
       "source_file": "tests/Feature/MembershipManagementTest.php",
@@ -7740,6 +7806,17 @@
       "community_name": "Membership",
       "norm_label": "membershipmanagementtest.php",
       "id": "tests_feature_membershipmanagementtest"
+    },
+    {
+      "label": "PlaySessionRegistrationTest.php",
+      "file_type": "code",
+      "source_file": "tests/Feature/PlaySessionRegistrationTest.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 148,
+      "community_name": "Membership",
+      "norm_label": "playsessionregistrationtest.php",
+      "id": "tests_feature_playsessionregistrationtest"
     },
     {
       "label": "server-loading.blade.php",
@@ -8237,26 +8314,15 @@
       "id": "artisan"
     },
     {
-      "label": "SessionRegistrationFactory.php",
+      "label": "AttendanceController.php",
       "file_type": "code",
-      "source_file": "database/factories/SessionRegistrationFactory.php",
+      "source_file": "app/Http/Controllers/AttendanceController.php",
       "source_location": "L1",
       "_origin": "ast",
       "community": 160,
-      "community_name": "SessionRegistrationFactory.php",
-      "norm_label": "sessionregistrationfactory.php",
-      "id": "database_factories_sessionregistrationfactory"
-    },
-    {
-      "label": "static",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "community": 160,
-      "community_name": "SessionRegistrationFactory.php",
-      "norm_label": "static",
-      "id": "database_factories_sessionregistrationfactory_php_static"
+      "community_name": "RecordAttendanceAction",
+      "norm_label": "attendancecontroller.php",
+      "id": "app_http_controllers_attendancecontroller"
     },
     {
       "label": "07-expense.md",
@@ -8838,6 +8904,28 @@
       "community_name": "form.blade.php",
       "norm_label": "form.blade.php",
       "id": "resources_views_transactions_form_blade"
+    },
+    {
+      "label": "PlaySessionController.php",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/PlaySessionController.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "PlaySession",
+      "norm_label": "playsessioncontroller.php",
+      "id": "app_http_controllers_playsessioncontroller"
+    },
+    {
+      "label": "PushNotificationController.php",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/PushNotificationController.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "PlaySession",
+      "norm_label": "pushnotificationcontroller.php",
+      "id": "app_http_controllers_pushnotificationcontroller"
     },
     {
       "label": "Illuminate\\Http\\RedirectResponse",
@@ -12790,17 +12878,6 @@
       "id": "app_http_controllers_notificationsetupcontroller"
     },
     {
-      "label": "RegistrationController.php",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/RegistrationController.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 47,
-      "community_name": "web.php",
-      "norm_label": "registrationcontroller.php",
-      "id": "app_http_controllers_registrationcontroller"
-    },
-    {
       "label": "StockMovementController.php",
       "file_type": "code",
       "source_file": "app/Http/Controllers/StockMovementController.php",
@@ -12856,6 +12933,17 @@
       "id": "routes_web"
     },
     {
+      "label": "TransactionController.php",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/TransactionController.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 48,
+      "community_name": "Expense",
+      "norm_label": "transactioncontroller.php",
+      "id": "app_http_controllers_transactioncontroller"
+    },
+    {
       "label": "Expense.php",
       "file_type": "code",
       "source_file": "app/Models/Expense.php",
@@ -12865,28 +12953,6 @@
       "community_name": "Expense",
       "norm_label": "expense.php",
       "id": "app_models_expense"
-    },
-    {
-      "label": "ReportRepository.php",
-      "file_type": "code",
-      "source_file": "app/Repositories/ReportRepository.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "Expense",
-      "norm_label": "reportrepository.php",
-      "id": "app_repositories_reportrepository"
-    },
-    {
-      "label": "Illuminate\\Database\\Eloquent\\Builder",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "Expense",
-      "norm_label": "illuminate\\database\\eloquent\\builder",
-      "id": "illuminate_database_eloquent_builder"
     },
     {
       "label": "AGENTS.md",
@@ -13802,6 +13868,28 @@
       "id": "database_factories_pushsubscriptionfactory"
     },
     {
+      "label": "SessionRegistrationFactory.php",
+      "file_type": "code",
+      "source_file": "database/factories/SessionRegistrationFactory.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "User",
+      "norm_label": "sessionregistrationfactory.php",
+      "id": "database_factories_sessionregistrationfactory"
+    },
+    {
+      "label": "static",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "User",
+      "norm_label": "static",
+      "id": "database_factories_sessionregistrationfactory_php_static"
+    },
+    {
       "label": "ShuttlecockItemFactory.php",
       "file_type": "code",
       "source_file": "database/factories/ShuttlecockItemFactory.php",
@@ -13822,17 +13910,6 @@
       "community_name": "User",
       "norm_label": "stockmovementfactory.php",
       "id": "database_factories_stockmovementfactory"
-    },
-    {
-      "label": "TopUpRequestFactory.php",
-      "file_type": "code",
-      "source_file": "database/factories/TopUpRequestFactory.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 52,
-      "community_name": "User",
-      "norm_label": "topuprequestfactory.php",
-      "id": "database_factories_topuprequestfactory"
     },
     {
       "label": "TopUpSettingFactory.php",
@@ -14186,17 +14263,6 @@
       "id": "app_actions_adjustmembershipcreditaction"
     },
     {
-      "label": "CreateSessionRegistrationByAdminAction.php",
-      "file_type": "code",
-      "source_file": "app/Actions/CreateSessionRegistrationByAdminAction.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 54,
-      "community_name": "Illuminate\\Validation\\ValidationException",
-      "norm_label": "createsessionregistrationbyadminaction.php",
-      "id": "app_actions_createsessionregistrationbyadminaction"
-    },
-    {
       "label": "DeleteMemberAction.php",
       "file_type": "code",
       "source_file": "app/Actions/DeleteMemberAction.php",
@@ -14318,17 +14384,6 @@
       "id": "app_actions_updateplaysessionaction"
     },
     {
-      "label": "UpdateSessionRegistrationAction.php",
-      "file_type": "code",
-      "source_file": "app/Actions/UpdateSessionRegistrationAction.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 54,
-      "community_name": "Illuminate\\Validation\\ValidationException",
-      "norm_label": "updatesessionregistrationaction.php",
-      "id": "app_actions_updatesessionregistrationaction"
-    },
-    {
       "label": "TransactionService.php",
       "file_type": "code",
       "source_file": "app/Services/TransactionService.php",
@@ -14338,17 +14393,6 @@
       "community_name": "Illuminate\\Validation\\ValidationException",
       "norm_label": "transactionservice.php",
       "id": "app_services_transactionservice"
-    },
-    {
-      "label": "Illuminate\\Database\\QueryException",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "community": 54,
-      "community_name": "Illuminate\\Validation\\ValidationException",
-      "norm_label": "illuminate\\database\\queryexception",
-      "id": "illuminate_database_queryexception"
     },
     {
       "label": "Illuminate\\Support\\Facades\\DB",
@@ -14371,17 +14415,6 @@
       "community_name": "Illuminate\\Validation\\ValidationException",
       "norm_label": "illuminate\\validation\\validationexception",
       "id": "illuminate_validation_validationexception"
-    },
-    {
-      "label": "CashQuotaLifecycleTest.php",
-      "file_type": "code",
-      "source_file": "tests/Feature/CashQuotaLifecycleTest.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 54,
-      "community_name": "Illuminate\\Validation\\ValidationException",
-      "norm_label": "cashquotalifecycletest.php",
-      "id": "tests_feature_cashquotalifecycletest"
     },
     {
       "label": "pest-testing/SKILL.md",
@@ -17146,48 +17179,15 @@
       "id": "illuminate_validation_validator"
     },
     {
-      "label": "CreateTopUpRequestAction.php",
-      "file_type": "code",
-      "source_file": "app/Actions/CreateTopUpRequestAction.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "CreateTopUpRequestAction.php",
-      "norm_label": "createtopuprequestaction.php",
-      "id": "app_actions_createtopuprequestaction"
-    },
-    {
       "label": "SendSessionRegistrationNotificationAction.php",
       "file_type": "code",
       "source_file": "app/Actions/SendSessionRegistrationNotificationAction.php",
       "source_location": "L1",
       "_origin": "ast",
       "community": 71,
-      "community_name": "CreateTopUpRequestAction.php",
+      "community_name": "SendSessionRegistrationNotificationAction",
       "norm_label": "sendsessionregistrationnotificationaction.php",
       "id": "app_actions_sendsessionregistrationnotificationaction"
-    },
-    {
-      "label": "Illuminate\\Http\\UploadedFile",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "CreateTopUpRequestAction.php",
-      "norm_label": "illuminate\\http\\uploadedfile",
-      "id": "illuminate_http_uploadedfile"
-    },
-    {
-      "label": "Illuminate\\Support\\Facades\\Storage",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "community": 71,
-      "community_name": "CreateTopUpRequestAction.php",
-      "norm_label": "illuminate\\support\\facades\\storage",
-      "id": "illuminate_support_facades_storage"
     },
     {
       "label": "Throwable",
@@ -17196,20 +17196,9 @@
       "source_location": "",
       "_origin": "ast",
       "community": 71,
-      "community_name": "CreateTopUpRequestAction.php",
+      "community_name": "SendSessionRegistrationNotificationAction",
       "norm_label": "throwable",
       "id": "throwable"
-    },
-    {
-      "label": "DashboardController.php",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/DashboardController.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 72,
-      "community_name": "ReportService",
-      "norm_label": "dashboardcontroller.php",
-      "id": "app_http_controllers_dashboardcontroller"
     },
     {
       "label": "ReportController.php",
@@ -17221,6 +17210,17 @@
       "community_name": "ReportService",
       "norm_label": "reportcontroller.php",
       "id": "app_http_controllers_reportcontroller"
+    },
+    {
+      "label": "ReportRepository.php",
+      "file_type": "code",
+      "source_file": "app/Repositories/ReportRepository.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "ReportService",
+      "norm_label": "reportrepository.php",
+      "id": "app_repositories_reportrepository"
     },
     {
       "label": "ReportService.php",
@@ -17243,6 +17243,17 @@
       "community_name": "ReportService",
       "norm_label": "barryvdh\\dompdf\\facade\\pdf",
       "id": "barryvdh_dompdf_facade_pdf"
+    },
+    {
+      "label": "Illuminate\\Database\\Eloquent\\Builder",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "ReportService",
+      "norm_label": "illuminate\\database\\eloquent\\builder",
+      "id": "illuminate_database_eloquent_builder"
     },
     {
       "label": "Artisan",
@@ -18074,17 +18085,6 @@
       "id": "app_http_controllers_membercontroller"
     },
     {
-      "label": "PlaySessionController.php",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/PlaySessionController.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 80,
-      "community_name": "Illuminate\\View\\View",
-      "norm_label": "playsessioncontroller.php",
-      "id": "app_http_controllers_playsessioncontroller"
-    },
-    {
       "label": "PublicPlaySessionController.php",
       "file_type": "code",
       "source_file": "app/Http/Controllers/PublicPlaySessionController.php",
@@ -18094,17 +18094,6 @@
       "community_name": "Illuminate\\View\\View",
       "norm_label": "publicplaysessioncontroller.php",
       "id": "app_http_controllers_publicplaysessioncontroller"
-    },
-    {
-      "label": "PushNotificationController.php",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/PushNotificationController.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 80,
-      "community_name": "Illuminate\\View\\View",
-      "norm_label": "pushnotificationcontroller.php",
-      "id": "app_http_controllers_pushnotificationcontroller"
     },
     {
       "label": "Illuminate\\Support\\Facades\\Date",
@@ -18149,6 +18138,17 @@
       "community_name": "ResetLegacyPushSubscriptionsAction",
       "norm_label": "authcontroller.php",
       "id": "app_http_controllers_authcontroller"
+    },
+    {
+      "label": "RegistrationController.php",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/RegistrationController.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "ResetLegacyPushSubscriptionsAction",
+      "norm_label": "registrationcontroller.php",
+      "id": "app_http_controllers_registrationcontroller"
     },
     {
       "label": "RequireCurrentPushSetup.php",
@@ -19079,6 +19079,17 @@
       "id": "app_actions_deleteshuttlecockitemaction"
     },
     {
+      "label": "DashboardController.php",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/DashboardController.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 90,
+      "community_name": "ShuttlecockItem",
+      "norm_label": "dashboardcontroller.php",
+      "id": "app_http_controllers_dashboardcontroller"
+    },
+    {
       "label": "ShuttlecockInventoryController.php",
       "file_type": "code",
       "source_file": "app/Http/Controllers/ShuttlecockInventoryController.php",
@@ -19088,17 +19099,6 @@
       "community_name": "ShuttlecockItem",
       "norm_label": "shuttlecockinventorycontroller.php",
       "id": "app_http_controllers_shuttlecockinventorycontroller"
-    },
-    {
-      "label": "TransactionController.php",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/TransactionController.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 91,
-      "community_name": "TransactionController.php",
-      "norm_label": "transactioncontroller.php",
-      "id": "app_http_controllers_transactioncontroller"
     },
     {
       "label": "collections.md",
@@ -20319,7 +20319,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Http/Controllers/DashboardController.php",
-      "source_location": "L48",
+      "source_location": "L49",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_http_controllers_dashboardcontroller_dashboardcontroller_memberdashboard",
@@ -29443,7 +29443,7 @@
       "_origin": "ast",
       "confidence_score": 1.0,
       "source": "tests_feature_playsessionregistrationtest",
-      "target": "app_models_income_income"
+      "target": "app_models_attendance_attendance"
     },
     {
       "relation": "imports",
@@ -29455,7 +29455,7 @@
       "_origin": "ast",
       "confidence_score": 1.0,
       "source": "tests_feature_playsessionregistrationtest",
-      "target": "app_models_membership_membership"
+      "target": "app_models_income_income"
     },
     {
       "relation": "imports",
@@ -29467,7 +29467,7 @@
       "_origin": "ast",
       "confidence_score": 1.0,
       "source": "tests_feature_playsessionregistrationtest",
-      "target": "app_models_playsession_playsession"
+      "target": "app_models_membership_membership"
     },
     {
       "relation": "imports",
@@ -29479,7 +29479,7 @@
       "_origin": "ast",
       "confidence_score": 1.0,
       "source": "tests_feature_playsessionregistrationtest",
-      "target": "app_models_sessionregistration_sessionregistration"
+      "target": "app_models_playsession_playsession"
     },
     {
       "relation": "imports",
@@ -29487,6 +29487,18 @@
       "confidence": "EXTRACTED",
       "source_file": "tests/Feature/PlaySessionRegistrationTest.php",
       "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "tests_feature_playsessionregistrationtest",
+      "target": "app_models_sessionregistration_sessionregistration"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/Feature/PlaySessionRegistrationTest.php",
+      "source_location": "L8",
       "weight": 1.0,
       "_origin": "ast",
       "confidence_score": 1.0,

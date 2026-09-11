@@ -273,7 +273,7 @@
       "_origin": "ast",
       "id": "database_factories_userfactory_userfactory",
       "community": 153,
-      "community_name": "UserFactory",
+      "community_name": "Illuminate\\Support\\Str",
       "norm_label": "userfactory"
     },
     {
@@ -2092,7 +2092,7 @@
       "_origin": "ast",
       "id": "database_factories_userfactory_userfactory_admin",
       "community": 153,
-      "community_name": "UserFactory",
+      "community_name": "Illuminate\\Support\\Str",
       "norm_label": ".admin()"
     },
     {
@@ -2104,7 +2104,7 @@
       "_origin": "ast",
       "id": "database_factories_userfactory_userfactory_definition",
       "community": 153,
-      "community_name": "UserFactory",
+      "community_name": "Illuminate\\Support\\Str",
       "norm_label": ".definition()"
     },
     {
@@ -2116,7 +2116,7 @@
       "_origin": "ast",
       "id": "database_factories_userfactory_userfactory_member",
       "community": 153,
-      "community_name": "UserFactory",
+      "community_name": "Illuminate\\Support\\Str",
       "norm_label": ".member()"
     },
     {
@@ -2128,7 +2128,7 @@
       "_origin": "ast",
       "id": "database_factories_userfactory_userfactory_unverified",
       "community": 153,
-      "community_name": "UserFactory",
+      "community_name": "Illuminate\\Support\\Str",
       "norm_label": ".unverified()"
     },
     {
@@ -8062,6 +8062,39 @@
       "norm_label": "member notifications are mandatory per device session"
     },
     {
+      "label": "cache.php",
+      "file_type": "code",
+      "source_file": "config/cache.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "config_cache",
+      "community": 153,
+      "community_name": "Illuminate\\Support\\Str",
+      "norm_label": "cache.php"
+    },
+    {
+      "label": "database.php",
+      "file_type": "code",
+      "source_file": "config/database.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "config_database",
+      "community": 153,
+      "community_name": "Illuminate\\Support\\Str",
+      "norm_label": "database.php"
+    },
+    {
+      "label": "session.php",
+      "file_type": "code",
+      "source_file": "config/session.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "config_session",
+      "community": 153,
+      "community_name": "Illuminate\\Support\\Str",
+      "norm_label": "session.php"
+    },
+    {
       "label": "UserFactory.php",
       "file_type": "code",
       "source_file": "database/factories/UserFactory.php",
@@ -8069,7 +8102,7 @@
       "_origin": "ast",
       "id": "database_factories_userfactory",
       "community": 153,
-      "community_name": "UserFactory",
+      "community_name": "Illuminate\\Support\\Str",
       "norm_label": "userfactory.php"
     },
     {
@@ -8080,7 +8113,7 @@
       "_origin": "ast",
       "id": "database_factories_userfactory_php_static",
       "community": 153,
-      "community_name": "UserFactory",
+      "community_name": "Illuminate\\Support\\Str",
       "norm_label": "static"
     },
     {
@@ -8091,8 +8124,30 @@
       "_origin": "ast",
       "id": "illuminate_support_facades_hash",
       "community": 153,
-      "community_name": "UserFactory",
+      "community_name": "Illuminate\\Support\\Str",
       "norm_label": "illuminate\\support\\facades\\hash"
+    },
+    {
+      "label": "Illuminate\\Support\\Str",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_support_str",
+      "community": 153,
+      "community_name": "Illuminate\\Support\\Str",
+      "norm_label": "illuminate\\support\\str"
+    },
+    {
+      "label": "Pdo\\Mysql",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "pdo_mysql",
+      "community": 153,
+      "community_name": "Illuminate\\Support\\Str",
+      "norm_label": "pdo\\mysql"
     },
     {
       "label": "Acuan proyek saat ini \u2014 7 September 2026",
@@ -10245,6 +10300,17 @@
       "norm_label": "topupsetting.php"
     },
     {
+      "label": "User.php",
+      "file_type": "code",
+      "source_file": "app/Models/User.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_models_user",
+      "community": 4,
+      "community_name": "Illuminate\\Database\\Eloquent\\Model",
+      "norm_label": "user.php"
+    },
+    {
       "label": "Illuminate\\Database\\Eloquent\\Attributes\\Fillable",
       "file_type": "code",
       "source_file": "",
@@ -10254,6 +10320,17 @@
       "community": 4,
       "community_name": "Illuminate\\Database\\Eloquent\\Model",
       "norm_label": "illuminate\\database\\eloquent\\attributes\\fillable"
+    },
+    {
+      "label": "Illuminate\\Database\\Eloquent\\Attributes\\Hidden",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_database_eloquent_attributes_hidden",
+      "community": 4,
+      "community_name": "Illuminate\\Database\\Eloquent\\Model",
+      "norm_label": "illuminate\\database\\eloquent\\attributes\\hidden"
     },
     {
       "label": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
@@ -10276,6 +10353,17 @@
       "community": 4,
       "community_name": "Illuminate\\Database\\Eloquent\\Model",
       "norm_label": "illuminate\\database\\eloquent\\model"
+    },
+    {
+      "label": "Illuminate\\Notifications\\Notifiable",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_notifications_notifiable",
+      "community": 4,
+      "community_name": "Illuminate\\Database\\Eloquent\\Model",
+      "norm_label": "illuminate\\notifications\\notifiable"
     },
     {
       "label": "Illuminate\\Support\\Carbon",
@@ -17843,94 +17931,6 @@
       "norm_label": "illuminate\\database\\eloquent\\relations\\hasone"
     },
     {
-      "label": "User.php",
-      "file_type": "code",
-      "source_file": "app/Models/User.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_models_user",
-      "community": 79,
-      "community_name": "User.php",
-      "norm_label": "user.php"
-    },
-    {
-      "label": "cache.php",
-      "file_type": "code",
-      "source_file": "config/cache.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "config_cache",
-      "community": 79,
-      "community_name": "User.php",
-      "norm_label": "cache.php"
-    },
-    {
-      "label": "database.php",
-      "file_type": "code",
-      "source_file": "config/database.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "config_database",
-      "community": 79,
-      "community_name": "User.php",
-      "norm_label": "database.php"
-    },
-    {
-      "label": "session.php",
-      "file_type": "code",
-      "source_file": "config/session.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "config_session",
-      "community": 79,
-      "community_name": "User.php",
-      "norm_label": "session.php"
-    },
-    {
-      "label": "Illuminate\\Database\\Eloquent\\Attributes\\Hidden",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_database_eloquent_attributes_hidden",
-      "community": 79,
-      "community_name": "User.php",
-      "norm_label": "illuminate\\database\\eloquent\\attributes\\hidden"
-    },
-    {
-      "label": "Illuminate\\Notifications\\Notifiable",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_notifications_notifiable",
-      "community": 79,
-      "community_name": "User.php",
-      "norm_label": "illuminate\\notifications\\notifiable"
-    },
-    {
-      "label": "Illuminate\\Support\\Str",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_support_str",
-      "community": 79,
-      "community_name": "User.php",
-      "norm_label": "illuminate\\support\\str"
-    },
-    {
-      "label": "Pdo\\Mysql",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "pdo_mysql",
-      "community": 79,
-      "community_name": "User.php",
-      "norm_label": "pdo\\mysql"
-    },
-    {
       "label": "require-dev",
       "file_type": "code",
       "source_file": "composer.json",
@@ -20319,7 +20319,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Http/Controllers/DashboardController.php",
-      "source_location": "L48",
+      "source_location": "L49",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_http_controllers_dashboardcontroller_dashboardcontroller_memberdashboard",
@@ -29442,7 +29442,7 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_feature_playsessionregistrationtest",
-      "target": "app_models_income_income",
+      "target": "app_models_attendance_attendance",
       "confidence_score": 1.0
     },
     {
@@ -29454,7 +29454,7 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_feature_playsessionregistrationtest",
-      "target": "app_models_membership_membership",
+      "target": "app_models_income_income",
       "confidence_score": 1.0
     },
     {
@@ -29466,7 +29466,7 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_feature_playsessionregistrationtest",
-      "target": "app_models_playsession_playsession",
+      "target": "app_models_membership_membership",
       "confidence_score": 1.0
     },
     {
@@ -29478,7 +29478,7 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_feature_playsessionregistrationtest",
-      "target": "app_models_sessionregistration_sessionregistration",
+      "target": "app_models_playsession_playsession",
       "confidence_score": 1.0
     },
     {
@@ -29487,6 +29487,18 @@
       "confidence": "EXTRACTED",
       "source_file": "tests/Feature/PlaySessionRegistrationTest.php",
       "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_feature_playsessionregistrationtest",
+      "target": "app_models_sessionregistration_sessionregistration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/Feature/PlaySessionRegistrationTest.php",
+      "source_location": "L8",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_feature_playsessionregistrationtest",

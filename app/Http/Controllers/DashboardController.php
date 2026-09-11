@@ -40,6 +40,7 @@ class DashboardController extends Controller
             ->whereHas('membership', fn ($query) => $query->whereBelongsTo($member));
         $remainingCredits = (int) $memberships->sum('balance');
         $usedCredits = abs((int) (clone $memberTransactions)->where('quantity', '<', 0)->sum('quantity'));
+        $attendanceCount = $member->attendances()->where('status', 'present')->count();
         $transactions = $memberTransactions
             ->with(['membership', 'attendance.playSession'])
             ->latest()
@@ -55,6 +56,6 @@ class DashboardController extends Controller
             ->limit(6)
             ->get();
 
-        return view('members.dashboard', compact('member', 'memberships', 'transactions', 'upcomingSessions', 'remainingCredits', 'usedCredits'));
+        return view('members.dashboard', compact('member', 'memberships', 'transactions', 'upcomingSessions', 'remainingCredits', 'usedCredits', 'attendanceCount'));
     }
 }

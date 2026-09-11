@@ -1,11 +1,11 @@
 # Graph Report - ngebadmintonyuk  (2026-09-11)
 
 ## Corpus Check
-- 265 files · ~137,971 words
+- 265 files · ~137,998 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1664 nodes · 2562 edges · 174 communities (135 shown, 39 thin omitted)
+- 1664 nodes · 2563 edges · 173 communities (134 shown, 39 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
@@ -69,7 +69,6 @@
 - Events & Notifications Best Practices
 - Queue & Job Best Practices
 - Income
-- User.php
 - Illuminate\View\View
 - ResetLegacyPushSubscriptionsAction
 - Caching Best Practices
@@ -120,7 +119,7 @@
 - Aturan operasional yang tidak boleh terlewat
 - Konteks final proyek NgeBadmintonYuk
 - Http
-- UserFactory
+- Illuminate\Support\Str
 - Acuan proyek saat ini — 7 September 2026
 - Status branding — 7 September 2026
 - Database saat ini — 7 September 2026
@@ -167,7 +166,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (174 total, 39 thin omitted)
+## Communities (173 total, 39 thin omitted)
 
 ### Community 0 - "Illuminate\Http\Request"
 Cohesion: 0.20
@@ -186,8 +185,8 @@ Cohesion: 0.17
 Nodes (7): DeletePlaySessionAction, SendSessionRegistrationNotificationAction, UpdatePlaySessionAction, PlaySessionController, SessionRegistrationController, PlaySession, Illuminate\Http\RedirectResponse
 
 ### Community 4 - "Illuminate\Database\Eloquent\Model"
-Cohesion: 0.36
-Nodes (4): Illuminate\Database\Eloquent\Attributes\Fillable, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Database\Eloquent\Model, Illuminate\Support\Carbon
+Cohesion: 0.28
+Nodes (6): Illuminate\Database\Eloquent\Attributes\Fillable, Illuminate\Database\Eloquent\Attributes\Hidden, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Database\Eloquent\Model, Illuminate\Notifications\Notifiable, Illuminate\Support\Carbon
 
 ### Community 5 - "package.json"
 Cohesion: 0.06
@@ -377,10 +376,6 @@ Nodes (9): Always Queue Notifications, Events & Notifications Best Practices, Im
 Cohesion: 0.18
 Nodes (10): Always Implement `failed()`, Batch Related Jobs, Implement `ShouldBeUnique`, Queue & Job Best Practices, Rate Limit External API Calls in Jobs, `retryUntil()` Needs `$tries = 0`, Set `retry_after` Greater Than `timeout`, Use Exponential Backoff (+2 more)
 
-### Community 79 - "User.php"
-Cohesion: 0.25
-Nodes (4): Illuminate\Database\Eloquent\Attributes\Hidden, Illuminate\Notifications\Notifiable, Illuminate\Support\Str, Pdo\Mysql
-
 ### Community 80 - "Illuminate\View\View"
 Cohesion: 0.13
 Nodes (6): MemberController, PublicPlaySessionController, PushNotificationController, FilterPlaySessionsRequest, Illuminate\Support\Facades\Date, Illuminate\View\View
@@ -525,9 +520,9 @@ Nodes (9): Aturan operasional yang tidak boleh terlewat, Backlog yang tetap terb
 Cohesion: 0.18
 Nodes (11): Alur dan batas integrasi, Identitas dan scope, Konteks final proyek NgeBadmintonYuk, Konteks siap dipakai untuk pekerjaan berikutnya, Pembaruan antarmuka: indikator proses server, Pembaruan terbaru: notifikasi wajib bagi member, Peta sumber, Riwayat verifikasi audit awal, sebelum tahap kas–kuota (+3 more)
 
-### Community 153 - "UserFactory"
-Cohesion: 0.36
-Nodes (3): static, UserFactory, Illuminate\Support\Facades\Hash
+### Community 153 - "Illuminate\Support\Str"
+Cohesion: 0.19
+Nodes (5): static, UserFactory, Illuminate\Support\Facades\Hash, Illuminate\Support\Str, Pdo\Mysql
 
 ## Knowledge Gaps
 - **707 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+702 more)
@@ -537,7 +532,7 @@ Nodes (3): static, UserFactory, Illuminate\Support\Facades\Hash
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `User` to `PlaySession`, `Illuminate\Database\Eloquent\Model`, `UpdateMemberRequest`, `Membership`, `UserFactory`, `SessionRegistrationFactory.php`, `Category`, `StoreSessionRegistrationByAdminRequest`, `DeleteMemberAction`, `web.php`, `Illuminate\Database\Eloquent\Relations\HasMany`, `Illuminate\Validation\ValidationException`, `PushSubscription`, `Illuminate\Validation\Rule`, `CreateTopUpRequestAction.php`, `ReportService`, `User.php`, `Illuminate\View\View`, `ResetLegacyPushSubscriptionsAction`, `UpdateSessionRegistrationRequest`, `SessionRegistration`?**
+- **Why does `User` connect `User` to `PlaySession`, `Illuminate\Database\Eloquent\Model`, `UpdateMemberRequest`, `Membership`, `Illuminate\Support\Str`, `SessionRegistrationFactory.php`, `Category`, `StoreSessionRegistrationByAdminRequest`, `DeleteMemberAction`, `web.php`, `Illuminate\Database\Eloquent\Relations\HasMany`, `Illuminate\Validation\ValidationException`, `PushSubscription`, `Illuminate\Validation\Rule`, `CreateTopUpRequestAction.php`, `ReportService`, `Illuminate\View\View`, `ResetLegacyPushSubscriptionsAction`, `UpdateSessionRegistrationRequest`, `SessionRegistration`?**
   _High betweenness centrality (0.058) - this node is a cross-community bridge._
 - **Why does `Modul` connect `Modul` to `07-expense.md`?**
   _High betweenness centrality (0.020) - this node is a cross-community bridge._
