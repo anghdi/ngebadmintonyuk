@@ -5,6 +5,14 @@ import { installServerLoading } from './server-loading.js';
 
 const serverLoading = installServerLoading(window, document);
 
+document.querySelectorAll('form[data-confirm]').forEach((form) => {
+    form.addEventListener('submit', (event) => {
+        if (!window.confirm(form.dataset.confirm)) {
+            event.preventDefault();
+        }
+    });
+});
+
 const sidebar = document.querySelector('#sidebar');
 const menu = document.querySelector('[data-sidebar-open]');
 

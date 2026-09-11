@@ -1,7 +1,8 @@
 # Graph Report - ngebadmintonyuk  (2026-09-11)
 
 ## Corpus Check
-- cluster-only mode — file stats not available
+- 265 files · ~137,971 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
 - 1664 nodes · 2562 edges · 174 communities (135 shown, 39 thin omitted)
@@ -146,16 +147,16 @@
 4. `Membership` - 40 edges
 5. `PushSubscription` - 29 edges
 6. `ShuttlecockItem` - 25 edges
-7. `Category` - 20 edges
-8. `Controller` - 20 edges
-9. `TopUpRequest` - 20 edges
-10. `Income` - 20 edges
+7. `Controller` - 20 edges
+8. `Category` - 20 edges
+9. `Income` - 20 edges
+10. `TopUpRequest` - 20 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `createMembership()` --references--> `User`  [EXTRACTED]
-  tests/Feature/MembershipManagementTest.php → app/Models/User.php
 - `send()` --references--> `PushSubscription`  [EXTRACTED]
   tests/Feature/PushNotificationTest.php → app/Models/PushSubscription.php
+- `createMembership()` --references--> `User`  [EXTRACTED]
+  tests/Feature/MembershipManagementTest.php → app/Models/User.php
 - `createMembership()` --calls--> `Membership`  [EXTRACTED]
   tests/Feature/MembershipManagementTest.php → app/Models/Membership.php
 - `browser()` --calls--> `installMemberNotifications()`  [EXTRACTED]
@@ -529,7 +530,7 @@ Cohesion: 0.36
 Nodes (3): static, UserFactory, Illuminate\Support\Facades\Hash
 
 ## Knowledge Gaps
-- **707 isolated node(s):** `composer install`, `Illuminate\\Foundation\\ComposerScripts::postAutoloadDump`, `Illuminate\\Foundation\\ComposerScripts::prePackageUninstall`, `@lint:check`, `npm install` (+702 more)
+- **707 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+702 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **39 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -537,12 +538,12 @@ Nodes (3): static, UserFactory, Illuminate\Support\Facades\Hash
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `User` connect `User` to `PlaySession`, `Illuminate\Database\Eloquent\Model`, `UpdateMemberRequest`, `Membership`, `UserFactory`, `SessionRegistrationFactory.php`, `Category`, `StoreSessionRegistrationByAdminRequest`, `DeleteMemberAction`, `web.php`, `Illuminate\Database\Eloquent\Relations\HasMany`, `Illuminate\Validation\ValidationException`, `PushSubscription`, `Illuminate\Validation\Rule`, `CreateTopUpRequestAction.php`, `ReportService`, `User.php`, `Illuminate\View\View`, `ResetLegacyPushSubscriptionsAction`, `UpdateSessionRegistrationRequest`, `SessionRegistration`?**
-  _High betweenness centrality (0.047) - this node is a cross-community bridge._
-- **Why does `PlaySession` connect `PlaySession` to `Illuminate\Database\Eloquent\Model`, `SendPushNotificationRequest`, `Membership`, `SessionRegistrationFactory.php`, `Category`, `UpdateSessionRegistrationPaymentRequest`, `Illuminate\Foundation\Http\FormRequest`, `Illuminate\Database\Eloquent\Relations\HasMany`, `User`, `Illuminate\Validation\ValidationException`, `Illuminate\Database\Eloquent\Relations\BelongsTo`, `PushSubscription`, `Illuminate\Validation\Rule`, `CreateTopUpRequestAction.php`, `ReportService`, `Illuminate\View\View`, `ShuttlecockItem`, `UpdateSessionRegistrationRequest`, `SessionRegistration`?**
-  _High betweenness centrality (0.018) - this node is a cross-community bridge._
-- **Why does `PushSubscription` connect `PushSubscription` to `Illuminate\Database\Eloquent\Model`, `Illuminate\View\View`, `ResetLegacyPushSubscriptionsAction`, `User`, `StorePushSubscriptionRequest`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
-- **What connects `composer install`, `Illuminate\\Foundation\\ComposerScripts::postAutoloadDump`, `Illuminate\\Foundation\\ComposerScripts::prePackageUninstall` to the rest of the system?**
+  _High betweenness centrality (0.058) - this node is a cross-community bridge._
+- **Why does `Modul` connect `Modul` to `07-expense.md`?**
+  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+- **Why does `Modul` connect `Modul` to `10-project-status.md`?**
+  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+- **What connects `$schema`, `name`, `type` to the rest of the system?**
   _707 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `scripts` be split into smaller, more focused modules?**
   _Cohesion score 0.057057057057057055 - nodes in this community are weakly interconnected._

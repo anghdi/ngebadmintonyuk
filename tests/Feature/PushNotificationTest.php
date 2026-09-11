@@ -8,6 +8,7 @@ use App\Models\SessionRegistration;
 use App\Models\User;
 use App\Services\FirebaseCloudMessaging;
 use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
 test('PWA manifest uses resized variants of the community logo', function () {
@@ -134,13 +135,17 @@ test('member must activate notification permission after login', function () {
     $this->post(route('login.store'), [
         'email' => $player->email,
         'password' => 'password',
-    ])->assertRedirect(route('dashboard'));
+    ])->assertRedirect(route('dashboard'))
+        ->assertCookie(Auth::getRecallerName());
 
     $this->get(route('dashboard'))
         ->assertRedirect(route('notifications.setup'));
     $this->get(route('notifications.setup'))
         ->assertSuccessful()->assertSee('data-push-setup="true"', escape: false)
-        ->assertSee('Aktifkan notifikasi dulu')->assertDontSee('Nanti saja');
+        ->assertSee('Aktifkan notifikasi dulu')
+        ->assertSee('ANDROID · CHROME')
+        ->assertSee('IPHONE / IPAD · SAFARI')
+        ->assertDontSee('Nanti saja');
 });
 
 test('member with legacy Firebase notification must reinstall before logging in again', function () {

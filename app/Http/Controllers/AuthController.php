@@ -21,7 +21,6 @@ class AuthController extends Controller
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()->withErrors(['email' => 'Email atau password tidak sesuai.'])->onlyInput('email');
         }
-        $request->session()->regenerate();
 
         $user = $request->user();
 
@@ -32,6 +31,12 @@ class AuthController extends Controller
 
             return redirect()->route('login')->with('legacy_push_reset', true);
         }
+
+        if (! $user->isAdmin()) {
+            Auth::login($user, remember: true);
+        }
+
+        $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard'));
     }

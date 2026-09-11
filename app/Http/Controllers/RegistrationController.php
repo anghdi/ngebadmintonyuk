@@ -18,9 +18,9 @@ class RegistrationController extends Controller
     public function store(RegisterMemberRequest $request): RedirectResponse
     {
         $member = User::create($request->validated());
-        Auth::login($member);
+        Auth::login($member, remember: true);
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard')->with('success', 'Akun kamu sudah aktif. Selamat bergabung!');
+        return redirect()->route('notifications.setup')->with('success', 'Akun kamu sudah aktif. Aktifkan notifikasi untuk melanjutkan.');
     }
 }

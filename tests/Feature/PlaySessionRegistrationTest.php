@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Income;
+use App\Models\Membership;
 use App\Models\PlaySession;
 use App\Models\SessionRegistration;
 use App\Models\User;
@@ -120,6 +121,125 @@ test('admin payment check creates one linked income', function () {
     expect($registration->refresh()->payment_status)->toBe('unpaid')
         ->and($registration->income_id)->toBeNull()
         ->and(Income::query()->count())->toBe(0);
+});
+
+test('administrator can mark a listed cash player present and record income in one action', function () {
+    $administrator = User::factory()->admin()->create();
+    $player = User::factory()->member()->create();
+    $playSession = PlaySession::factory()->create([
+        'created_by' => $administrator->id,
+        'price_per_session' => 35000,
+    ]);
+    $registration = SessionRegistration::factory()->create([
+        'play_session_id' => $playSession->id,
+        'user_id' => $player->id,
+        'name' => $player->name,
+        'payment_method' => 'cash',
+    ]);
+
+    $this->actingAs($administrator)
+        ->patch(route('session-registrations.present', [$playSession, $registration]))
+        ->assertRedirect()
+        ->assertSessionHas('success', "{$player->name} ditandai hadir dan pembayaran tunai tercatat lunas.");
+
+    $registration->refresh();
+
+    expect($registration->attendance_status)->toBe('present')
+        ->and($registration->payment_status)->toBe('paid')
+        ->and($registration->income_id)->not->toBeNull()
+        ->and($playSession->attendances()->whereBelongsTo($player)->where('status', 'present')->exists())->toBeTrue()
+        ->and(Income::query()->count())->toBe(1)
+        ->and($registration->income->details()->sole()->amount)->toBe(35000);
+});
+
+test('administrator can mark a membership player present and only use one credit', function () {
+    $administrator = User::factory()->admin()->create();
+    $player = User::factory()->member()->create();
+    $playSession = PlaySession::factory()->create(['created_by' => $administrator->id]);
+    $membership = Membership::factory()->create([
+        'user_id' => $player->id,
+        'venue_name' => Membership::COMMUNITY_VENUE,
+        'court_name' => Membership::COMMUNITY_COURT,
+        'price_per_session' => Membership::COMMUNITY_PRICE,
+        'created_by' => $administrator->id,
+    ]);
+    $membership->transactions()->create([
+        'type' => 'credit',
+        'quantity' => 4,
+        'notes' => 'Top up',
+        'created_by' => $administrator->id,
+    ]);
+    $registration = SessionRegistration::factory()->create([
+        'play_session_id' => $playSession->id,
+        'user_id' => $player->id,
+        'name' => $player->name,
+        'payment_method' => 'membership',
+    ]);
+
+    $route = route('session-registrations.present', [$playSession, $registration]);
+
+    $this->actingAs($administrator)->patch($route)
+        ->assertRedirect()
+        ->assertSessionHas('success', "{$player->name} ditandai hadir dan 1 kuota membership dipakai.");
+    $this->patch($route)->assertSessionHasNoErrors();
+
+    expect($registration->refresh()->attendance_status)->toBe('present')
+        ->and($registration->payment_status)->toBe('paid')
+        ->and($membership->transactions()->sum('quantity'))->toBe(3)
+        ->and($membership->transactions()->where('type', 'usage')->count())->toBe(1)
+        ->and(Income::query()->count())->toBe(0);
+});
+
+test('quick present endpoint is restricted to administrators and its session', function () {
+    $administrator = User::factory()->admin()->create();
+    $player = User::factory()->member()->create();
+    $playSession = PlaySession::factory()->create(['created_by' => $administrator->id]);
+    $otherSession = PlaySession::factory()->create(['created_by' => $administrator->id]);
+    $registration = SessionRegistration::factory()->create([
+        'play_session_id' => $playSession->id,
+        'user_id' => $player->id,
+    ]);
+
+    $this->actingAs($player)
+        ->patch(route('session-registrations.present', [$playSession, $registration]))
+        ->assertForbidden();
+    $this->actingAs($administrator)
+        ->patch(route('session-registrations.present', [$otherSession, $registration]))
+        ->assertNotFound();
+
+    expect($registration->refresh()->attendance_status)->toBe('listed')
+        ->and($registration->payment_status)->toBe('unpaid');
+});
+
+test('quick present action is idempotent and unavailable to waiting players', function () {
+    $administrator = User::factory()->admin()->create();
+    $playSession = PlaySession::factory()->create([
+        'created_by' => $administrator->id,
+        'max_players' => 1,
+        'max_waiting_players' => 1,
+    ]);
+    $confirmedRegistration = SessionRegistration::factory()->member()->create([
+        'play_session_id' => $playSession->id,
+        'payment_method' => 'transfer',
+    ]);
+    $waitingRegistration = SessionRegistration::factory()->member()->create([
+        'play_session_id' => $playSession->id,
+        'payment_method' => 'cash',
+    ]);
+
+    $this->actingAs($administrator)
+        ->patch(route('session-registrations.present', [$playSession, $confirmedRegistration]))
+        ->assertRedirect();
+    $this->actingAs($administrator)
+        ->patch(route('session-registrations.present', [$playSession, $confirmedRegistration]))
+        ->assertRedirect();
+    $this->actingAs($administrator)
+        ->patch(route('session-registrations.present', [$playSession, $waitingRegistration]))
+        ->assertSessionHasErrors('payment');
+
+    expect(Income::query()->count())->toBe(1)
+        ->and($waitingRegistration->refresh()->attendance_status)->toBe('listed')
+        ->and($waitingRegistration->payment_status)->toBe('unpaid');
 });
 
 test('waiting list payment cannot be recorded before promotion', function () {

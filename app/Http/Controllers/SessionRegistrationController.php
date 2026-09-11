@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Actions\CreateSessionRegistrationByAdminAction;
 use App\Actions\DeleteSessionRegistrationAction;
+use App\Actions\MarkSessionRegistrationPresentAction;
 use App\Actions\RecordSessionRegistrationPaymentAction;
 use App\Actions\RegisterForPlaySessionAction;
 use App\Actions\SendSessionRegistrationNotificationAction;
 use App\Actions\UpdateSessionRegistrationAction;
 use App\Http\Requests\CancelSessionRegistrationRequest;
+use App\Http\Requests\MarkSessionRegistrationPresentRequest;
 use App\Http\Requests\StoreSessionRegistrationByAdminRequest;
 use App\Http\Requests\StoreSessionRegistrationRequest;
 use App\Http\Requests\UpdateSessionRegistrationPaymentRequest;
@@ -68,6 +70,18 @@ class SessionRegistrationController extends Controller
         );
 
         return back()->with('success', 'Pembayaran berhasil diperbarui.');
+    }
+
+    public function markPresent(MarkSessionRegistrationPresentRequest $request, PlaySession $playSession, SessionRegistration $registration, MarkSessionRegistrationPresentAction $markPresent): RedirectResponse
+    {
+        $updatedRegistration = $markPresent->handle($registration, $request->user());
+        $message = match ($updatedRegistration->payment_method) {
+            'membership' => "{$updatedRegistration->name} ditandai hadir dan 1 kuota membership dipakai.",
+            'transfer' => "{$updatedRegistration->name} ditandai hadir dan pembayaran transfer tercatat lunas.",
+            default => "{$updatedRegistration->name} ditandai hadir dan pembayaran tunai tercatat lunas.",
+        };
+
+        return back()->with('success', $message);
     }
 
     public function destroy(Request $request, PlaySession $playSession, SessionRegistration $registration, DeleteSessionRegistrationAction $delete, SendSessionRegistrationNotificationAction $sendNotification): RedirectResponse

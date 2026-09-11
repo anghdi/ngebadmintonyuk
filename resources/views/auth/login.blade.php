@@ -36,6 +36,7 @@
         <label>Email<input type="email" name="email" value="{{ old('email') }}" required autofocus></label>
         <label>Kata sandi<input type="password" name="password" required></label>
         <label class="check"><input type="checkbox" name="remember"> Tetap masuk</label>
+        <small class="auth-persistent-note">Akun pemain otomatis tetap masuk di perangkat ini sampai kamu memilih Keluar.</small>
         <button class="btn primary full">Masuk</button>
     </form>
     <div class="auth-divider"><span>atau</span></div>

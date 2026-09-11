@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 test('guest can open member registration from login', function () {
     $this->get(route('login'))
@@ -23,8 +24,12 @@ test('new member is activated and signed in immediately', function () {
 
     $member = User::where('email', 'made@example.com')->firstOrFail();
 
-    $response->assertRedirect(route('dashboard'));
-    $this->get(route('dashboard'))->assertRedirect(route('notifications.setup'));
+    $response->assertRedirect(route('notifications.setup'))
+        ->assertCookie(Auth::getRecallerName());
+    $this->get(route('notifications.setup'))->assertSuccessful()
+        ->assertSee('ANDROID · CHROME')
+        ->assertSee('IPHONE / IPAD · SAFARI')
+        ->assertSee('Akun kamu sudah aktif. Aktifkan notifikasi untuk melanjutkan.');
     $this->assertAuthenticatedAs($member);
     expect($member->role)->toBe('member')
         ->and($member->phone)->toBeNull();

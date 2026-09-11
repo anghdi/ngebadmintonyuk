@@ -17,7 +17,7 @@
     <img class="login-logo" src="{{ asset('logo.png') }}" alt="NgeBadmintonYuk">
     <span class="eyebrow">PENDAFTARAN AKUN</span>
     <h1>Buat akun pemain</h1>
-    <p>Member maupun non-member perlu akun untuk masuk daftar bermain.</p>
+    <p>Member maupun non-member perlu akun untuk masuk daftar bermain. Setelah mendaftar, kamu wajib mengaktifkan notifikasi pada perangkat ini.</p>
     @if($errors->any())
         <div class="alert">{{ $errors->first() }}</div>
     @endif
@@ -30,7 +30,7 @@
             <label>Kata sandi<input type="password" name="password" required autocomplete="new-password"></label>
             <label>Ulangi kata sandi<input type="password" name="password_confirmation" required autocomplete="new-password"></label>
         </div>
-        <button class="btn primary full">Daftar</button>
+        <button class="btn primary full">Daftar dan aktifkan notifikasi</button>
     </form>
     <small>KOMUNITAS BADMINTON</small>
 </main>

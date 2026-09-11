@@ -78,6 +78,7 @@ Route::middleware(['auth', RequireCurrentPushSetup::class, RequireMemberNotifica
         Route::post('/play-sessions/{playSession}/registrations', [SessionRegistrationController::class, 'storeByAdmin'])->name('session-registrations.store');
         Route::put('/play-sessions/{playSession}/registrations/{registration}', [SessionRegistrationController::class, 'update'])->scopeBindings()->name('session-registrations.update');
         Route::patch('/play-sessions/{playSession}/registrations/{registration}/payment', [SessionRegistrationController::class, 'updatePayment'])->scopeBindings()->name('session-registrations.payment');
+        Route::patch('/play-sessions/{playSession}/registrations/{registration}/present', [SessionRegistrationController::class, 'markPresent'])->scopeBindings()->name('session-registrations.present');
         Route::delete('/play-sessions/{playSession}/registrations/{registration}', [SessionRegistrationController::class, 'destroy'])->scopeBindings()->name('session-registrations.destroy');
         Route::get('/inventory', [ShuttlecockInventoryController::class, 'index'])->name('inventory.index');
         Route::post('/inventory/items', [ShuttlecockInventoryController::class, 'store'])->name('inventory.items.store');

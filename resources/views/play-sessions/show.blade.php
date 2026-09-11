@@ -46,6 +46,29 @@
             <td><span class="status-pill {{ $registration->attendance_status === 'present' ? 'active' : ($registration->attendance_status === 'no_show' ? 'danger' : 'muted') }}">{{ ['listed' => 'Terdaftar', 'present' => 'Hadir', 'no_show' => 'Tidak hadir'][$registration->attendance_status] }}</span></td>
             <td><strong>{{ $noShows }}/3</strong><small>{{ $noShows >= 3 ? 'Diblokir' : 'Tidak hadir' }}</small></td>
             <td>
+                @if(! $isWaiting && $registration->user_id && $registration->attendance_status !== 'present')
+                    @php($quickPresentLabel = match (true) {
+                        $registration->payment_method === 'membership' => 'Hadir + 1 kuota',
+                        $registration->payment_status === 'unpaid' => 'Hadir + lunasi',
+                        default => 'Tandai hadir',
+                    })
+                    @php($quickPresentConfirmation = match ($registration->payment_method) {
+                        'membership' => 'Tandai '.$registration->name.' hadir dan pakai 1 kuota membership?',
+                        'transfer' => 'Tandai '.$registration->name.' hadir dan catat pembayaran transfer sebagai lunas?',
+                        default => 'Tandai '.$registration->name.' hadir dan catat pembayaran tunai sebagai lunas?',
+                    })
+                    <form method="post" action="{{ route('session-registrations.present', [$playSession, $registration]) }}" class="quick-present-form" data-confirm="{{ $quickPresentConfirmation }}">
+                        @csrf @method('patch')
+                        <button class="btn primary">{{ $quickPresentLabel }}</button>
+                        <small>{{ $registration->payment_method === 'membership' ? 'Memakai kuota saat dikonfirmasi' : ($registration->payment_status === 'paid' ? 'Pembayaran sudah lunas' : rupiah($playSession->price_per_session).' akan masuk kas') }}</small>
+                    </form>
+                @elseif($isWaiting)
+                    <span class="quick-present-unavailable">Menunggu slot utama</span>
+                @elseif(! $registration->user_id)
+                    <span class="quick-present-unavailable">Hubungkan akun dahulu</span>
+                @else
+                    <span class="quick-present-complete">✓ Sudah hadir</span>
+                @endif
                 <details class="registration-editor">
                     <summary>Edit data</summary>
                     <form method="post" action="{{ route('session-registrations.update', [$playSession, $registration]) }}" class="session-registration-form">
