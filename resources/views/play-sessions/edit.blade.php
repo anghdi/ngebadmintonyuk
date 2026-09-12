@@ -6,7 +6,7 @@
     <div class="page-head">
         <div>
             <a class="back-link" href="{{ route('play-sessions.show', $playSession) }}">← Kembali ke sesi</a>
-            <span class="eyebrow">SESI BERMAIN</span>
+            <span class="eyebrow">Sesi bermain</span>
             <h1>Edit sesi</h1>
             <p>Perbarui jadwal dan status sesi.</p>
         </div>

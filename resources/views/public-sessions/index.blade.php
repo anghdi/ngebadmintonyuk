@@ -4,18 +4,18 @@
 
 @section('content')
     <section class="public-hero">
-        <span class="eyebrow">JADWAL KOMUNITAS</span>
+        <span class="eyebrow">Jadwal komunitas</span>
         <h1>Pilih jadwal bermain</h1>
-        <p>Terbuka untuk member dan pemain umum.</p>
+        <p>Pilih sesi yang masih tersedia.</p>
     </section>
 
     <x-usage-guide />
 
     <section class="schedule-month-picker" aria-labelledby="public-month-title">
         <div>
-            <span class="eyebrow">PILIH BULAN</span>
+            <span class="eyebrow">Periode</span>
             <h2 id="public-month-title">Jadwal per bulan</h2>
-            <p>Daftar jadwal baru ditampilkan setelah kamu memilih bulan.</p>
+            <p>Pilih bulan untuk melihat sesi.</p>
         </div>
         <form method="get" action="{{ route('public-sessions.index') }}" class="schedule-month-form">
             <label for="public-month">Bulan</label>
@@ -31,7 +31,7 @@
 
     @if($selectedMonth)
         <div class="section-heading schedule-month-heading">
-            <div><span class="eyebrow">JADWAL TERPILIH</span><h2>{{ $selectedMonthLabel }}</h2></div>
+            <div><span class="eyebrow">Jadwal tersedia</span><h2>{{ $selectedMonthLabel }}</h2></div>
         </div>
     @endif
 
@@ -47,12 +47,12 @@
                     <h2>{{ $playSession->venue_name }}</h2>
                     <p>{{ $playSession->court_name }}</p>
                     <div class="public-session-meta"><span>{{ rupiah($playSession->price_per_session) }}</span><span>{{ $confirmedCount }}/{{ $playSession->max_players }} pemain</span></div>
-                    <div class="session-slot-summary"><span class="main">Slot utama {{ max(0, $playSession->max_players - $confirmedCount) }}</span><span class="waiting">Waiting {{ $waitingCount }}/{{ $playSession->max_waiting_players }}</span></div>
-                    <a class="btn {{ $isClosed ? 'soft' : 'primary' }} full" href="{{ route('public-sessions.show', $playSession) }}">{{ $isClosed ? 'Daftar penuh' : ($confirmedCount >= $playSession->max_players ? 'Masuk waiting list' : 'Lihat dan ikut') }}</a>
+                    <div class="session-slot-summary"><span class="main">{{ max(0, $playSession->max_players - $confirmedCount) }} slot</span><span class="waiting">{{ $waitingCount }}/{{ $playSession->max_waiting_players }} antrean</span></div>
+                    <a class="btn {{ $isClosed ? 'soft' : 'primary' }} full" href="{{ route('public-sessions.show', $playSession) }}">{{ $isClosed ? 'Lihat sesi' : ($confirmedCount >= $playSession->max_players ? 'Ikut antrean' : 'Lihat sesi') }}</a>
                 </div>
             </article>
         @empty
-            <div class="empty-state"><span>🏸</span><h2>{{ $selectedMonth ? 'Belum ada jadwal' : 'Pilih bulan terlebih dahulu' }}</h2><p>{{ $selectedMonth ? 'Tidak ada jadwal tersedia pada bulan ini.' : 'Pilih salah satu bulan di atas untuk melihat jadwal main.' }}</p></div>
+            <div class="empty-state"><h2>{{ $selectedMonth ? 'Belum ada jadwal' : 'Pilih bulan' }}</h2><p>{{ $selectedMonth ? 'Tidak ada sesi pada bulan ini.' : 'Jadwal akan muncul setelah bulan dipilih.' }}</p></div>
         @endforelse
     </section>
 

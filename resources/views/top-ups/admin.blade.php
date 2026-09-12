@@ -5,17 +5,17 @@
 @section('content')
     <div class="page-head">
         <div>
-            <span class="eyebrow">PEMBAYARAN</span>
+            <span class="eyebrow">Pembayaran</span>
             <h1>Verifikasi top up</h1>
-            <p>Periksa dana dan bukti transfer member. Persetujuan menambahkan 4 kuota dan mencatat pemasukan satu kali pada tanggal persetujuan.</p>
+            <p>Periksa transfer sebelum menambahkan kuota.</p>
         </div>
     </div>
 
     <section class="card top-up-setting-card">
         <div>
-            <span class="eyebrow">PENGATURAN PAKET</span>
+            <span class="eyebrow">Pengaturan</span>
             <h2>Paket top up</h2>
-            <p>Setiap top up memberikan 4 kuota bermain.</p>
+            <p>{{ $topUpSetting->credits }} kuota per pengajuan.</p>
         </div>
         <form method="post" action="{{ route('top-up-settings.update') }}" class="setting-form">
             @csrf @method('put')

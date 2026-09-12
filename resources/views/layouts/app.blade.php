@@ -29,6 +29,7 @@
         data-push-delete-url="{{ route('push-subscriptions.destroy') }}"
     @endif
 >
+<a class="skip-link" href="#main-content">Lewati ke konten</a>
 <div class="shell">
     <aside id="sidebar" aria-label="Navigasi utama">
         <div class="sidebar-head">
@@ -39,7 +40,7 @@
         </div>
         <div class="sidebar-intro">
             <span class="sidebar-pulse" aria-hidden="true"></span>
-            <span>Pengelolaan komunitas badminton</span>
+            <span>Kelola komunitas</span>
         </div>
         <nav class="sidebar-nav">
             <a @class(['active' => request()->routeIs('dashboard')]) href="{{ route('dashboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="home" /></span> Beranda</a>
@@ -70,23 +71,26 @@
 
     <button type="button" class="sidebar-backdrop" aria-label="Tutup navigasi" data-sidebar-close></button>
 
-    <main>
+    <main id="main-content" tabindex="-1">
         <header>
             <button type="button" class="menu" aria-label="Buka navigasi" aria-controls="sidebar" aria-expanded="false" data-sidebar-open><x-nav-icon name="menu" /></button>
             <a href="{{ route('dashboard') }}" class="mobile-brand" aria-label="NgeKas">
                 <img src="{{ asset('pwa-icon-192.png') }}" alt="">
                 <strong>NgeBadmintonYuk</strong>
             </a>
+            <div class="header-context" aria-hidden="true">
+                <span>@yield('title', 'Beranda')</span>
+            </div>
             <div class="header-actions">
                 <details class="notification-bell">
-                    <summary aria-label="Riwayat notifikasi terkirim">
+                    <summary aria-label="Buka notifikasi terkirim">
                         <x-nav-icon name="bell" />
                         @if($headerNotifications->isNotEmpty())
                             <span>{{ $headerNotifications->count() }}</span>
                         @endif
                     </summary>
                     <div class="notification-bell-panel">
-                        <div class="notification-bell-head"><strong>Notifikasi terkirim</strong><small>{{ $headerNotifications->count() }} terbaru</small></div>
+                        <div class="notification-bell-head"><strong>Notifikasi terkirim</strong><small>{{ $headerNotifications->count() }} item</small></div>
                         @forelse($headerNotifications as $notification)
                             <a href="{{ $notification->url }}">
                                 <strong>{{ $notification->title }}</strong>
@@ -94,13 +98,13 @@
                                 <small>{{ $notification->created_at->diffForHumans() }}</small>
                             </a>
                         @empty
-                            <p>Belum ada notifikasi yang berhasil dikirim.</p>
+                            <p>Belum ada notifikasi terkirim.</p>
                         @endforelse
                     </div>
                 </details>
                 <div class="user-summary">
                 <span class="user-avatar"><img src="{{ asset('pwa-icon-192.png') }}" alt=""></span>
-                <span><b>{{ auth()->user()->name }}</b><small>{{ auth()->user()->isAdmin() ? 'Administrator' : 'Akun pemain' }}</small></span>
+                <span><b>{{ auth()->user()->name }}</b><small>{{ auth()->user()->isAdmin() ? 'Admin' : 'Member' }}</small></span>
                 </div>
             </div>
         </header>

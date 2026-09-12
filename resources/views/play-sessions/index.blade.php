@@ -1,11 +1,11 @@
 @extends('layouts.app')
 @section('title', 'Sesi Main')
 @section('content')
-<div class="page-head"><div><span class="eyebrow">SESI BERMAIN</span><h1>Jadwal komunitas</h1><p>Kelola jadwal dan kehadiran member.</p></div></div>
+<div class="page-head"><div><span class="eyebrow">Operasional</span><h1>Jadwal komunitas</h1><p>Atur sesi dan daftar pemain.</p></div></div>
 
 <div class="admin-split session-layout">
     <section class="card package-form-card">
-        <span class="eyebrow">SESI BARU</span><h2>Buat jadwal</h2>
+        <span class="eyebrow">Sesi baru</span><h2>Buat jadwal</h2>
         <form method="post" action="{{ route('play-sessions.store') }}" class="compact-form">
             @csrf
             <label>Tanggal dan jam<input type="datetime-local" name="scheduled_at" value="{{ old('scheduled_at') }}" required></label>
@@ -20,7 +20,7 @@
     </section>
 
     <section class="card session-list-card">
-        <div class="card-head"><div><span class="eyebrow">AGENDA</span><h2>Daftar sesi</h2></div></div>
+        <div class="card-head"><div><span class="eyebrow">Agenda</span><h2>Daftar sesi</h2></div></div>
         <form method="get" action="{{ route('play-sessions.index') }}" class="schedule-month-form admin-month-form">
             <label for="admin-month">Pilih bulan</label>
             <select id="admin-month" name="month" required>
@@ -39,7 +39,7 @@
             @php($waitingCount = max(0, $session->registrations_count - $session->max_players))
             <article class="session-row"><time><b>{{ $session->scheduled_at->format('d') }}</b>{{ $session->scheduled_at->translatedFormat('M') }}</time><span><a href="{{ route('play-sessions.show', $session) }}"><strong>{{ $session->venue_name }}</strong></a><small>{{ $session->court_name }} · {{ $session->scheduled_at->format('H:i') }} WITA</small></span><div class="session-capacity-pills"><span><b>{{ $confirmedCount }}/{{ $session->max_players }}</b> pemain</span><span class="waiting"><b>{{ $waitingCount }}/{{ $session->max_waiting_players }}</b> waiting</span></div><div class="row-actions"><a class="link" href="{{ route('play-sessions.edit', $session) }}">Edit</a><form method="post" action="{{ route('play-sessions.destroy', $session) }}" onsubmit="return confirm('Hapus sesi ini?')">@csrf @method('delete')<button class="link danger">Hapus</button></form></div></article>
         @empty
-            <div class="empty-state"><span>◫</span><h2>{{ $selectedMonth ? 'Belum ada jadwal' : 'Pilih bulan terlebih dahulu' }}</h2><p>{{ $selectedMonth ? 'Tidak ada sesi pada bulan ini.' : 'Pilih bulan untuk melihat dan mengelola sesi.' }}</p></div>
+            <div class="empty-state"><h2>{{ $selectedMonth ? 'Belum ada jadwal' : 'Pilih bulan' }}</h2><p>{{ $selectedMonth ? 'Tidak ada sesi pada bulan ini.' : 'Pilih bulan untuk melihat sesi.' }}</p></div>
         @endforelse
         {{ $playSessions->links() }}
     </section>

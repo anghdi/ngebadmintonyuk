@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ route('app.css') }}">
 </head>
 <body class="public-page">
+<a class="skip-link" href="#public-content">Lewati ke konten</a>
 <header class="public-nav">
     <a href="{{ route('public-sessions.index') }}" class="public-brand"><img src="{{ asset('logo.png') }}" alt="NgeBadmintonYuk"></a>
     <div class="public-actions">
@@ -26,7 +27,7 @@
         @endauth
     </div>
 </header>
-<main class="public-content">
+<main class="public-content" id="public-content" tabindex="-1">
     @if(session('success'))
         <div class="flash">{{ session('success') }}</div>
     @endif

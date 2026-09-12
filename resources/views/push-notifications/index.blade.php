@@ -5,9 +5,9 @@
 @section('content')
     <div class="page-head">
         <div>
-            <span class="eyebrow">NOTIFIKASI</span>
+            <span class="eyebrow">Komunikasi</span>
             <h1>Kirim notifikasi</h1>
-            <p>Kirim informasi langsung ke perangkat pemain.</p>
+            <p>Kirim informasi ke perangkat member.</p>
         </div>
         <span class="notification-device-count"><b>{{ $subscriptionCount }}</b> perangkat aktif</span>
     </div>
@@ -16,7 +16,7 @@
 
     <div class="admin-split notification-layout">
         <section class="card notification-form-card">
-            <span class="eyebrow">PESAN BARU</span>
+            <span class="eyebrow">Pesan baru</span>
             <h2>Detail notifikasi</h2>
             <form method="post" action="{{ route('push-notifications.store') }}" class="compact-form">
                 @csrf
@@ -51,12 +51,12 @@
                 </label>
                 <button class="btn primary full">Kirim sekarang</button>
             </form>
-            <p class="notification-hint">Notifikasi hanya dikirim ke perangkat yang telah diaktifkan oleh pemain melalui dashboard.</p>
+            <p class="notification-hint">Hanya perangkat yang sudah aktif akan menerima pesan.</p>
         </section>
 
         <section class="card notification-history-card">
             <div class="card-head">
-                <div><span class="eyebrow">RIWAYAT</span><h2>Pengiriman terakhir</h2></div>
+                <div><span class="eyebrow">Riwayat</span><h2>Pengiriman terakhir</h2></div>
             </div>
             @forelse($notifications as $notification)
                 <article class="notification-history-row">
@@ -77,7 +77,7 @@
                     </span>
                 </article>
             @empty
-                <div class="empty-state compact"><span>◉</span><h2>Belum ada notifikasi</h2><p>Riwayat pengiriman akan tampil di sini.</p></div>
+                <div class="empty-state compact"><h2>Belum ada notifikasi</h2><p>Riwayat pengiriman akan muncul di sini.</p></div>
             @endforelse
             {{ $notifications->links() }}
         </section>

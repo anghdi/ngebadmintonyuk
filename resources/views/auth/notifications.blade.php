@@ -20,36 +20,36 @@
     data-push-delete-url="{{ route('push-subscriptions.destroy') }}">
 <main class="login-card">
     <img class="login-logo" src="{{ asset('logo.png') }}" alt="NgeBadmintonYuk">
-    <span class="eyebrow">SATU LANGKAH LAGI</span>
-    <h1>Aktifkan notifikasi dulu</h1>
-    <p>Notifikasi wajib aktif pada perangkat ini agar kamu menerima perubahan jadwal dan informasi komunitas sebelum memakai fitur member.</p>
+    <span class="eyebrow">Langkah terakhir</span>
+    <h1>Aktifkan notifikasi</h1>
+    <p>Aktifkan pada perangkat ini untuk melanjutkan.</p>
     @if(session('success'))
         <div class="alert success" role="status">{{ session('success') }}</div>
     @endif
     <section class="my-6 flex flex-col gap-4" data-push-opt-in aria-label="Aktivasi notifikasi">
-        <p data-push-status role="status" aria-live="polite">Tekan tombol di bawah, lalu pilih Izinkan pada permintaan browser.</p>
+        <p data-push-status role="status" aria-live="polite">Tekan tombol lalu pilih Izinkan.</p>
         <button type="button" class="btn primary full" data-push-toggle>Aktifkan notifikasi</button>
     </section>
     <noscript><div class="alert">Aktifkan JavaScript pada browser untuk menyiapkan notifikasi.</div></noscript>
     <section class="mb-6 grid gap-4 text-left md:grid-cols-2" aria-label="Panduan aktivasi notifikasi">
         <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <span class="eyebrow">ANDROID · CHROME</span>
+            <span class="eyebrow">Android · Chrome</span>
             <h2 class="mt-2 text-base">Aktifkan di Android</h2>
             <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm">
-                <li>Buka NgeBadmintonYuk menggunakan <b>Google Chrome</b>.</li>
-                <li>Tekan tombol <b>Aktifkan notifikasi</b> di atas.</li>
-                <li>Saat Chrome meminta izin, pilih <b>Izinkan</b>.</li>
-                <li>Tunggu sampai tombol berubah menjadi <b>Notifikasi aktif</b>. Kamu akan masuk ke aplikasi otomatis.</li>
+                <li>Buka situs ini di <b>Google Chrome</b>.</li>
+                <li>Tekan <b>Aktifkan notifikasi</b>.</li>
+                <li>Pilih <b>Izinkan</b> saat diminta.</li>
+                <li>Tunggu sampai aplikasi terbuka.</li>
             </ol>
         </article>
         <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <span class="eyebrow">IPHONE / IPAD · SAFARI</span>
+            <span class="eyebrow">iPhone/iPad · Safari</span>
             <h2 class="mt-2 text-base">Aktifkan di iOS</h2>
             <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm">
-                <li>Pastikan perangkat memakai <b>iOS/iPadOS 16.4+</b>, lalu buka situs ini di Safari.</li>
-                <li>Tekan <b>Bagikan</b>, pilih <b>Tambahkan ke Layar Utama</b>, lalu tekan Tambah.</li>
-                <li>Tutup Safari dan buka NgeBadmintonYuk dari ikon di Layar Utama.</li>
-                <li>Masuk, tekan <b>Aktifkan notifikasi</b>, lalu pilih <b>Izinkan</b>.</li>
+                <li>Buka situs ini di Safari pada iOS/iPadOS 16.4+.</li>
+                <li>Tekan <b>Bagikan</b> lalu <b>Tambahkan ke Layar Utama</b>.</li>
+                <li>Buka aplikasi dari Layar Utama.</li>
+                <li>Tekan <b>Aktifkan notifikasi</b> lalu <b>Izinkan</b>.</li>
             </ol>
         </article>
     </section>

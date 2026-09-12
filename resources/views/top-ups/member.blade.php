@@ -5,7 +5,7 @@
 @section('content')
     <div class="page-head">
         <div>
-            <span class="eyebrow">PEMBAYARAN</span>
+            <span class="eyebrow">Pembayaran</span>
             <h1>Top up kuota</h1>
             <p>Transfer dan unggah bukti pembayaran.</p>
         </div>
@@ -13,7 +13,7 @@
 
     <div class="top-up-grid">
         <section class="card payment-card">
-            <span class="eyebrow">NOMINAL TRANSFER</span>
+            <span class="eyebrow">Nominal transfer</span>
             <strong class="payment-amount">{{ rupiah($topUpSetting->amount) }}</strong>
             <span class="payment-credit">{{ $topUpSetting->credits }} kuota bermain</span>
 
@@ -26,11 +26,11 @@
                 @endforeach
             </div>
 
-            <div class="payment-note">Pilih salah satu rekening tujuan. Nominal transfer harus sesuai.</div>
+            <div class="payment-note">Transfer sesuai nominal ke salah satu rekening.</div>
         </section>
 
         <section class="card">
-            <span class="eyebrow">BUKTI TRANSFER</span>
+            <span class="eyebrow">Bukti transfer</span>
             <h2>Kirim pengajuan</h2>
 
             <div class="top-up-steps" aria-label="Tahapan top up">
@@ -78,7 +78,7 @@
     </div>
 
     <section class="card table-card">
-        <div class="card-head"><div><span class="eyebrow">RIWAYAT</span><h2>Pengajuan top up</h2></div></div>
+        <div class="card-head"><div><span class="eyebrow">Riwayat</span><h2>Pengajuan top up</h2></div></div>
         <table>
             <thead><tr><th>TANGGAL</th><th>PAKET</th><th>REKENING</th><th>NOMINAL</th><th>STATUS</th><th>KUOTA</th><th>BUKTI</th></tr></thead>
             <tbody>

@@ -11,10 +11,10 @@
     <link rel="stylesheet" href="{{ route('app.css') }}">
 </head>
 <body class="login-page">
-<main class="login-card">
-    <span class="auth-shuttle" aria-hidden="true"><img src="{{ asset('icon.png') }}" alt=""></span>
+<a class="skip-link" href="#auth-content">Lewati ke formulir</a>
+<main class="login-card" id="auth-content" tabindex="-1">
     <img class="login-logo" src="{{ asset('logo.png') }}" alt="NgeBadmintonYuk">
-    <span class="eyebrow">NGE BADMINTON YUK</span>
+    <span class="eyebrow">NgeBadmintonYuk</span>
     <h1>Masuk ke akun</h1>
     <p>Akses jadwal, kuota, dan informasi komunitas.</p>
     @if(session('legacy_push_reset'))
@@ -33,8 +33,8 @@
     @endif
     <form method="post" action="{{ route('login.store') }}">
         @csrf
-        <label>Email<input type="email" name="email" value="{{ old('email') }}" required autofocus></label>
-        <label>Kata sandi<input type="password" name="password" required></label>
+        <label>Email<input type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="email">@error('email')<span class="field-error">{{ $message }}</span>@enderror</label>
+        <label>Kata sandi<input type="password" name="password" required autocomplete="current-password">@error('password')<span class="field-error">{{ $message }}</span>@enderror</label>
         <label class="check"><input type="checkbox" name="remember"> Tetap masuk</label>
         <small class="auth-persistent-note">Akun pemain otomatis tetap masuk di perangkat ini sampai kamu memilih Keluar.</small>
         <button class="btn primary full">Masuk</button>
@@ -42,7 +42,7 @@
     <div class="auth-divider"><span>atau</span></div>
     <a class="btn soft full" href="{{ route('public-sessions.index') }}">Lihat jadwal main</a>
     <a class="btn dark full" href="{{ route('register') }}">Buat akun pemain</a>
-    <small>KOMUNITAS BADMINTON</small>
+    <small>Komunitas badminton</small>
 </main>
 <x-server-loading />
 </body>

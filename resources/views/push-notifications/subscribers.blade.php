@@ -5,9 +5,9 @@
 @section('content')
     <div class="page-head">
         <div>
-            <span class="eyebrow">NOTIFIKASI</span>
+            <span class="eyebrow">Komunikasi</span>
             <h1>Member aktif</h1>
-            <p>Daftar member yang telah mengizinkan notifikasi pada perangkatnya.</p>
+            <p>Member yang siap menerima notifikasi.</p>
         </div>
         <span class="notification-device-count"><b>{{ $memberCount }}</b> member · {{ $subscriptionCount }} perangkat</span>
     </div>
@@ -16,7 +16,7 @@
 
     <section class="card notification-subscriber-card">
         <div class="card-head">
-            <div><span class="eyebrow">PENERIMA AKTIF</span><h2>Perangkat terdaftar</h2></div>
+            <div><span class="eyebrow">Penerima aktif</span><h2>Perangkat terdaftar</h2></div>
         </div>
 
         @forelse($members as $member)
@@ -40,7 +40,7 @@
                 </span>
             </article>
         @empty
-            <div class="empty-state compact"><span>◉</span><h2>Belum ada member aktif</h2><p>Member akan muncul setelah mengaktifkan notifikasi.</p></div>
+            <div class="empty-state compact"><h2>Belum ada member aktif</h2><p>Data muncul setelah notifikasi diaktifkan.</p></div>
         @endforelse
 
         {{ $members->links() }}
