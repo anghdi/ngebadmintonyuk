@@ -132,6 +132,7 @@
 
 
 @stack('scripts')
+<x-app-update />
 <x-server-loading />
 </body>
 </html>

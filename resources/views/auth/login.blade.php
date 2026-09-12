@@ -44,6 +44,7 @@
     <a class="btn dark full" href="{{ route('register') }}">Buat akun pemain</a>
     <small>Komunitas badminton</small>
 </main>
+<x-app-update />
 <x-server-loading />
 </body>
 </html>

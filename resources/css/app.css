@@ -1069,3 +1069,25 @@
 @media (max-width: 430px) {
     .member-welcome .actions { align-items: stretch; flex-direction: column-reverse; }
 }
+
+@layer components {
+    .app-update { position: fixed; right: 1rem; bottom: max(1rem, env(safe-area-inset-bottom)); z-index: 1200; display: flex; width: min(440px, calc(100% - 2rem)); align-items: center; justify-content: space-between; gap: 1rem; border: 1px solid rgb(255 255 255 / 15%); border-radius: 12px; background: #172a63; color: white; padding: .8rem .9rem; box-shadow: 0 14px 36px rgb(10 26 63 / 24%); }
+    .app-update[hidden] { display: none; }
+    .app-update-copy { display: grid; gap: .1rem; min-width: 0; }
+    .app-update-copy strong { font-size: .82rem; }
+    .app-update-copy span { color: #dce4f4; font-size: .7rem; line-height: 1.35; }
+    .app-update-actions { display: flex; flex: 0 0 auto; align-items: center; gap: .35rem; }
+    .app-update-actions button { min-height: 36px; border: 0; border-radius: 8px; padding: .45rem .65rem; font: inherit; font-size: .72rem; font-weight: 700; cursor: pointer; }
+    .app-update-later { background: transparent; color: #dce4f4; }
+    .app-update-reload { background: #ffd23f; color: #172a63; }
+    .app-update-actions button:focus-visible { outline: 3px solid rgb(255 210 63 / 45%); outline-offset: 2px; }
+}
+
+@media (max-width: 640px) {
+    .app-update { right: .75rem; bottom: max(.75rem, env(safe-area-inset-bottom)); left: .75rem; width: auto; }
+}
+
+@media (max-width: 420px) {
+    .app-update { align-items: stretch; flex-direction: column; gap: .65rem; }
+    .app-update-actions { justify-content: flex-end; }
+}

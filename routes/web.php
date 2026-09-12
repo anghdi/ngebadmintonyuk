@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AppVersionController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
@@ -26,6 +27,7 @@ use App\Models\Income;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard')->name('home');
+Route::get('/app-version', AppVersionController::class)->name('app.version');
 Route::get('/app.css', fn () => response()->file(resource_path('css/app.css'), ['Content-Type' => 'text/css']))->name('app.css');
 Route::get('/jadwal', [PublicPlaySessionController::class, 'index'])->middleware([RequireCurrentPushSetup::class, RequireMemberNotifications::class])->name('public-sessions.index');
 Route::get('/jadwal/{playSession}', [PublicPlaySessionController::class, 'show'])->middleware([RequireCurrentPushSetup::class, RequireMemberNotifications::class])->name('public-sessions.show');

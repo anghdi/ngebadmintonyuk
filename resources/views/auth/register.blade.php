@@ -34,6 +34,7 @@
     </form>
     <small>Komunitas badminton</small>
 </main>
+<x-app-update />
 <x-server-loading />
 </body>
 </html>

@@ -36,6 +36,7 @@
     @endif
     @yield('content')
 </main>
+<x-app-update />
 <x-server-loading />
 </body>
 </html>
