@@ -116,6 +116,30 @@ test('profile uploads become webp and resize proportionally without upscaling', 
     ['photo.webp', 100, 100, 100, 100],
 ]);
 
+test('profile accepts photos up to ten megabytes and compresses them', function (int $size) {
+    Storage::fake('local');
+    $member = User::factory()->member()->create();
+    $this->actingAsNotifiedMember($member)->put(route('profile.update'), [
+        'name' => $member->name, 'date_of_birth' => '1995-01-01',
+        'avatar' => UploadedFile::fake()->image('large.jpg', 1600, 800)->size($size),
+    ])->assertSessionHasNoErrors();
+    $contents = Storage::disk('local')->get($member->refresh()->avatar_path);
+    $image = getimagesizefromstring($contents);
+    expect($image['mime'])->toBe('image/webp')->and($image[0])->toBe(512)
+        ->and(strlen($contents))->toBeLessThan($size * 1024);
+})->with([2049, 10240]);
+
+test('profile rejects photos larger than ten megabytes without replacing the avatar', function () {
+    Storage::fake('local');
+    $member = User::factory()->member()->create();
+    $this->actingAsNotifiedMember($member)->put(route('profile.update'), [
+        'name' => $member->name, 'date_of_birth' => '1995-01-01',
+        'avatar' => UploadedFile::fake()->image('too-large.jpg')->size(10241),
+    ])->assertSessionHasErrors(['avatar' => 'Ukuran foto maksimal 10 MB.']);
+    expect($member->refresh()->avatar_path)->toBeNull();
+    expect(Storage::disk('local')->allFiles('member-avatars'))->toBe([]);
+});
+
 test('avatar compression preserves transparent pixels', function () {
     Storage::fake('local');
     $source = imagecreatetruecolor(100, 100);

@@ -28,7 +28,7 @@ class UpdateProfileRequest extends FormRequest
             'nickname' => ['nullable', 'string', 'max:50'],
             'phone' => ['nullable', 'string', 'max:30'],
             'playing_level' => ['nullable', Rule::in(['beginner', 'intermediate', 'advanced'])],
-            'avatar' => ['nullable', 'image', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048', 'dimensions:max_width=4096,max_height=4096'],
+            'avatar' => ['nullable', 'image', 'mimetypes:image/jpeg,image/png,image/webp', 'max:10240', 'dimensions:max_width=4096,max_height=4096'],
         ];
     }
 
@@ -40,7 +40,7 @@ class UpdateProfileRequest extends FormRequest
             'date_of_birth.date_format' => 'Tanggal lahir tidak valid.',
             'date_of_birth.before_or_equal' => 'Tanggal lahir tidak boleh di masa depan.',
             'date_of_birth.after_or_equal' => 'Periksa kembali tanggal lahir.',
-            'avatar.max' => 'Ukuran foto maksimal 2 MB.',
+            'avatar.max' => 'Ukuran foto maksimal 10 MB.',
         ];
     }
 

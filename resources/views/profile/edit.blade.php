@@ -27,7 +27,7 @@
                     <label>WhatsApp <span class="optional">Opsional</span><input type="tel" name="phone" value="{{ old('phone', $member->phone) }}" maxlength="30" autocomplete="tel">@error('phone')<span class="field-error">{{ $message }}</span>@enderror</label>
                     <label>Level bermain <span class="optional">Opsional</span><select name="playing_level"><option value="">Belum dipilih</option><option value="beginner" @selected(old('playing_level', $member->playing_level) === 'beginner')>Pemula</option><option value="intermediate" @selected(old('playing_level', $member->playing_level) === 'intermediate')>Menengah</option><option value="advanced" @selected(old('playing_level', $member->playing_level) === 'advanced')>Mahir</option></select>@error('playing_level')<span class="field-error">{{ $message }}</span>@enderror</label>
                 </div>
-                <label>Foto profil <span class="optional">Opsional</span><input type="file" name="avatar" accept="image/jpeg,image/png,image/webp">@error('avatar')<span class="field-error">{{ $message }}</span>@enderror<small>JPG, PNG, WebP · maksimal 2 MB</small></label>
+                <label>Foto profil <span class="optional">Opsional</span><input type="file" name="avatar" accept="image/jpeg,image/png,image/webp">@error('avatar')<span class="field-error">{{ $message }}</span>@enderror<small>JPG, PNG, WebP · maksimal 10 MB · otomatis dikompres</small></label>
                 <label>Email<input type="email" value="{{ $member->email }}" readonly></label>
                 <button type="submit" class="btn primary">Simpan profil</button>
             </form>
