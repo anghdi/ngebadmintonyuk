@@ -27,7 +27,7 @@
             <strong>{{ rupiah($balance) }}</strong>
             <p>Posisi kas saat ini.</p>
         </div>
-        <span class="balance-mark" aria-hidden="true"><img src="{{ asset('icon.png') }}" alt=""></span>
+        <span class="balance-mark" aria-hidden="true"><img src="{{ asset('icon.webp') }}" alt=""></span>
     </section>
 
     <div class="section-heading">

@@ -18,6 +18,7 @@
         <div class="form-grid">
             <label>Venue<input name="venue_name" value="{{ old('venue_name', $playSession->venue_name) }}" required></label>
             <label>Lapangan<input name="court_name" value="{{ old('court_name', $playSession->court_name) }}" required></label>
+            <label>Jumlah lapangan<select name="court_count" required><option value="1" @selected((int) old('court_count', $playSession->court_count) === 1)>1 lapangan</option><option value="2" @selected((int) old('court_count', $playSession->court_count) === 2)>2 lapangan</option></select></label>
             <label>Harga per pemain<input type="number" name="price_per_session" value="{{ old('price_per_session', $playSession->price_per_session) }}" min="0" required></label>
             <label>Maksimal pemain<input type="number" name="max_players" value="{{ old('max_players', $playSession->max_players) }}" min="1" max="200" required></label>
             <label>Slot waiting list<input type="number" name="max_waiting_players" value="{{ old('max_waiting_players', $playSession->max_waiting_players) }}" min="0" max="200" required></label>

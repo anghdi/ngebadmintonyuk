@@ -12,6 +12,7 @@ use App\Models\Membership;
 use App\Models\PlaySession;
 use App\Models\SessionRegistration;
 use App\Models\User;
+use App\Services\RotationScheduleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Date;
 use Illuminate\View\View;
@@ -78,7 +79,7 @@ class PlaySessionController extends Controller
         return redirect()->route('play-sessions.index')->with('success', 'Sesi bermain berhasil dihapus.');
     }
 
-    public function show(PlaySession $playSession): View
+    public function show(PlaySession $playSession, RotationScheduleService $schedules): View
     {
         $playSession->load('attendances.transaction');
         $registrations = $playSession->registrations()->with('user:id,name')->oldest('id')->get();
@@ -116,6 +117,6 @@ class PlaySessionController extends Controller
             return [$member->id => (int) $balance];
         });
 
-        return view('play-sessions.show', compact('playSession', 'members', 'availableMembers', 'availableGuests', 'guestNoShowCounts', 'attendances', 'compatibleBalances', 'registrations', 'confirmedRegistrations', 'waitingRegistrations', 'noShowCounts'));
+        return view('play-sessions.show', compact('playSession', 'members', 'availableMembers', 'availableGuests', 'guestNoShowCounts', 'attendances', 'compatibleBalances', 'registrations', 'confirmedRegistrations', 'waitingRegistrations', 'noShowCounts') + $schedules->viewData($playSession, $confirmedRegistrations));
     }
 }

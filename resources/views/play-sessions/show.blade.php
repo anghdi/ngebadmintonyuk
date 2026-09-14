@@ -3,6 +3,22 @@
 @section('content')
 <div class="page-head session-head"><div><a class="back-link" href="{{ route('play-sessions.index') }}">← Semua sesi</a><span class="eyebrow">ABSENSI SESI</span><h1>{{ $playSession->venue_name }}</h1><p>{{ $playSession->court_name }} · {{ $playSession->scheduled_at->translatedFormat('l, d M Y') }} pukul {{ $playSession->scheduled_at->format('H:i') }} WITA</p></div><div class="session-head-actions"><div class="session-price"><small>HARGA SESI</small><strong>{{ rupiah($playSession->price_per_session) }}</strong></div><div class="actions"><a class="btn soft" href="{{ route('play-sessions.edit', $playSession) }}">Edit</a><form method="post" action="{{ route('play-sessions.destroy', $playSession) }}" onsubmit="return confirm('Hapus sesi kosong ini? Sesi dengan peserta atau absensi tidak dapat dihapus.')">@csrf @method('delete')<button class="btn danger-bg">Hapus</button></form></div></div></div>
 
+<section id="rotasi" class="card detail-card mb-5">
+    <div class="card-head"><div><span class="eyebrow">Rotasi bermain</span><h2>{{ $playSession->court_count }} lapangan · {{ $confirmedRegistrations->count() }} pemain</h2></div></div>
+    @if($playSession->status === 'scheduled')
+        <form method="post" action="{{ route('play-sessions.rotation', $playSession) }}" class="flex flex-wrap items-end gap-3" @if($rotationSchedule) onsubmit="return confirm('Ganti jadwal rotasi dengan jadwal baru?')" @endif>
+            @csrf
+            <input type="hidden" name="expected_version" value="{{ $rotationSchedule['version'] ?? 0 }}">
+            <input type="hidden" name="roster_fingerprint" value="{{ $rotationFingerprint }}">
+            <label class="min-w-0">Jumlah ronde<input class="w-28" type="number" name="round_count" min="{{ $rotationMinimumRounds }}" max="80" value="{{ old('round_count', count($rotationSchedule['rounds'] ?? []) ?: min(80, $rotationMinimumRounds * 3)) }}" required></label>
+            <button class="btn primary" @disabled($confirmedRegistrations->count() < $playSession->court_count * 4)>{{ $rotationSchedule ? 'Generate ulang' : 'Generate rotasi' }}</button>
+        </form>
+        <p class="mt-3 text-sm text-slate-500">Dari list utama, termasuk tamu. Minimal {{ $playSession->court_count * 4 }} pemain. Waiting tidak ikut.</p>
+        @error('round_count')<p class="mt-2 text-sm text-red-700" role="alert">{{ $message }}</p>@enderror
+    @endif
+    <x-rotation-schedule :schedule="$rotationSchedule" :stale="$rotationStale" />
+</section>
+
 <section class="card table-card registration-admin-card">
     <div class="card-head"><div><span class="eyebrow">DAFTAR PEMAIN</span><h2>{{ $confirmedRegistrations->count() }}/{{ $playSession->max_players }} pemain · {{ $waitingRegistrations->count() }}/{{ $playSession->max_waiting_players }} waiting</h2></div><a class="btn soft" href="{{ route('public-sessions.show', $playSession) }}" target="_blank" rel="noopener">Lihat halaman publik</a></div>
     @if($registrations->count() < $playSession->max_players + $playSession->max_waiting_players && $availableMembers->isNotEmpty())

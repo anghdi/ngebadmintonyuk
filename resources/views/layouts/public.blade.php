@@ -17,7 +17,7 @@
 <div @if(auth()->check() && ! auth()->user()->hasCompleteProfile()) inert @endif>
 <a class="skip-link" href="#public-content">Lewati ke konten</a>
 <header class="public-nav">
-    <a href="{{ route('public-sessions.index') }}" class="public-brand"><img src="{{ asset('logo.png') }}" alt="NgeBadmintonYuk"></a>
+    <a href="{{ route('public-sessions.index') }}" class="public-brand"><img src="{{ asset('logo.webp') }}" alt="NgeBadmintonYuk"></a>
     <div class="public-actions">
         @auth
             <span>{{ auth()->user()->name }}</span>

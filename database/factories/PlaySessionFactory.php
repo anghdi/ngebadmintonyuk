@@ -22,6 +22,7 @@ class PlaySessionFactory extends Factory
             'scheduled_at' => now()->addDay()->setTime(19, 0),
             'venue_name' => 'GOR NgeBadmintonYuk',
             'court_name' => 'Lapangan 1',
+            'court_count' => 1,
             'price_per_session' => 25000,
             'max_players' => 12,
             'max_waiting_players' => 4,

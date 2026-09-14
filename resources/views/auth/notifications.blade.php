@@ -19,7 +19,7 @@
     data-push-store-url="{{ route('push-subscriptions.store') }}"
     data-push-delete-url="{{ route('push-subscriptions.destroy') }}">
 <main class="login-card">
-    <img class="login-logo" src="{{ asset('logo.png') }}" alt="NgeBadmintonYuk">
+    <img class="login-logo" src="{{ asset('logo.webp') }}" alt="NgeBadmintonYuk">
     <span class="eyebrow">Langkah terakhir</span>
     <h1>Aktifkan notifikasi</h1>
     <p>Aktifkan pada perangkat ini untuk melanjutkan.</p>

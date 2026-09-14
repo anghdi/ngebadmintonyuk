@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\MemberReportController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\NotificationSetupController;
 use App\Http\Controllers\PlaySessionController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RotationScheduleController;
 use App\Http\Controllers\SessionRegistrationController;
 use App\Http\Controllers\ShuttlecockInventoryController;
 use App\Http\Controllers\StockMovementController;
@@ -74,6 +76,8 @@ Route::middleware(['auth', RequireCurrentPushSetup::class, RequireMemberNotifica
             Route::resource($uri, TransactionController::class)->parameters([$uri => 'transaction']);
         }
         Route::get('/reports', ReportController::class)->name('reports.index');
+        Route::get('/member-reports', [MemberReportController::class, 'index'])->name('member-reports.index');
+        Route::get('/member-reports/pdf', [MemberReportController::class, 'download'])->name('member-reports.pdf');
         Route::get('/reports/pdf', [ReportController::class, 'download'])->name('reports.pdf');
         Route::get('/push-notifications', [PushNotificationController::class, 'index'])->name('push-notifications.index');
         Route::get('/push-notifications/subscribers', [PushNotificationController::class, 'subscribers'])->name('push-notifications.subscribers');
@@ -85,6 +89,7 @@ Route::middleware(['auth', RequireCurrentPushSetup::class, RequireMemberNotifica
         Route::post('/members/{member}/memberships/{membership}/credits/adjust', [MembershipController::class, 'adjustCredits'])->scopeBindings()->name('memberships.credits.adjust');
         Route::delete('/members/{member}/memberships/{membership}', [MembershipController::class, 'destroy'])->name('memberships.destroy');
         Route::resource('play-sessions', PlaySessionController::class)->only(['index', 'store', 'show', 'edit', 'update', 'destroy']);
+        Route::post('/play-sessions/{playSession}/rotation', RotationScheduleController::class)->middleware('throttle:10,1')->name('play-sessions.rotation');
         Route::put('/play-sessions/{playSession}/members/{member}/attendance', [AttendanceController::class, 'update'])->name('attendances.update');
         Route::post('/play-sessions/{playSession}/registrations', [SessionRegistrationController::class, 'storeByAdmin'])->name('session-registrations.store');
         Route::post('/play-sessions/{playSession}/guests', [SessionRegistrationController::class, 'storeGuest'])->name('session-guests.store');

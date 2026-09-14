@@ -13,7 +13,7 @@
 <body class="login-page">
 <a class="skip-link" href="#auth-content">Lewati ke formulir</a>
 <main class="login-card" id="auth-content" tabindex="-1">
-    <img class="login-logo" src="{{ asset('logo.png') }}" alt="NgeBadmintonYuk">
+    <img class="login-logo" src="{{ asset('logo.webp') }}" alt="NgeBadmintonYuk">
     <span class="eyebrow">NgeBadmintonYuk</span>
     <h1>Masuk ke akun</h1>
     <p>Akses jadwal, kuota, dan informasi komunitas.</p>

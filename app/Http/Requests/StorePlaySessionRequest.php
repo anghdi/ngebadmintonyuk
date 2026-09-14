@@ -18,6 +18,7 @@ class StorePlaySessionRequest extends FormRequest
             'scheduled_at' => ['required', 'date'],
             'venue_name' => ['required', 'string', 'max:255'],
             'court_name' => ['required', 'string', 'max:255'],
+            'court_count' => ['sometimes', 'required', 'integer', 'between:1,2'],
             'price_per_session' => ['required', 'integer', 'min:0'],
             'max_players' => ['required', 'integer', 'min:1', 'max:200'],
             'max_waiting_players' => ['required', 'integer', 'min:0', 'max:200'],

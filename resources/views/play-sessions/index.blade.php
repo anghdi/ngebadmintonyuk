@@ -11,6 +11,7 @@
             <label>Tanggal dan jam<input type="datetime-local" name="scheduled_at" value="{{ old('scheduled_at') }}" required></label>
             <label>Venue<input name="venue_name" value="{{ old('venue_name') }}" required></label>
             <label>Lapangan<input name="court_name" value="{{ old('court_name') }}" required></label>
+            <label>Jumlah lapangan<select name="court_count" required><option value="1" @selected((int) old('court_count', 1) === 1)>1 lapangan</option><option value="2" @selected((int) old('court_count', 1) === 2)>2 lapangan</option></select></label>
             <label>Harga per pemain<input type="number" name="price_per_session" value="{{ old('price_per_session', 25000) }}" min="0" required></label>
             <label>Maksimal pemain<input type="number" name="max_players" value="{{ old('max_players', 12) }}" min="1" max="200" required></label>
             <label>Slot waiting list<input type="number" name="max_waiting_players" value="{{ old('max_waiting_players', 4) }}" min="0" max="200" required></label>

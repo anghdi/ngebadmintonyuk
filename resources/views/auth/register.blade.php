@@ -14,7 +14,7 @@
 <a class="skip-link" href="#auth-content">Lewati ke formulir</a>
 <main class="login-card register-card" id="auth-content" tabindex="-1">
     <a href="{{ route('login') }}" class="auth-back">← Kembali ke halaman masuk</a>
-    <img class="login-logo" src="{{ asset('logo.png') }}" alt="NgeBadmintonYuk">
+    <img class="login-logo" src="{{ asset('logo.webp') }}" alt="NgeBadmintonYuk">
     <span class="eyebrow">Pendaftaran akun</span>
     <h1>Buat akun pemain</h1>
     <p>Buat akun, aktifkan notifikasi, lalu pilih sesi.</p>

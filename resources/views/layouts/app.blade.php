@@ -34,7 +34,7 @@
     <aside id="sidebar" aria-label="Navigasi utama">
         <div class="sidebar-head">
             <a href="{{ route('dashboard') }}" class="brand" aria-label="NgeKas — NgeBadmintonYuk">
-                <img src="{{ asset('logo.png') }}" alt="NgeBadmintonYuk">
+                <img src="{{ asset('logo.webp') }}" alt="NgeBadmintonYuk">
             </a>
             <button type="button" class="sidebar-close" aria-label="Tutup navigasi" data-sidebar-close><x-nav-icon name="close" /></button>
         </div>
@@ -62,6 +62,7 @@
                 <a @class(['active' => request()->routeIs('expenses.*')]) href="{{ route('expenses.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="expense" /></span> Pengeluaran</a>
                 <a @class(['active' => request()->routeIs('categories.*')]) href="{{ route('categories.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="tag" /></span> Kategori</a>
                 <a @class(['active' => request()->routeIs('reports.*')]) href="{{ route('reports.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="report" /></span> Laporan</a>
+                <a @class(['active' => request()->routeIs('member-reports.*')]) href="{{ route('member-reports.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="report" /></span> Laporan Member</a>
                 <a @class(['active' => request()->routeIs('push-notifications.*')]) href="{{ route('push-notifications.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="bell" /></span> Notifikasi</a>
             @endif
         </nav>

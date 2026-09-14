@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\RegisterForPlaySessionAction;
+use App\Actions\UpdateMemberProfileAction;
 use App\Models\Attendance;
 use App\Models\PlaySession;
 use App\Models\SessionRegistration;
@@ -84,7 +85,8 @@ test('avatars are validated stored privately and replaced safely', function () {
     ])->assertSessionHasNoErrors();
     $oldPath = $member->refresh()->avatar_path;
     Storage::disk('local')->assertExists($oldPath);
-    $this->get(route('profile.avatar'))->assertOk();
+    expect($oldPath)->toEndWith('.webp');
+    $this->get(route('profile.avatar'))->assertOk()->assertHeader('content-type', 'image/webp');
     $this->put(route('profile.update'), [
         'name' => $member->name, 'date_of_birth' => '1995-01-01',
         'avatar' => UploadedFile::fake()->image('new.png'),
@@ -95,6 +97,72 @@ test('avatars are validated stored privately and replaced safely', function () {
         'name' => $member->name, 'date_of_birth' => '1995-01-01',
         'avatar' => UploadedFile::fake()->create('file.svg', 1, 'image/svg+xml'),
     ])->assertSessionHasErrors('avatar');
+});
+
+test('profile uploads become webp and resize proportionally without upscaling', function (string $filename, int $width, int $height, int $expectedWidth, int $expectedHeight) {
+    Storage::fake('local');
+    $member = User::factory()->member()->create();
+    $this->actingAsNotifiedMember($member)->put(route('profile.update'), [
+        'name' => $member->name, 'date_of_birth' => '1995-01-01',
+        'avatar' => UploadedFile::fake()->image($filename, $width, $height),
+    ])->assertSessionHasNoErrors();
+    $path = $member->refresh()->avatar_path;
+    $image = getimagesizefromstring(Storage::disk('local')->get($path));
+    expect($path)->toEndWith('.webp')->and($image['mime'])->toBe('image/webp')
+        ->and($image[0])->toBe($expectedWidth)->and($image[1])->toBe($expectedHeight);
+})->with([
+    ['photo.jpg', 1600, 800, 512, 256],
+    ['photo.png', 800, 1600, 256, 512],
+    ['photo.webp', 100, 100, 100, 100],
+]);
+
+test('avatar compression preserves transparent pixels', function () {
+    Storage::fake('local');
+    $source = imagecreatetruecolor(100, 100);
+    imagealphablending($source, false);
+    imagesavealpha($source, true);
+    imagefill($source, 0, 0, imagecolorallocatealpha($source, 0, 0, 0, 127));
+    ob_start();
+    imagepng($source);
+    $bytes = ob_get_clean();
+    $member = User::factory()->member()->create();
+    $this->actingAsNotifiedMember($member)->put(route('profile.update'), [
+        'name' => $member->name, 'date_of_birth' => '1995-01-01',
+        'avatar' => UploadedFile::fake()->createWithContent('transparent.png', $bytes),
+    ])->assertSessionHasNoErrors();
+    $result = imagecreatefromstring(Storage::disk('local')->get($member->refresh()->avatar_path));
+    expect((imagecolorat($result, 0, 0) >> 24) & 127)->toBe(127);
+});
+
+test('avatar compression applies camera exif orientation before removing metadata', function () {
+    Storage::fake('local');
+    $source = imagecreatetruecolor(200, 100);
+    ob_start();
+    imagejpeg($source);
+    $jpeg = ob_get_clean();
+    $exif = "Exif\0\0II".pack('vVv', 42, 8, 1).pack('vvVvvV', 0x0112, 3, 1, 6, 0, 0);
+    $jpeg = substr($jpeg, 0, 2)."\xff\xe1".pack('n', strlen($exif) + 2).$exif.substr($jpeg, 2);
+    $member = User::factory()->member()->create();
+    $this->actingAsNotifiedMember($member)->put(route('profile.update'), [
+        'name' => $member->name, 'date_of_birth' => '1995-01-01',
+        'avatar' => UploadedFile::fake()->createWithContent('camera.jpg', $jpeg),
+    ])->assertSessionHasNoErrors();
+    $contents = Storage::disk('local')->get($member->refresh()->avatar_path);
+    $result = getimagesizefromstring($contents);
+    expect($result[0])->toBe(100)->and($result[1])->toBe(200)
+        ->and($contents)->not->toContain('Exif');
+});
+
+test('failed profile persistence keeps old avatar and cleans up compressed replacement', function () {
+    Storage::fake('local');
+    Storage::disk('local')->put('member-avatars/old.png', 'old file');
+    $member = Mockery::mock(User::class)->makePartial();
+    $member->avatar_path = 'member-avatars/old.png';
+    $member->shouldReceive('update')->once()->andThrow(new RuntimeException('Database unavailable'));
+    expect(fn () => app(UpdateMemberProfileAction::class)->handle($member, [
+        'name' => 'Raka', 'date_of_birth' => '1995-01-01',
+    ], UploadedFile::fake()->image('new.png')))->toThrow(RuntimeException::class);
+    expect(Storage::disk('local')->allFiles('member-avatars'))->toBe(['member-avatars/old.png']);
 });
 
 test('password change requires the old password and keeps member signed in', function () {

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Story Studio')
 @section('content')
-<div class="story-studio" data-story-studio data-logo="{{ asset('logo.png') }}" data-demo="{{ asset('images/member-action-01.webp') }}">
+<div class="story-studio" data-story-studio data-logo="{{ asset('logo.webp') }}" data-demo="{{ asset('images/member-action-01.webp') }}">
     <div class="page-heading">
         <div><span class="eyebrow">MOMEN DI LAPANGAN</span><h1>Story Studio</h1><p>Foto kamu. Cerita kita.</p></div>
     </div>

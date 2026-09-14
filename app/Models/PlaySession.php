@@ -15,6 +15,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon $scheduled_at
  * @property string $venue_name
  * @property string $court_name
+ * @property int $court_count
+ * @property array<string, mixed>|null $rotation_schedule
  * @property int $price_per_session
  * @property int $max_players
  * @property int $max_waiting_players
@@ -22,18 +24,20 @@ use Illuminate\Support\Carbon;
  * @property string|null $notes
  * @property int $created_by
  */
-#[Fillable(['scheduled_at', 'venue_name', 'court_name', 'price_per_session', 'max_players', 'max_waiting_players', 'status', 'notes', 'created_by'])]
+#[Fillable(['scheduled_at', 'venue_name', 'court_name', 'court_count', 'price_per_session', 'max_players', 'max_waiting_players', 'status', 'notes', 'created_by'])]
 class PlaySession extends Model
 {
     /** @use HasFactory<PlaySessionFactory> */
     use HasFactory;
 
-    protected $attributes = ['max_players' => 12, 'max_waiting_players' => 4, 'status' => 'scheduled'];
+    protected $attributes = ['court_count' => 1, 'max_players' => 12, 'max_waiting_players' => 4, 'status' => 'scheduled'];
 
     protected function casts(): array
     {
         return [
             'scheduled_at' => 'datetime',
+            'court_count' => 'integer',
+            'rotation_schedule' => 'array',
             'price_per_session' => 'integer',
             'max_players' => 'integer',
             'max_waiting_players' => 'integer',

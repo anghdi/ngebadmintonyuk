@@ -8,7 +8,7 @@
         <div>
             <span class="eyebrow">Sesi bermain</span>
             <h1>{{ $playSession->venue_name }}</h1>
-            <p>{{ $playSession->court_name }} · {{ $playSession->scheduled_at->translatedFormat('l, d M Y') }} · {{ $playSession->scheduled_at->format('H:i') }} WITA</p>
+            <p>{{ $playSession->court_name }} · {{ $playSession->court_count }} lapangan · {{ $playSession->scheduled_at->translatedFormat('l, d M Y') }} · {{ $playSession->scheduled_at->format('H:i') }} WITA</p>
         </div>
         <div class="public-session-capacity"><strong>{{ rupiah($playSession->price_per_session) }}</strong><span>{{ $confirmedRegistrations->count() }}/{{ $playSession->max_players }} pemain · {{ $waitingRegistrations->count() }}/{{ $playSession->max_waiting_players }} waiting</span></div>
     </section>
@@ -42,9 +42,8 @@
                     <p class="registration-cancel-note">Pendaftaran yang sudah dibayar atau diproses admin tidak dapat dibatalkan sendiri.</p>
                 @endif
             @elseif($isRegistrationClosed)
-                <span class="eyebrow">Daftar penuh</span>
-                <h2>Kapasitas terpenuhi</h2>
-                <p>Slot utama dan waiting list sudah penuh.</p>
+                <span class="eyebrow">Pendaftaran ditutup</span>
+                <h2>{{ $playSession->scheduled_at->isFuture() && $playSession->status === 'scheduled' ? 'Kapasitas terpenuhi' : 'Sesi sudah dimulai atau selesai' }}</h2>
             @elseif($noShowCount >= 3)
                 <span class="eyebrow">Pendaftaran diblokir</span>
                 <h2>Hubungi admin</h2>
@@ -93,4 +92,8 @@
             </ol>
         </section>
     </div>
+    <section id="rotasi" class="card detail-card mt-5">
+        <div class="card-head"><div><span class="eyebrow">Giliran bermain</span><h2>Jadwal rotasi</h2></div></div>
+        <x-rotation-schedule :schedule="$rotationSchedule" :stale="$rotationStale" :current-user-id="auth()->id()" />
+    </section>
 @endsection
