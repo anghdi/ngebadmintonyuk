@@ -23,7 +23,7 @@ class GenerateRotationScheduleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'round_count' => ['required', 'integer', 'between:1,80'],
+            'sets_per_match' => ['required', 'integer', 'between:1,2'],
             'expected_version' => ['required', 'integer', 'min:0'],
             'roster_fingerprint' => ['required', 'string', 'size:64'],
         ];

@@ -1,5 +1,6 @@
 @props(['schedule'])
 @php($players = collect($schedule['roster'])->keyBy('id'))
+@if(isset($schedule['sets_per_match']))<p class="mt-3 text-sm">{{ $schedule['sets_per_match'] }} set × {{ $schedule['points_per_set'] }} poin · batas main {{ str_replace(':', '.', $schedule['play_until']) }}</p>@endif
 <div class="mt-4 overflow-x-auto rounded-lg border border-slate-200" tabindex="0" aria-label="Tabel review rotasi">
     <table class="w-full min-w-[600px] text-left text-sm">
         <caption class="px-3 py-3 text-left font-semibold">Review {{ count($schedule['rounds']) }} ronde · {{ $schedule['court_count'] }} lapangan</caption>

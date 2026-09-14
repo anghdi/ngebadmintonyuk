@@ -42,7 +42,6 @@ class RotationScheduleService
             'rotationPublished' => $published && ! $stale,
             'rotationStale' => $stale && ($review || $published),
             'rotationFingerprint' => $fingerprint,
-            'rotationMinimumRounds' => max(1, (int) ceil($registrations->count() / ($session->court_count * 4))),
         ];
     }
 

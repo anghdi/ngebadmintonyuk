@@ -10,6 +10,7 @@
         $myId = $currentUserId ? $players->firstWhere('user_id', $currentUserId)['id'] ?? null : null;
     @endphp
     <div class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500"><span>{{ count($schedule['rounds']) }} ronde</span><span>{{ $schedule['court_count'] }} lapangan</span><span>Ganda · sesuai urutan ronde</span></div>
+    @if(isset($schedule['sets_per_match']))<p class="mt-2 text-sm">{{ $schedule['sets_per_match'] }} set × {{ $schedule['points_per_set'] }} poin · batas main {{ str_replace(':', '.', $schedule['play_until']) }}</p><p class="text-xs text-slate-500">Giliran berikutnya setelah pertandingan selesai. Tidak harus semua giliran selesai sebelum 23.00.</p>@endif
     <div class="mt-4 space-y-3">
         @foreach($schedule['rounds'] as $round)
             @php

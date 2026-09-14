@@ -22,28 +22,28 @@ test('admin publishes all rounds from the main list including unpaid members and
     $roster = $service->roster($session->registrations()->oldest('id')->limit(8)->get());
 
     $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation', $session), [
-        'round_count' => 6, 'expected_version' => 0, 'roster_fingerprint' => $service->fingerprint($roster, 2),
+        'sets_per_match' => 1, 'expected_version' => 0, 'roster_fingerprint' => $service->fingerprint($roster, 2),
     ])->assertRedirect()->assertSessionHasNoErrors();
 
     $schedule = $session->refresh()->rotation_schedule;
-    expect($schedule['rounds'])->toHaveCount(6)
+    expect($schedule['rounds'])->toHaveCount(3)
         ->and(array_column($schedule['roster'], 'id'))->not->toContain($waiting->id)
         ->and(array_column($schedule['roster'], 'guest_id'))->toContain($guest->id)
-        ->and(array_values($schedule['games']))->each->toBe(6);
+        ->and(array_values($schedule['games']))->each->toBe(3);
     expect(Attendance::count())->toBe(0)->and(Income::count())->toBe(0);
     expect($session->registrations()->where('payment_status', 'paid')->count())->toBe(0);
 
-    $this->get(route('play-sessions.show', $session))->assertOk()->assertSee('Review 6 ronde')->assertSee('Publikasikan rotasi');
+    $this->get(route('play-sessions.show', $session))->assertOk()->assertSee('Review 3 ronde')->assertSee('Publikasikan rotasi');
     $this->actingAsNotifiedMember($member)->get(route('rotations.show', $session))->assertNotFound();
     $this->get(route('rotations.index'))->assertOk()->assertSee('Belum ada rotasi');
-    $this->get(route('public-sessions.show', $session))->assertOk()->assertSee('Menunggu rotasi disetujui admin')->assertDontSee('Ronde 6');
+    $this->get(route('public-sessions.show', $session))->assertOk()->assertSee('Menunggu rotasi disetujui admin')->assertDontSee('Ronde 3');
     $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 1])->assertSessionHasNoErrors();
     $this->actingAsNotifiedMember($member)->get(route('rotations.show', $session))
-        ->assertOk()->assertSee('Ronde 6')->assertSee('Kamu main')->assertSee('Pasanganmu:')->assertSee($guest->name)->assertDontSee($guest->phone ?? 'PRIVATE_PHONE');
+        ->assertOk()->assertSee('Ronde 3')->assertSee('Kamu main')->assertSee('Pasanganmu:')->assertSee($guest->name)->assertDontSee($guest->phone ?? 'PRIVATE_PHONE');
     $this->get(route('rotations.index'))->assertOk()->assertSee($session->venue_name)->assertDontSee('Belum ada rotasi');
     $session->update(['scheduled_at' => now()->subHour()]);
     $this->get(route('public-sessions.show', $session))->assertOk()->assertSee('Lihat rotasi main');
-    $this->get(route('rotations.show', $session))->assertOk()->assertSee('Ronde 6');
+    $this->get(route('rotations.show', $session))->assertOk()->assertSee('Ronde 3');
     $session->update(['status' => 'completed']);
     $this->get(route('public-sessions.show', $session))->assertOk();
     $session->update(['status' => 'cancelled']);
@@ -94,7 +94,7 @@ test('changed main roster hides old schedule but waiting and payment changes do 
     $registrations = SessionRegistration::factory()->for($session)->count(4)->create();
     $service = app(RotationScheduleService::class);
     $roster = $service->roster($registrations);
-    app(GenerateRotationScheduleAction::class)->handle($session, 3, 0, $service->fingerprint($roster, 1));
+    app(GenerateRotationScheduleAction::class)->handle($session, 1, 0, $service->fingerprint($roster, 1));
     app(PublishRotationScheduleAction::class)->handle($session, 1);
     $session->refresh();
     SessionRegistration::factory()->for($session)->create();
@@ -111,23 +111,23 @@ test('generation validates roster rounds status and prevents concurrent overwrit
     $session = PlaySession::factory()->create(['max_players' => 12]);
     $registrations = SessionRegistration::factory()->for($session)->count(12)->create();
     $service = app(RotationScheduleService::class);
-    $data = ['round_count' => 2, 'expected_version' => 0, 'roster_fingerprint' => $service->fingerprint($service->roster($registrations), 1)];
+    $data = ['sets_per_match' => 0, 'expected_version' => 0, 'roster_fingerprint' => $service->fingerprint($service->roster($registrations), 1)];
     $this->actingAs(User::factory()->admin()->create());
-    $this->post(route('play-sessions.rotation', $session), $data)->assertSessionHasErrors('round_count');
-    $data['round_count'] = 6;
+    $this->post(route('play-sessions.rotation', $session), $data)->assertSessionHasErrors('sets_per_match');
+    $data['sets_per_match'] = 1;
     $this->post(route('play-sessions.rotation', $session), $data)->assertSessionHasNoErrors();
     $schedule = $session->refresh()->rotation_schedule;
-    $this->post(route('play-sessions.rotation', $session), $data)->assertSessionHasErrors('round_count');
+    $this->post(route('play-sessions.rotation', $session), $data)->assertSessionHasErrors('sets_per_match');
     expect($session->refresh()->rotation_schedule)->toBe($schedule);
     $data['expected_version'] = 1;
     $session->update(['status' => 'completed']);
-    $this->post(route('play-sessions.rotation', $session), $data)->assertSessionHasErrors('round_count');
+    $this->post(route('play-sessions.rotation', $session), $data)->assertSessionHasErrors('sets_per_match');
 
     $small = PlaySession::factory()->create(['court_count' => 2]);
     $smallRoster = SessionRegistration::factory()->for($small)->count(7)->create();
     $this->post(route('play-sessions.rotation', $small), [
-        'round_count' => 6, 'expected_version' => 0, 'roster_fingerprint' => $service->fingerprint($service->roster($smallRoster), 2),
-    ])->assertSessionHasErrors('round_count');
+        'sets_per_match' => 2, 'expected_version' => 0, 'roster_fingerprint' => $service->fingerprint($service->roster($smallRoster), 2),
+    ])->assertSessionHasErrors('sets_per_match');
     expect($small->refresh()->rotation_schedule)->toBeNull();
 });
 
@@ -151,7 +151,7 @@ test('publishing rejects stale drafts and regeneration requires a new review', f
     $session = PlaySession::factory()->create(['max_players' => 4]);
     $registrations = SessionRegistration::factory()->for($session)->count(4)->create();
     $service = app(RotationScheduleService::class);
-    app(GenerateRotationScheduleAction::class)->handle($session, 3, 0, $service->fingerprint($service->roster($registrations), 1));
+    app(GenerateRotationScheduleAction::class)->handle($session, 1, 0, $service->fingerprint($service->roster($registrations), 1));
     $this->actingAsNotifiedMember(User::factory()->member()->create())->postJson(route('play-sessions.rotation.publish', $session), ['expected_version' => 1])->assertForbidden();
     $this->actingAs(User::factory()->admin()->create());
     $this->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 2])->assertSessionHasErrors('rotation');
@@ -161,10 +161,40 @@ test('publishing rejects stale drafts and regeneration requires a new review', f
     $publishedAt = $session->refresh()->rotation_schedule['published_at'];
     $this->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 1])->assertSessionHasNoErrors();
     expect($session->refresh()->rotation_schedule['published_at'])->toBe($publishedAt);
-    app(GenerateRotationScheduleAction::class)->handle($session, 6, 1, $service->fingerprint($service->roster($registrations), 1));
+    app(GenerateRotationScheduleAction::class)->handle($session, 2, 1, $service->fingerprint($service->roster($registrations), 1));
     expect($session->refresh()->rotation_schedule['published_at'])->toBeNull()->and($session->rotation_schedule['version'])->toBe(2);
     $this->actingAsNotifiedMember(User::factory()->member()->create())->get(route('rotations.show', $session))->assertNotFound();
     $registrations[0]->update(['name' => 'Replaced player']);
     $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 2])->assertSessionHasErrors('rotation');
     expect($session->refresh()->rotation_schedule['published_at'])->toBeNull();
 });
+
+test('match format automatically generates fair turns without a manual round count', function (int $players, int $courts, int $sets, int $expectedRounds) {
+    $session = PlaySession::factory()->create(['max_players' => $players, 'court_count' => $courts]);
+    $registrations = SessionRegistration::factory()->for($session)->count($players)->create();
+    $service = app(RotationScheduleService::class);
+    $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation', $session), [
+        'sets_per_match' => $sets, 'expected_version' => 0,
+        'roster_fingerprint' => $service->fingerprint($service->roster($registrations), $courts),
+        'round_count' => 80,
+    ])->assertSessionHasNoErrors();
+    $schedule = $session->refresh()->rotation_schedule;
+    expect($schedule['rounds'])->toHaveCount($expectedRounds)
+        ->and($schedule['sets_per_match'])->toBe($sets)->and($schedule['points_per_set'])->toBe(21)
+        ->and($schedule['play_until'])->toBe('23:00')->and($schedule['published_at'])->toBeNull();
+    expect(min($schedule['games']))->toBeGreaterThan(0);
+    expect(max($schedule['games']) - min($schedule['games']))->toBeLessThanOrEqual(1);
+    $this->get(route('play-sessions.show', $session))->assertOk()->assertSee('Format pertandingan')
+        ->assertDontSee('name="round_count"', false)->assertSee($sets.' set × 21 poin')->assertSee('batas main 23.00');
+})->with([[12, 1, 1, 9], [12, 1, 2, 6], [12, 2, 1, 5], [12, 2, 2, 3], [5, 1, 1, 4], [200, 1, 1, 80]]);
+
+test('unsupported match formats cannot create a rotation draft', function (mixed $sets) {
+    $session = PlaySession::factory()->create();
+    $registrations = SessionRegistration::factory()->for($session)->count(4)->create();
+    $service = app(RotationScheduleService::class);
+    $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation', $session), [
+        'sets_per_match' => $sets, 'expected_version' => 0,
+        'roster_fingerprint' => $service->fingerprint($service->roster($registrations), 1),
+    ])->assertSessionHasErrors('sets_per_match');
+    expect($session->refresh()->rotation_schedule)->toBeNull();
+})->with([null, 0, 3, 1.5]);

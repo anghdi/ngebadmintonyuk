@@ -10,11 +10,12 @@
             @csrf
             <input type="hidden" name="expected_version" value="{{ $rotationSchedule['version'] ?? 0 }}">
             <input type="hidden" name="roster_fingerprint" value="{{ $rotationFingerprint }}">
-            <label class="min-w-0">Jumlah ronde<input class="w-28" type="number" name="round_count" min="{{ $rotationMinimumRounds }}" max="80" value="{{ old('round_count', count($rotationSchedule['rounds'] ?? []) ?: min(80, $rotationMinimumRounds * 3)) }}" required></label>
+            <label class="min-w-0">Format pertandingan<select name="sets_per_match" required><option value="1" @selected((int) old('sets_per_match', $rotationSchedule['sets_per_match'] ?? 1) === 1)>1 set × 21 poin</option><option value="2" @selected((int) old('sets_per_match', $rotationSchedule['sets_per_match'] ?? 1) === 2)>2 set × 21 poin</option></select></label>
             <button class="btn primary" @disabled($confirmedRegistrations->count() < $playSession->court_count * 4)>{{ $rotationSchedule ? 'Generate ulang' : 'Generate rotasi' }}</button>
         </form>
         <p class="mt-3 text-sm text-slate-500">Dari list utama, termasuk tamu. Minimal {{ $playSession->court_count * 4 }} pemain. Waiting tidak ikut.</p>
-        @error('round_count')<p class="mt-2 text-sm text-red-700" role="alert">{{ $message }}</p>@enderror
+        <p class="mt-2 text-xs text-slate-500">Giliran otomatis: sekitar 3 kali main untuk 1 set, 2 kali untuk 2 set. Ikuti urutan; batas main 23.00.</p>
+        @error('sets_per_match')<p class="mt-2 text-sm text-red-700" role="alert">{{ $message }}</p>@enderror
     @endif
     @if($rotationStale)
         <p class="mt-4 text-sm text-amber-800">List berubah. Generate ulang sebelum publikasi.</p>
