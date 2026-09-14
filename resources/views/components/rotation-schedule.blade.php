@@ -12,9 +12,14 @@
     <div class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500"><span>{{ count($schedule['rounds']) }} ronde</span><span>{{ $schedule['court_count'] }} lapangan</span><span>Ganda · sesuai urutan ronde</span></div>
     <div class="mt-4 space-y-3">
         @foreach($schedule['rounds'] as $round)
-            @php($myCourt = $myId ? collect($round['courts'])->first(fn ($court) => in_array($myId, [...$court['team_a'], ...$court['team_b']])) : null)
+            @php
+                $myCourt = $myId ? collect($round['courts'])->first(fn ($court) => in_array($myId, [...$court['team_a'], ...$court['team_b']])) : null;
+                $myTeam = $myCourt ? (in_array($myId, $myCourt['team_a']) ? $myCourt['team_a'] : $myCourt['team_b']) : [];
+                $myPartner = $myCourt ? collect($myTeam)->first(fn ($id) => $id !== $myId) : null;
+            @endphp
             <details class="rounded-xl border border-slate-200 bg-white" @if($loop->first) open @endif>
                 <summary class="flex cursor-pointer flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm"><strong>Ronde {{ $round['number'] }}</strong>@if($myId)<span class="rounded-full bg-slate-100 px-2 py-1 text-xs">{{ $myCourt ? 'Kamu main · Lapangan '.$myCourt['number'] : 'Kamu istirahat' }}</span>@else<span class="text-slate-500">Lihat pasangan</span>@endif</summary>
+                @if($myPartner)<p class="px-4 pb-3 text-sm text-teal-700">Pasanganmu: <strong>{{ $players[$myPartner]['name'] }}</strong></p>@endif
                 <div class="grid gap-3 px-4 pb-4 {{ $schedule['court_count'] === 2 ? 'md:grid-cols-2' : '' }}">
                     @foreach($round['courts'] as $court)
                         <div class="min-w-0 rounded-lg bg-slate-50 p-3">

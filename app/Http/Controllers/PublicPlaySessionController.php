@@ -50,9 +50,12 @@ class PublicPlaySessionController extends Controller
     public function show(Request $request, PlaySession $playSession, RotationScheduleService $schedules): View
     {
         abort_unless(($playSession->status === 'scheduled' && $playSession->scheduled_at->isFuture())
-            || ($request->user() && $playSession->rotation_schedule !== null && $playSession->status !== 'cancelled'), 404);
+            || ($request->user() && ($playSession->rotation_schedule['published_at'] ?? null) !== null && $playSession->status !== 'cancelled'), 404);
 
         $playSession->load(['registrations' => fn ($query) => $query->select('id', 'play_session_id', 'user_id', 'guest_id', 'name', 'phone', 'payment_method', 'payment_status', 'attendance_status')->oldest('id')]);
+        if ($request->user()) {
+            $playSession->loadMissing('registrations.user:id,name,avatar_path,role');
+        }
         $confirmedRegistrations = $playSession->registrations->take($playSession->max_players)->values();
         $waitingRegistrations = $playSession->registrations->slice($playSession->max_players)->values();
         $isRegistrationClosed = $playSession->status !== 'scheduled' || ! $playSession->scheduled_at->isFuture() || $playSession->registrations->count() >= $playSession->max_players + $playSession->max_waiting_players;

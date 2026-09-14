@@ -18,13 +18,20 @@ export function createLoadingController({ show, hide, slow, setTimer = setTimeou
         dismiss();
     };
 
-    const start = (message = 'Sedang memuat halaman…') => {
+    const start = (message = 'Sedang memuat halaman…', { immediate = false } = {}) => {
         const token = Symbol('request');
         pending.add(token);
 
         if (pending.size === 1) {
-            showTimer = setTimer(() => show(message), 160);
+            if (immediate) {
+                show(message);
+            } else {
+                showTimer = setTimer(() => show(message), 160);
+            }
             slowTimer = setTimer(slow, 10000);
+        } else if (immediate) {
+            clearTimer(showTimer);
+            show(message);
         }
 
         return () => {
@@ -69,9 +76,12 @@ export function shouldLoadLink(event, link, currentUrl) {
 
 export function bindServerLoading(window, document, controller) {
     let submitting = false;
+    let restoreSubmission = () => {};
 
     const reset = () => {
         submitting = false;
+        restoreSubmission();
+        restoreSubmission = () => {};
         controller.reset();
     };
 
@@ -101,7 +111,34 @@ export function bindServerLoading(window, document, controller) {
         }
 
         submitting = true;
-        controller.start(method?.toLowerCase() === 'get' ? 'Sedang memuat data…' : 'Sedang mengirim data…');
+        const uploading = Array.from(form.querySelectorAll?.('input[type="file"]') ?? []).some((input) => input.files?.length > 0);
+        const message = uploading
+            ? (form.dataset?.uploadLoadingMessage ?? 'Sedang mengunggah file…')
+            : (form.dataset?.loadingMessage ?? (method?.toLowerCase() === 'get' ? 'Sedang memuat data…' : 'Sedang mengirim data…'));
+        const originalLabel = submitter?.textContent;
+        const originalBusy = form.getAttribute?.('aria-busy');
+        const originalDisabled = submitter?.getAttribute('aria-disabled');
+        form.setAttribute?.('aria-busy', 'true');
+        if (submitter?.tagName === 'BUTTON') {
+            submitter.textContent = uploading ? 'Mengunggah…' : 'Memproses…';
+            submitter.setAttribute('aria-disabled', 'true');
+        }
+        restoreSubmission = () => {
+            if (originalBusy == null) {
+                form.removeAttribute?.('aria-busy');
+            } else {
+                form.setAttribute?.('aria-busy', originalBusy);
+            }
+            if (submitter?.tagName === 'BUTTON') {
+                submitter.textContent = originalLabel;
+                if (originalDisabled == null) {
+                    submitter.removeAttribute('aria-disabled');
+                } else {
+                    submitter.setAttribute('aria-disabled', originalDisabled);
+                }
+            }
+        };
+        controller.start(message, { immediate: true });
     });
 
     document.querySelector('[data-loading-dismiss]')?.addEventListener('click', controller.dismiss);

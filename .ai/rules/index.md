@@ -14,6 +14,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Http/Controllers/*PlaySessionController.php, app/Http/Controllers/** | .ai/rules/controllers.md |
 | app/Http/** | .ai/rules/http.md |
 | resources/{js,views}/** | .ai/rules/jsviews.md |
+| app/Http/**, resources/views/profile/** | .ai/rules/profile.md |
 | resources/views/public-sessions/** | .ai/rules/public-sessions.md |
 | resources/views/push-notifications/** | .ai/rules/push-notifications.md |
 | app/{Services,Http}/** | .ai/rules/services-http.md |

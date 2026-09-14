@@ -72,6 +72,52 @@ test('failed async work clears loading and preserves its error', async () => {
     assert.equal(await controller.run(async () => 42), 42);
 });
 
+test('form loading appears immediately and replaces a pending navigation message', () => {
+    const { controller, events, tick } = setup();
+    const navigation = controller.start();
+    const submission = controller.start('Uploading', { immediate: true });
+    assert.deepEqual(events.at(-1), ['show', 'Uploading']);
+    tick(160);
+    assert.deepEqual(events.at(-1), ['show', 'Uploading']);
+    navigation();
+    submission();
+    assert.deepEqual(events.at(-1), ['hide']);
+});
+
+test('photo uploads show specific feedback and restore the button on browser back', () => {
+    const handlers = new Map();
+    const { controller, events } = setup();
+    const window = { location: { href: current }, addEventListener: (name, handler) => handlers.set(name, handler) };
+    bindServerLoading(window, { readyState: 'complete', querySelector: () => null }, controller);
+    const attributes = new Map();
+    const submitter = {
+        tagName: 'BUTTON', textContent: 'Simpan profil', name: 'status', value: 'approved', disabled: false,
+        getAttribute: (key) => attributes.get(key), hasAttribute: (key) => attributes.has(key),
+        setAttribute: (key, value) => attributes.set(key, value), removeAttribute: (key) => attributes.delete(key),
+    };
+    const formAttributes = new Map();
+    const form = {
+        method: 'post', target: '', hasAttribute: () => false,
+        dataset: { uploadLoadingMessage: 'Mengunggah dan menyimpan foto…' },
+        querySelectorAll: () => [{ files: [{}] }],
+        getAttribute: (key) => formAttributes.get(key), setAttribute: (key, value) => formAttributes.set(key, value),
+        removeAttribute: (key) => formAttributes.delete(key),
+    };
+    const event = { target: form, submitter, defaultPrevented: false, preventDefault() { this.defaultPrevented = true; } };
+    handlers.get('submit')(event);
+    assert.deepEqual(events.at(-1), ['show', 'Mengunggah dan menyimpan foto…']);
+    assert.equal(submitter.textContent, 'Mengunggah…');
+    assert.equal(formAttributes.get('aria-busy'), 'true');
+    assert.equal(submitter.disabled, false);
+    assert.equal(submitter.value, 'approved');
+    handlers.get('submit')(event);
+    assert.equal(event.defaultPrevented, true);
+    handlers.get('pageshow')();
+    assert.equal(submitter.textContent, 'Simpan profil');
+    assert.equal(attributes.has('aria-disabled'), false);
+    assert.equal(formAttributes.has('aria-busy'), false);
+});
+
 test('dismiss hides the indicator without cancelling the running operation', async () => {
     const { controller, events, tick } = setup();
     let resolve;

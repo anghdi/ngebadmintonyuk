@@ -30,13 +30,17 @@ class RotationScheduleService
     /** @param Collection<int, SessionRegistration> $registrations
      * @return array<string, mixed>
      */
-    public function viewData(PlaySession $session, Collection $registrations): array
+    public function viewData(PlaySession $session, Collection $registrations, bool $review = false): array
     {
         $fingerprint = $this->fingerprint($this->roster($registrations), $session->court_count);
+        $schedule = $session->rotation_schedule;
+        $published = ($schedule['published_at'] ?? null) !== null;
+        $stale = $schedule !== null && ($schedule['fingerprint'] ?? null) !== $fingerprint;
 
         return [
-            'rotationSchedule' => $session->rotation_schedule,
-            'rotationStale' => $session->rotation_schedule !== null && ($session->rotation_schedule['fingerprint'] ?? null) !== $fingerprint,
+            'rotationSchedule' => $review || ($published && ! $stale) ? $schedule : null,
+            'rotationPublished' => $published && ! $stale,
+            'rotationStale' => $stale && ($review || $published),
             'rotationFingerprint' => $fingerprint,
             'rotationMinimumRounds' => max(1, (int) ceil($registrations->count() / ($session->court_count * 4))),
         ];

@@ -45,6 +45,9 @@
         <nav class="sidebar-nav">
             <a @class(['active' => request()->routeIs('dashboard')]) href="{{ route('dashboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="home" /></span> Beranda</a>
             <a @class(['active' => request()->routeIs('public-sessions.*')]) href="{{ route('public-sessions.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="calendar" /></span> Jadwal Main</a>
+            @if(! auth()->user()->isAdmin())
+                <a @class(['active' => request()->routeIs('rotations.*')]) href="{{ route('rotations.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="session" /></span> Rotasi Main</a>
+            @endif
             <a @class(['active' => request()->routeIs('scoreboard')]) href="{{ route('scoreboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="score" /></span> Papan Skor</a>
             <a @class(['active' => request()->routeIs('story-studio')]) href="{{ route('story-studio') }}"><span class="nav-icon-wrap"><x-nav-icon name="camera" /></span> Story Studio</a>
             @if(! auth()->user()->isAdmin())

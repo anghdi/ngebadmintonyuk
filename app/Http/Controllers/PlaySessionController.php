@@ -82,7 +82,7 @@ class PlaySessionController extends Controller
     public function show(PlaySession $playSession, RotationScheduleService $schedules): View
     {
         $playSession->load('attendances.transaction');
-        $registrations = $playSession->registrations()->with('user:id,name')->oldest('id')->get();
+        $registrations = $playSession->registrations()->with('user:id,name,avatar_path,role')->oldest('id')->get();
         $confirmedRegistrations = $registrations->take($playSession->max_players)->values();
         $waitingRegistrations = $registrations->slice($playSession->max_players)->values();
         $noShowCounts = SessionRegistration::query()
@@ -117,6 +117,6 @@ class PlaySessionController extends Controller
             return [$member->id => (int) $balance];
         });
 
-        return view('play-sessions.show', compact('playSession', 'members', 'availableMembers', 'availableGuests', 'guestNoShowCounts', 'attendances', 'compatibleBalances', 'registrations', 'confirmedRegistrations', 'waitingRegistrations', 'noShowCounts') + $schedules->viewData($playSession, $confirmedRegistrations));
+        return view('play-sessions.show', compact('playSession', 'members', 'availableMembers', 'availableGuests', 'guestNoShowCounts', 'attendances', 'compatibleBalances', 'registrations', 'confirmedRegistrations', 'waitingRegistrations', 'noShowCounts') + $schedules->viewData($playSession, $confirmedRegistrations, review: true));
     }
 }

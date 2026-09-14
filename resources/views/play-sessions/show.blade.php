@@ -3,10 +3,10 @@
 @section('content')
 <div class="page-head session-head"><div><a class="back-link" href="{{ route('play-sessions.index') }}">← Semua sesi</a><span class="eyebrow">ABSENSI SESI</span><h1>{{ $playSession->venue_name }}</h1><p>{{ $playSession->court_name }} · {{ $playSession->scheduled_at->translatedFormat('l, d M Y') }} pukul {{ $playSession->scheduled_at->format('H:i') }} WITA</p></div><div class="session-head-actions"><div class="session-price"><small>HARGA SESI</small><strong>{{ rupiah($playSession->price_per_session) }}</strong></div><div class="actions"><a class="btn soft" href="{{ route('play-sessions.edit', $playSession) }}">Edit</a><form method="post" action="{{ route('play-sessions.destroy', $playSession) }}" onsubmit="return confirm('Hapus sesi kosong ini? Sesi dengan peserta atau absensi tidak dapat dihapus.')">@csrf @method('delete')<button class="btn danger-bg">Hapus</button></form></div></div></div>
 
-<section id="rotasi" class="card detail-card mb-5">
+<section id="rotasi" class="card mb-5 p-4 sm:p-5">
     <div class="card-head"><div><span class="eyebrow">Rotasi bermain</span><h2>{{ $playSession->court_count }} lapangan · {{ $confirmedRegistrations->count() }} pemain</h2></div></div>
     @if($playSession->status === 'scheduled')
-        <form method="post" action="{{ route('play-sessions.rotation', $playSession) }}" class="flex flex-wrap items-end gap-3" @if($rotationSchedule) onsubmit="return confirm('Ganti jadwal rotasi dengan jadwal baru?')" @endif>
+        <form method="post" action="{{ route('play-sessions.rotation', $playSession) }}" class="flex flex-wrap items-end gap-3" @if($rotationSchedule) onsubmit="return confirm('Generate ulang akan mengganti jadwal dan kembali menjadi draf. Lanjutkan?')" @endif>
             @csrf
             <input type="hidden" name="expected_version" value="{{ $rotationSchedule['version'] ?? 0 }}">
             <input type="hidden" name="roster_fingerprint" value="{{ $rotationFingerprint }}">
@@ -16,7 +16,17 @@
         <p class="mt-3 text-sm text-slate-500">Dari list utama, termasuk tamu. Minimal {{ $playSession->court_count * 4 }} pemain. Waiting tidak ikut.</p>
         @error('round_count')<p class="mt-2 text-sm text-red-700" role="alert">{{ $message }}</p>@enderror
     @endif
-    <x-rotation-schedule :schedule="$rotationSchedule" :stale="$rotationStale" />
+    @if($rotationStale)
+        <p class="mt-4 text-sm text-amber-800">List berubah. Generate ulang sebelum publikasi.</p>
+    @elseif($rotationSchedule)
+        <p class="mt-4 text-sm font-medium {{ $rotationPublished ? 'text-teal-700' : 'text-amber-800' }}">{{ $rotationPublished ? 'Dipublikasikan · member dapat melihat' : 'Draf · belum terlihat oleh member' }}</p>
+        <x-rotation-review :schedule="$rotationSchedule" />
+        @if(!$rotationPublished && $playSession->status === 'scheduled')
+            <form class="mt-4" method="post" action="{{ route('play-sessions.rotation.publish', $playSession) }}" data-confirm="Publikasikan jadwal ini untuk member?">
+                @csrf<input type="hidden" name="expected_version" value="{{ $rotationSchedule['version'] }}"><button class="btn primary">Publikasikan rotasi</button>
+            </form>
+        @endif
+    @endif
 </section>
 
 <section class="card table-card registration-admin-card">
@@ -58,7 +68,7 @@
         @php($isWaiting = $waitingRegistrations->contains('id', $registration->id))
         <tr @class(['waiting-registration-row' => $isWaiting])>
             <td><span @class(['queue-badge', 'waiting' => $isWaiting])>{{ $isWaiting ? 'W'.($waitingRegistrations->search(fn ($item) => $item->id === $registration->id) + 1) : '#'.($confirmedRegistrations->search(fn ($item) => $item->id === $registration->id) + 1) }}</span></td>
-            <td><strong>{{ $registration->name }}</strong><small>{{ $registration->guest_id ? 'Tamu' : ($registration->user ? 'Punya akun' : 'Data lama tanpa akun') }}{{ $registration->phone ? ' · '.$registration->phone : ' · WhatsApp tidak diisi' }}</small></td>
+            <td><div class="flex items-center gap-3"><x-player-avatar :member="$registration->user" :name="$registration->name" /><div><strong>{{ $registration->name }}</strong><small>{{ $registration->guest_id ? 'Tamu' : ($registration->user ? 'Member' : 'Data lama tanpa akun') }}{{ $registration->phone ? ' · '.$registration->phone : '' }}</small></div></div></td>
             <td>
                 <form method="post" action="{{ route('session-registrations.payment', [$playSession, $registration]) }}" class="quick-payment-form">
                     @csrf @method('patch')

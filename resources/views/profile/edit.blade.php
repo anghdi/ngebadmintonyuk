@@ -15,7 +15,7 @@
         <section class="card profile-form-card">
             <h2>Data diri</h2>
             @if(! $member->hasCompleteProfile())<p class="profile-required-note">Nama dan tanggal lahir wajib diisi.</p>@endif
-            <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="compact-form">
+            <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="compact-form" data-loading-message="Menyimpan profil…" data-upload-loading-message="Mengunggah dan menyimpan foto…">
                 @csrf @method('put')
                 <label>Nama lengkap<input name="name" value="{{ old('name', $member->name) }}" maxlength="255" autocomplete="name" required>@error('name')<span class="field-error">{{ $message }}</span>@enderror</label>
                 <div class="form-grid">

@@ -76,7 +76,7 @@
             <div class="card-head"><div><span class="eyebrow">Pemain</span><h2>{{ $confirmedRegistrations->count() }}/{{ $playSession->max_players }} slot utama</h2></div><span class="list-count-badge">{{ max(0, $playSession->max_players - $confirmedRegistrations->count()) }} tersedia</span></div>
             <ol class="participant-list">
                 @forelse($confirmedRegistrations as $participant)
-                    <li><span>{{ $loop->iteration }}</span><strong>{{ $participant->name }}</strong><small>{{ ['transfer' => 'Transfer', 'cash' => 'Tunai', 'membership' => 'Kuota'][$participant->payment_method] }}</small></li>
+                    <li><span>{{ $loop->iteration }}</span><div class="flex min-w-0 items-center gap-2"><x-player-avatar :member="auth()->check() ? $participant->user : null" :name="$participant->name" /><strong class="min-w-0 break-words text-sm">{{ $participant->name }}</strong></div><small>{{ ['transfer' => 'Transfer', 'cash' => 'Tunai', 'membership' => 'Kuota'][$participant->payment_method] }}</small></li>
                 @empty
                     <li class="empty">Belum ada pemain.</li>
                 @endforelse
@@ -85,7 +85,7 @@
             <div class="waiting-list-head"><div><span class="eyebrow">Antrean</span><h2>{{ $waitingRegistrations->count() }}/{{ $playSession->max_waiting_players }} pemain</h2></div></div>
             <ol class="participant-list waiting-list">
                 @forelse($waitingRegistrations as $participant)
-                    <li><span>W{{ $loop->iteration }}</span><strong>{{ $participant->name }}</strong><small>Menunggu slot</small></li>
+                    <li><span>W{{ $loop->iteration }}</span><div class="flex min-w-0 items-center gap-2"><x-player-avatar :member="auth()->check() ? $participant->user : null" :name="$participant->name" /><strong class="min-w-0 break-words text-sm">{{ $participant->name }}</strong></div><small>Menunggu slot</small></li>
                 @empty
                     <li class="empty">Belum ada antrean.</li>
                 @endforelse
@@ -94,6 +94,9 @@
     </div>
     <section id="rotasi" class="card detail-card mt-5">
         <div class="card-head"><div><span class="eyebrow">Giliran bermain</span><h2>Jadwal rotasi</h2></div></div>
-        <x-rotation-schedule :schedule="$rotationSchedule" :stale="$rotationStale" :current-user-id="auth()->id()" />
+        @if($rotationStale)<p class="text-sm text-amber-800">List berubah. Menunggu admin generate ulang dan publikasi.</p>
+        @elseif($rotationPublished)
+            @auth<a class="btn primary" href="{{ route('rotations.show', $playSession) }}">Lihat rotasi main</a>@else<p class="text-sm">Masuk untuk melihat rotasi main.</p>@endauth
+        @else<p class="text-sm text-slate-500">Menunggu rotasi disetujui admin.</p>@endif
     </section>
 @endsection

@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\GenerateRotationScheduleAction;
+use App\Actions\PublishRotationScheduleAction;
 use App\Models\Attendance;
 use App\Models\Guest;
 use App\Models\Income;
@@ -32,10 +33,17 @@ test('admin publishes all rounds from the main list including unpaid members and
     expect(Attendance::count())->toBe(0)->and(Income::count())->toBe(0);
     expect($session->registrations()->where('payment_status', 'paid')->count())->toBe(0);
 
-    $this->actingAsNotifiedMember($member)->get(route('public-sessions.show', $session))
-        ->assertOk()->assertSee('Ronde 6')->assertSee('Kamu main')->assertSee($guest->name)->assertDontSee($guest->phone ?? 'PRIVATE_PHONE');
+    $this->get(route('play-sessions.show', $session))->assertOk()->assertSee('Review 6 ronde')->assertSee('Publikasikan rotasi');
+    $this->actingAsNotifiedMember($member)->get(route('rotations.show', $session))->assertNotFound();
+    $this->get(route('rotations.index'))->assertOk()->assertSee('Belum ada rotasi');
+    $this->get(route('public-sessions.show', $session))->assertOk()->assertSee('Menunggu rotasi disetujui admin')->assertDontSee('Ronde 6');
+    $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 1])->assertSessionHasNoErrors();
+    $this->actingAsNotifiedMember($member)->get(route('rotations.show', $session))
+        ->assertOk()->assertSee('Ronde 6')->assertSee('Kamu main')->assertSee('Pasanganmu:')->assertSee($guest->name)->assertDontSee($guest->phone ?? 'PRIVATE_PHONE');
+    $this->get(route('rotations.index'))->assertOk()->assertSee($session->venue_name)->assertDontSee('Belum ada rotasi');
     $session->update(['scheduled_at' => now()->subHour()]);
-    $this->get(route('public-sessions.show', $session))->assertOk()->assertSee('Ronde 6');
+    $this->get(route('public-sessions.show', $session))->assertOk()->assertSee('Lihat rotasi main');
+    $this->get(route('rotations.show', $session))->assertOk()->assertSee('Ronde 6');
     $session->update(['status' => 'completed']);
     $this->get(route('public-sessions.show', $session))->assertOk();
     $session->update(['status' => 'cancelled']);
@@ -87,6 +95,7 @@ test('changed main roster hides old schedule but waiting and payment changes do 
     $service = app(RotationScheduleService::class);
     $roster = $service->roster($registrations);
     app(GenerateRotationScheduleAction::class)->handle($session, 3, 0, $service->fingerprint($roster, 1));
+    app(PublishRotationScheduleAction::class)->handle($session, 1);
     $session->refresh();
     SessionRegistration::factory()->for($session)->create();
     $registrations[0]->update(['payment_status' => 'paid', 'attendance_status' => 'present']);
@@ -136,4 +145,26 @@ test('members cannot generate schedules and session court count is validated', f
     unset($data['court_count']);
     $this->post(route('play-sessions.store'), $data)->assertSessionHasNoErrors();
     expect(PlaySession::query()->latest('id')->first()->court_count)->toBe(1);
+});
+
+test('publishing rejects stale drafts and regeneration requires a new review', function () {
+    $session = PlaySession::factory()->create(['max_players' => 4]);
+    $registrations = SessionRegistration::factory()->for($session)->count(4)->create();
+    $service = app(RotationScheduleService::class);
+    app(GenerateRotationScheduleAction::class)->handle($session, 3, 0, $service->fingerprint($service->roster($registrations), 1));
+    $this->actingAsNotifiedMember(User::factory()->member()->create())->postJson(route('play-sessions.rotation.publish', $session), ['expected_version' => 1])->assertForbidden();
+    $this->actingAs(User::factory()->admin()->create());
+    $this->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 2])->assertSessionHasErrors('rotation');
+    expect($session->refresh()->rotation_schedule['published_at'])->toBeNull();
+    $this->flushSession();
+    $this->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 1])->assertSessionHasNoErrors();
+    $publishedAt = $session->refresh()->rotation_schedule['published_at'];
+    $this->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 1])->assertSessionHasNoErrors();
+    expect($session->refresh()->rotation_schedule['published_at'])->toBe($publishedAt);
+    app(GenerateRotationScheduleAction::class)->handle($session, 6, 1, $service->fingerprint($service->roster($registrations), 1));
+    expect($session->refresh()->rotation_schedule['published_at'])->toBeNull()->and($session->rotation_schedule['version'])->toBe(2);
+    $this->actingAsNotifiedMember(User::factory()->member()->create())->get(route('rotations.show', $session))->assertNotFound();
+    $registrations[0]->update(['name' => 'Replaced player']);
+    $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 2])->assertSessionHasErrors('rotation');
+    expect($session->refresh()->rotation_schedule['published_at'])->toBeNull();
 });

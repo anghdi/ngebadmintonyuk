@@ -33,7 +33,7 @@ class GenerateRotationScheduleAction
                 throw ValidationException::withMessages(['round_count' => 'List atau jadwal telah berubah. Muat ulang halaman sebelum generate.']);
             }
 
-            $locked->rotation_schedule = $this->schedules->generate($roster, $locked->court_count, $roundCount) + ['version' => $expectedVersion + 1];
+            $locked->rotation_schedule = $this->schedules->generate($roster, $locked->court_count, $roundCount) + ['version' => $expectedVersion + 1, 'published_at' => null];
             $locked->save();
         });
     }
