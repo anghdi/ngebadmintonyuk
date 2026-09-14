@@ -30,7 +30,7 @@
     @endif
 >
 <a class="skip-link" href="#main-content">Lewati ke konten</a>
-<div class="shell">
+<div class="shell" @if(! auth()->user()->hasCompleteProfile() && ! request()->routeIs('profile.*')) inert @endif>
     <aside id="sidebar" aria-label="Navigasi utama">
         <div class="sidebar-head">
             <a href="{{ route('dashboard') }}" class="brand" aria-label="NgeKas — NgeBadmintonYuk">
@@ -47,10 +47,14 @@
             <a @class(['active' => request()->routeIs('public-sessions.*')]) href="{{ route('public-sessions.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="calendar" /></span> Jadwal Main</a>
             <a @class(['active' => request()->routeIs('scoreboard')]) href="{{ route('scoreboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="score" /></span> Papan Skor</a>
             <a @class(['active' => request()->routeIs('story-studio')]) href="{{ route('story-studio') }}"><span class="nav-icon-wrap"><x-nav-icon name="camera" /></span> Story Studio</a>
+            @if(! auth()->user()->isAdmin())
+                <a @class(['active' => request()->routeIs('profile.*')]) href="{{ route('profile.edit') }}"><span class="nav-icon-wrap"><x-nav-icon name="users" /></span> Profil Saya</a>
+            @endif
             <a @class(['active' => request()->routeIs('top-ups.*')]) href="{{ route('top-ups.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="wallet" /></span> {{ auth()->user()->isAdmin() ? 'Verifikasi Top Up' : 'Top Up Kuota' }}</a>
             @if(auth()->user()->isAdmin())
                 <p>KOMUNITAS</p>
                 <a @class(['active' => request()->routeIs('members.*')]) href="{{ route('members.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="users" /></span> Member</a>
+                <a @class(['active' => request()->routeIs('guests.*')]) href="{{ route('guests.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="users" /></span> Tamu</a>
                 <a @class(['active' => request()->routeIs('play-sessions.*')]) href="{{ route('play-sessions.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="session" /></span> Sesi Bermain</a>
                 <a @class(['active' => request()->routeIs('inventory.*')]) href="{{ route('inventory.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="shuttlecock" /></span> Shuttlecock</a>
                 <p>KEUANGAN</p>
@@ -104,7 +108,7 @@
                     </div>
                 </details>
                 <div class="user-summary">
-                <span class="user-avatar"><img src="{{ asset('pwa-icon-192.png') }}" alt=""></span>
+                <span class="user-avatar"><img src="{{ ! auth()->user()->isAdmin() && auth()->user()->avatar_path ? route('profile.avatar') : asset('pwa-icon-192.png') }}" alt=""></span>
                 <span><b>{{ auth()->user()->name }}</b><small>{{ auth()->user()->isAdmin() ? 'Admin' : 'Member' }}</small></span>
                 </div>
             </div>
@@ -133,6 +137,7 @@
 
 
 @stack('scripts')
+<x-profile-required />
 <x-app-update />
 <x-server-loading />
 </body>

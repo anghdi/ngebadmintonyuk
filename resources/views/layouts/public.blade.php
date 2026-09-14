@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ route('app.css') }}">
 </head>
 <body class="public-page">
+<div @if(auth()->check() && ! auth()->user()->hasCompleteProfile()) inert @endif>
 <a class="skip-link" href="#public-content">Lewati ke konten</a>
 <header class="public-nav">
     <a href="{{ route('public-sessions.index') }}" class="public-brand"><img src="{{ asset('logo.png') }}" alt="NgeBadmintonYuk"></a>
@@ -36,6 +37,8 @@
     @endif
     @yield('content')
 </main>
+</div>
+<x-profile-required />
 <x-app-update />
 <x-server-loading />
 </body>

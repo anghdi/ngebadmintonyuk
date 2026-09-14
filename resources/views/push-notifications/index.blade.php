@@ -14,6 +14,15 @@
 
     <x-push-notification-navigation />
 
+    @if($birthdayMembers->isNotEmpty())
+        <section class="birthday-list" aria-label="Ulang tahun hari ini">
+            <h2>Ulang tahun hari ini</h2>
+            @foreach($birthdayMembers as $birthdayMember)
+                <a href="{{ route('push-notifications.index', ['birthday' => $birthdayMember->id]) }}">{{ $birthdayMember->nickname ?: $birthdayMember->name }} <span>Buat ucapan</span></a>
+            @endforeach
+        </section>
+    @endif
+
     <div class="admin-split notification-layout">
         <section class="card notification-form-card">
             <span class="eyebrow">Pesan baru</span>
@@ -44,10 +53,10 @@
                     </select>
                 </label>
                 <label>Judul
-                    <input name="title" value="{{ old('title') }}" maxlength="255" placeholder="Contoh: Jadwal main Jumat dibuka" required>
+                    <input name="title" value="{{ old('title', $birthdayTitle) }}" maxlength="255" placeholder="Contoh: Jadwal main Jumat dibuka" required>
                 </label>
                 <label>Isi notifikasi
-                    <textarea name="body" rows="4" maxlength="500" placeholder="Tulis informasi singkat dan jelas." required>{{ old('body') }}</textarea>
+                    <textarea name="body" rows="4" maxlength="500" placeholder="Tulis informasi singkat dan jelas." required>{{ old('body', $birthdayBody) }}</textarea>
                 </label>
                 <button class="btn primary full">Kirim sekarang</button>
             </form>

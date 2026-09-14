@@ -9,12 +9,20 @@ use App\Models\PushNotification;
 use App\Models\PushSubscription;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PushNotificationController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $birthdayMembers = User::query()->where('role', 'member')
+            ->whereMonth('date_of_birth', today()->month)
+            ->whereDay('date_of_birth', today()->day)
+            ->select(['id', 'name', 'nickname'])->orderBy('name')->get();
+        $birthdayMember = $birthdayMembers->firstWhere('id', (int) $request->query('birthday'));
+        $birthdayTitle = $birthdayMember ? 'Selamat ulang tahun, '.($birthdayMember->nickname ?: $birthdayMember->name).'!' : '';
+        $birthdayBody = $birthdayMember ? 'Hari ini '.($birthdayMember->nickname ?: $birthdayMember->name).' ulang tahun. Semoga sehat selalu. Sampai ketemu di lapangan!' : '';
         $playSessions = PlaySession::query()
             ->where('scheduled_at', '>=', now())
             ->where('status', 'scheduled')
@@ -29,7 +37,7 @@ class PushNotificationController extends Controller
             ->whereHas('user', fn ($query) => $query->where('role', 'member'))
             ->count();
 
-        return view('push-notifications.index', compact('playSessions', 'notifications', 'subscriptionCount'));
+        return view('push-notifications.index', compact('playSessions', 'notifications', 'subscriptionCount', 'birthdayMembers', 'birthdayTitle', 'birthdayBody'));
     }
 
     public function store(SendPushNotificationRequest $request, SendPushNotificationAction $sendPushNotification): RedirectResponse

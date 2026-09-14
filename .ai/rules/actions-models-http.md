@@ -34,3 +34,9 @@ This supersedes guest registration and phone-backed sanctions. Every new public 
 
 ## Play sessions include an ordered waiting list and linked income
 Each session has max_players plus admin-managed max_waiting_players. Registrations are ordered by id: entries beyond max_players are waiting and promote automatically when an earlier unpaid registration is removed; reject only when both capacities are full. Only confirmed players may be marked paid. Admin payment confirmation must atomically create one linked Iuran Lapangan income, and reverting payment removes that linked income.
+
+## Member profile and birth date are mandatory before joining
+All non-admin members, including existing accounts, must fill a name and valid date_of_birth before joining any new session. Date of birth stays private; birthday greetings are admin-initiated drafts only, never automatic sends or an opt-in workflow. Enforce registration in middleware and actions, including admin additions/replacements; historical attendance corrections stay available. Preserve device-specific notification setup before member features.
+
+## Admin-managed guests may join without member accounts
+This supersedes the account-only rule for admin additions only. Admin keeps reusable Guest contacts and may add guest_id registrations with no user_id, birth date or push subscription. Public self-registration still requires a complete member account. Guests share atomic capacity, waiting order, linked cash/transfer income and three-no-show sanctions keyed by guest_id. Guest attendance stays on SessionRegistration and never consumes membership credits; contact edits do not rewrite historical snapshots.

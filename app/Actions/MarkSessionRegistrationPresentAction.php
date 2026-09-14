@@ -12,16 +12,18 @@ class MarkSessionRegistrationPresentAction
     public function __construct(
         private RecordSessionRegistrationPaymentAction $recordPayment,
         private UpdateSessionRegistrationAction $updateRegistration,
+        private UpdateGuestAttendanceAction $updateGuestAttendance,
     ) {}
 
     public function handle(SessionRegistration $registration, User $administrator): SessionRegistration
     {
         return DB::transaction(function () use ($registration, $administrator): SessionRegistration {
+            $registration->playSession()->lockForUpdate()->firstOrFail();
             $lockedRegistration = SessionRegistration::query()
                 ->lockForUpdate()
                 ->findOrFail($registration->id);
 
-            if ($lockedRegistration->user_id === null) {
+            if ($lockedRegistration->user_id === null && $lockedRegistration->guest_id === null) {
                 throw ValidationException::withMessages([
                     'attendance' => 'Data lama tanpa akun harus diperbarui terlebih dahulu.',
                 ]);
@@ -37,6 +39,12 @@ class MarkSessionRegistrationPresentAction
                 $lockedRegistration->payment_method !== 'membership',
                 $administrator,
             );
+
+            if ($lockedRegistration->guest_id !== null) {
+                return $this->updateGuestAttendance->handle($lockedRegistration, [
+                    'attendance_status' => 'present', 'admin_notes' => $lockedRegistration->admin_notes,
+                ], $administrator);
+            }
 
             return $this->updateRegistration->handle($lockedRegistration, [
                 'user_id' => $lockedRegistration->user_id,

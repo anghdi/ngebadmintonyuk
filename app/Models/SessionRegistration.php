@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
  * @property int $id
  * @property int $play_session_id
  * @property int|null $user_id
+ * @property int|null $guest_id
  * @property string $name
  * @property string|null $phone
  * @property string $payment_method
@@ -24,7 +25,7 @@ use Illuminate\Support\Str;
  * @property int|null $income_id
  * @property Carbon|null $checked_at
  */
-#[Fillable(['play_session_id', 'user_id', 'name', 'phone', 'payment_method', 'payment_status', 'attendance_status', 'admin_notes', 'checked_by', 'checked_at', 'income_id'])]
+#[Fillable(['play_session_id', 'user_id', 'guest_id', 'name', 'phone', 'payment_method', 'payment_status', 'attendance_status', 'admin_notes', 'checked_by', 'checked_at', 'income_id'])]
 class SessionRegistration extends Model
 {
     /** @use HasFactory<SessionRegistrationFactory> */
@@ -65,6 +66,12 @@ class SessionRegistration extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /** @return BelongsTo<Guest, $this> */
+    public function guest(): BelongsTo
+    {
+        return $this->belongsTo(Guest::class);
     }
 
     /** @return BelongsTo<User, $this> */

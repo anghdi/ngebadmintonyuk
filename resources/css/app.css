@@ -1139,3 +1139,35 @@
     .story-preview { padding: .8rem; }
     .story-preview canvas { width: min(100%, 250px); }
 }
+
+@layer components {
+    .profile-page { max-width: 1050px; margin-inline: auto; }
+    .profile-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e1e5ed; padding-bottom: 1.25rem; }
+    .profile-avatar { display: grid; width: 64px; height: 64px; flex: 0 0 64px; place-items: center; overflow: hidden; border-radius: 50%; background: #e9efff; color: #2455f5; font-size: 1.2rem; font-weight: 800; }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-summary-name { display: grid; flex: 1; gap: .2rem; min-width: 140px; }
+    .profile-summary-name strong { font-size: 1rem; overflow-wrap: anywhere; }
+    .profile-summary-name span, .profile-stat span { color: #737b8c; font-size: .7rem; }
+    .profile-stat { display: grid; gap: .15rem; min-width: 85px; border-left: 1px solid #e1e5ed; padding-left: 1rem; }
+    .profile-stat strong { color: #172a63; font-size: 1.3rem; }
+    .profile-form-card h2, .profile-password-card h2 { margin-bottom: 1rem; font-size: 1rem; }
+    .profile-private-note { color: #737b8c; font-size: .7rem; }
+    .profile-required-note { border-radius: 8px; background: #fff8df; color: #79611c; padding: .6rem .75rem; font-size: .75rem; }
+    .profile-required-dialog { position: fixed; inset: 0; z-index: 2000; width: 100%; height: 100dvh; max-width: none; max-height: none; margin: 0; border: 0; background: rgb(10 22 45 / 75%); padding: 1rem; backdrop-filter: blur(4px); }
+    .profile-required-dialog[open] { display: grid; place-items: center; }
+    .profile-required-dialog::backdrop { background: transparent; }
+    .profile-required-card { width: min(100%, 360px); border-radius: 16px; background: white; padding: 1.5rem; text-align: center; }
+    .profile-required-icon { display: grid; width: 48px; height: 48px; place-items: center; margin: 0 auto 1rem; border-radius: 12px; background: #e9efff; color: #2455f5; }
+    .profile-required-card h2 { margin: 0; color: #172a63; font-size: 1.15rem; font-weight: 700; }
+    .profile-required-card p { margin: .6rem 0 1.2rem; color: #737b8c; font-size: .8rem; line-height: 1.5; }
+    .profile-logout { min-height: 40px; margin-top: .35rem; border: 0; background: transparent; color: #737b8c; font: inherit; font-size: .72rem; cursor: pointer; }
+    .birthday-list { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-bottom: 1.25rem; border-left: 3px solid #ffd23f; background: white; padding: .85rem 1rem; }
+    .birthday-list h2 { width: 100%; margin: 0 0 .1rem; font-size: .85rem; }
+    .birthday-list a { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .5rem; border: 1px solid #e1e5ed; border-radius: 8px; padding: .45rem .65rem; color: #172a63; font-size: .75rem; }
+    .birthday-list a span { color: #2455f5; font-size: .65rem; }
+}
+
+@media (max-width: 640px) {
+    .profile-stat { flex: 1; }
+    .profile-summary-name { flex-basis: calc(100% - 90px); }
+}

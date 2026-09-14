@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateGuestSessionRegistrationAction;
 use App\Actions\CreateSessionRegistrationByAdminAction;
 use App\Actions\DeleteSessionRegistrationAction;
 use App\Actions\MarkSessionRegistrationPresentAction;
 use App\Actions\RecordSessionRegistrationPaymentAction;
 use App\Actions\RegisterForPlaySessionAction;
 use App\Actions\SendSessionRegistrationNotificationAction;
+use App\Actions\UpdateGuestAttendanceAction;
 use App\Actions\UpdateSessionRegistrationAction;
 use App\Http\Requests\CancelSessionRegistrationRequest;
 use App\Http\Requests\MarkSessionRegistrationPresentRequest;
+use App\Http\Requests\StoreGuestSessionRegistrationRequest;
 use App\Http\Requests\StoreSessionRegistrationByAdminRequest;
 use App\Http\Requests\StoreSessionRegistrationRequest;
+use App\Http\Requests\UpdateGuestAttendanceRequest;
 use App\Http\Requests\UpdateSessionRegistrationPaymentRequest;
 use App\Http\Requests\UpdateSessionRegistrationRequest;
 use App\Models\PlaySession;
@@ -22,6 +26,23 @@ use Illuminate\Http\Request;
 
 class SessionRegistrationController extends Controller
 {
+    public function storeGuest(StoreGuestSessionRegistrationRequest $request, PlaySession $playSession, CreateGuestSessionRegistrationAction $create, SendSessionRegistrationNotificationAction $sendNotification): RedirectResponse
+    {
+        $registration = $create->handle($playSession, $request->validated());
+        $sendNotification->joined($registration, $playSession, $request->user());
+        $position = $playSession->registrations()->where('id', '<=', $registration->id)->count();
+        $listName = $position > $playSession->max_players ? 'waiting list' : 'daftar pemain';
+
+        return back()->with('success', "{$registration->name} ditambahkan ke {$listName}.");
+    }
+
+    public function updateGuestAttendance(UpdateGuestAttendanceRequest $request, PlaySession $playSession, SessionRegistration $registration, UpdateGuestAttendanceAction $update): RedirectResponse
+    {
+        $update->handle($registration, $request->validated(), $request->user());
+
+        return back()->with('success', 'Absensi tamu diperbarui.');
+    }
+
     public function store(StoreSessionRegistrationRequest $request, PlaySession $playSession, RegisterForPlaySessionAction $register, SendSessionRegistrationNotificationAction $sendNotification): RedirectResponse
     {
         $registration = $register->handle($playSession, $request->validated(), $request->user());

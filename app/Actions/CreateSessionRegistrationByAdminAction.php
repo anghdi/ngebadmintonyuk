@@ -64,6 +64,9 @@ class CreateSessionRegistrationByAdminAction
     private function resolveIdentity(array $data): array
     {
         $member = User::query()->where('role', 'member')->findOrFail($data['user_id']);
+        if (! $member->hasCompleteProfile()) {
+            throw ValidationException::withMessages(['user_id' => 'Member harus melengkapi profil terlebih dahulu.']);
+        }
         $phone = $member->phone ? SessionRegistration::normalizePhone($member->phone) : null;
 
         return [$member, $member->name, $phone];

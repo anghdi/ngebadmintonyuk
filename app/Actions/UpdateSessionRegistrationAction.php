@@ -16,12 +16,19 @@ class UpdateSessionRegistrationAction
     /** @param array{user_id: int, name: string, phone?: string|null, attendance_status: string, admin_notes?: string|null} $data */
     public function handle(SessionRegistration $registration, array $data, User $administrator): SessionRegistration
     {
+        if ($registration->guest_id !== null) {
+            throw ValidationException::withMessages(['account' => 'Gunakan formulir absensi tamu.']);
+        }
         try {
             return DB::transaction(function () use ($registration, $data, $administrator): SessionRegistration {
                 $playSession = $registration->playSession()->lockForUpdate()->firstOrFail();
                 User::query()->lockForUpdate()->findOrFail($data['user_id']);
                 $lockedRegistration = SessionRegistration::query()->lockForUpdate()->findOrFail($registration->id);
                 [$member, $name, $phone] = $this->resolveIdentity($data);
+
+                if ($lockedRegistration->user_id !== $member->id && ! $member->hasCompleteProfile()) {
+                    throw ValidationException::withMessages(['user_id' => 'Member harus melengkapi profil terlebih dahulu.']);
+                }
 
                 if ($lockedRegistration->user_id !== $member->id
                     && ($lockedRegistration->payment_status === 'paid' || $lockedRegistration->attendance_status !== 'listed')) {

@@ -7,6 +7,7 @@ use App\Actions\UpdatePlaySessionAction;
 use App\Http\Requests\FilterPlaySessionsRequest;
 use App\Http\Requests\StorePlaySessionRequest;
 use App\Http\Requests\UpdatePlaySessionRequest;
+use App\Models\Guest;
 use App\Models\Membership;
 use App\Models\PlaySession;
 use App\Models\SessionRegistration;
@@ -91,6 +92,11 @@ class PlaySessionController extends Controller
             ->groupBy('user_id')
             ->pluck('total', 'user_id');
         $attendances = $playSession->attendances->keyBy('user_id');
+        $availableGuests = Guest::query()->whereNotIn('id', $registrations->pluck('guest_id')->filter())->orderBy('name')->get(['id', 'name', 'phone']);
+        $guestNoShowCounts = SessionRegistration::query()
+            ->whereIn('guest_id', $registrations->pluck('guest_id')->filter())
+            ->where('attendance_status', 'no_show')->select('guest_id')
+            ->selectRaw('COUNT(*) as total')->groupBy('guest_id')->pluck('total', 'guest_id');
         $members = User::query()
             ->where('role', 'member')
             ->with(['memberships' => fn ($query) => $query->withSum('transactions as balance', 'quantity')])
@@ -110,6 +116,6 @@ class PlaySessionController extends Controller
             return [$member->id => (int) $balance];
         });
 
-        return view('play-sessions.show', compact('playSession', 'members', 'availableMembers', 'attendances', 'compatibleBalances', 'registrations', 'confirmedRegistrations', 'waitingRegistrations', 'noShowCounts'));
+        return view('play-sessions.show', compact('playSession', 'members', 'availableMembers', 'availableGuests', 'guestNoShowCounts', 'attendances', 'compatibleBalances', 'registrations', 'confirmedRegistrations', 'waitingRegistrations', 'noShowCounts'));
     }
 }

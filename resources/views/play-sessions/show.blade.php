@@ -22,17 +22,31 @@
         <div class="capacity-full-note">Slot utama dan waiting list sudah penuh.</div>
     @endif
     <div class="admin-list-legend"><span><i class="main"></i> Slot utama</span><span><i class="waiting"></i> Waiting list</span></div>
+    @if($registrations->count() < $playSession->max_players + $playSession->max_waiting_players && $playSession->status === 'scheduled' && $playSession->scheduled_at->isFuture())
+        <details class="registration-create-panel">
+            <summary>+ Masukkan tamu</summary>
+            @if($availableGuests->isNotEmpty())
+                <form method="post" action="{{ route('session-guests.store', $playSession) }}" class="registration-create-form">
+                    @csrf
+                    <label>Tamu<select name="guest_id" required><option value="">Pilih tamu</option>@foreach($availableGuests as $guest)<option value="{{ $guest->id }}">{{ $guest->name }}{{ $guest->phone ? ' · '.$guest->phone : '' }}</option>@endforeach</select></label>
+                    <label>Pembayaran<select name="payment_method" required><option value="cash">Tunai</option><option value="transfer">Transfer</option></select></label>
+                    <button class="btn primary">Tambahkan</button>
+                </form>
+            @endif
+            <a class="link" href="{{ route('guests.index') }}">Tambah atau kelola tamu</a>
+        </details>
+    @endif
     <table class="registration-table"><thead><tr><th>SLOT</th><th>PEMAIN</th><th>PEMBAYARAN</th><th>STATUS</th><th>RIWAYAT</th><th>PERBARUI</th></tr></thead><tbody>
     @forelse($registrations as $registration)
-        @php($noShows = (int) $noShowCounts->get($registration->user_id, 0))
+        @php($noShows = (int) ($registration->guest_id ? $guestNoShowCounts->get($registration->guest_id, 0) : $noShowCounts->get($registration->user_id, 0)))
         @php($isWaiting = $waitingRegistrations->contains('id', $registration->id))
         <tr @class(['waiting-registration-row' => $isWaiting])>
             <td><span @class(['queue-badge', 'waiting' => $isWaiting])>{{ $isWaiting ? 'W'.($waitingRegistrations->search(fn ($item) => $item->id === $registration->id) + 1) : '#'.($confirmedRegistrations->search(fn ($item) => $item->id === $registration->id) + 1) }}</span></td>
-            <td><strong>{{ $registration->name }}</strong><small>{{ $registration->user ? 'Punya akun' : 'Data lama tanpa akun' }}{{ $registration->phone ? ' · '.$registration->phone : ' · WhatsApp tidak diisi' }}</small></td>
+            <td><strong>{{ $registration->name }}</strong><small>{{ $registration->guest_id ? 'Tamu' : ($registration->user ? 'Punya akun' : 'Data lama tanpa akun') }}{{ $registration->phone ? ' · '.$registration->phone : ' · WhatsApp tidak diisi' }}</small></td>
             <td>
                 <form method="post" action="{{ route('session-registrations.payment', [$playSession, $registration]) }}" class="quick-payment-form">
                     @csrf @method('patch')
-                    <select name="payment_method" aria-label="Metode pembayaran {{ $registration->name }}"><option value="transfer" @selected($registration->payment_method === 'transfer')>Transfer</option><option value="cash" @selected($registration->payment_method === 'cash')>Tunai</option><option value="membership" @selected($registration->payment_method === 'membership')>Kuota membership</option></select>
+                    <select name="payment_method" aria-label="Metode pembayaran {{ $registration->name }}"><option value="transfer" @selected($registration->payment_method === 'transfer')>Transfer</option><option value="cash" @selected($registration->payment_method === 'cash')>Tunai</option>@if(! $registration->guest_id)<option value="membership" @selected($registration->payment_method === 'membership')>Kuota membership</option>@endif</select>
                     <input type="hidden" name="is_paid" value="0">
                     @if($registration->payment_method === 'membership')
                         <small>{{ $registration->payment_status === 'paid' ? '1 kuota terpakai' : 'Kuota dipotong saat hadir' }}</small>
@@ -46,7 +60,7 @@
             <td><span class="status-pill {{ $registration->attendance_status === 'present' ? 'active' : ($registration->attendance_status === 'no_show' ? 'danger' : 'muted') }}">{{ ['listed' => 'Terdaftar', 'present' => 'Hadir', 'no_show' => 'Tidak hadir'][$registration->attendance_status] }}</span></td>
             <td><strong>{{ $noShows }}/3</strong><small>{{ $noShows >= 3 ? 'Diblokir' : 'Tidak hadir' }}</small></td>
             <td>
-                @if(! $isWaiting && $registration->user_id && $registration->attendance_status !== 'present')
+                @if(! $isWaiting && ($registration->user_id || $registration->guest_id) && $registration->attendance_status !== 'present')
                     @php($quickPresentLabel = match (true) {
                         $registration->payment_method === 'membership' => 'Hadir + 1 kuota',
                         $registration->payment_status === 'unpaid' => 'Hadir + lunasi',
@@ -64,24 +78,28 @@
                     </form>
                 @elseif($isWaiting)
                     <span class="quick-present-unavailable">Menunggu slot utama</span>
-                @elseif(! $registration->user_id)
+                @elseif(! $registration->user_id && ! $registration->guest_id)
                     <span class="quick-present-unavailable">Hubungkan akun dahulu</span>
                 @else
                     <span class="quick-present-complete">✓ Sudah hadir</span>
                 @endif
                 <details class="registration-editor">
                     <summary>Edit data</summary>
-                    <form method="post" action="{{ route('session-registrations.update', [$playSession, $registration]) }}" class="session-registration-form">
+                    <form method="post" action="{{ route($registration->guest_id ? 'session-guests.attendance' : 'session-registrations.update', [$playSession, $registration]) }}" class="session-registration-form">
                         @csrf @method('put')
+                        @if(! $registration->guest_id)
                         <label>Akun pemain<select name="user_id" data-member-select required><option value="">Pilih akun</option>@foreach($members as $member)<option value="{{ $member->id }}" data-member-name="{{ $member->name }}" data-member-phone="{{ $member->phone }}" @selected($registration->user_id === $member->id)>{{ $member->name }}</option>@endforeach</select></label>
                         <label>Nama<input name="name" value="{{ $registration->name }}" required></label>
                         <label>WhatsApp <span class="optional">Opsional</span><input name="phone" value="{{ $registration->phone }}" inputmode="numeric"></label>
+                        @else
+                        <p>Tamu: {{ $registration->name }}</p>
+                        @endif
                         <label>Kehadiran<select name="attendance_status"><option value="listed" @selected($registration->attendance_status === 'listed')>Terdaftar</option><option value="present" @selected($registration->attendance_status === 'present')>Hadir</option><option value="no_show" @selected($registration->attendance_status === 'no_show')>Tidak hadir</option></select></label>
                         <label class="registration-notes">Catatan<input name="admin_notes" value="{{ $registration->admin_notes }}"></label>
                         <button class="btn primary">Simpan</button>
                     </form>
                     @if($registration->attendance_status === 'listed' && $registration->payment_status === 'unpaid')
-                        <form method="post" action="{{ route('session-registrations.destroy', [$playSession, $registration]) }}" class="registration-delete" onsubmit="return confirm('Keluarkan member ini dari listing?')">@csrf @method('delete')<button class="link danger">Keluarkan dari listing</button></form>
+                        <form method="post" action="{{ route('session-registrations.destroy', [$playSession, $registration]) }}" class="registration-delete" onsubmit="return confirm('Keluarkan pemain ini dari listing?')">@csrf @method('delete')<button class="link danger">Keluarkan dari listing</button></form>
                     @endif
                 </details>
             </td>

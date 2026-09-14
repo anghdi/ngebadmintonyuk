@@ -5,6 +5,7 @@
 
 <section class="card member-edit-card">
     <div><span class="eyebrow">Data member</span><h2>Informasi akun</h2></div>
+    <p>Tanggal lahir: <strong>{{ $member->date_of_birth?->translatedFormat('d M Y') ?: 'Belum diisi' }}</strong></p>
     <form method="post" action="{{ route('members.update', $member) }}" class="setting-form">
         @csrf @method('put')
         <label>Nama<input name="name" value="{{ old('name', $member->name) }}" required></label>

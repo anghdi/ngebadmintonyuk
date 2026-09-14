@@ -18,6 +18,10 @@ use Illuminate\Support\Str;
  * @property string $name
  * @property string $email
  * @property string|null $phone
+ * @property Carbon|null $date_of_birth
+ * @property string|null $nickname
+ * @property string|null $playing_level
+ * @property string|null $avatar_path
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string $role
@@ -25,8 +29,8 @@ use Illuminate\Support\Str;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'phone', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+#[Fillable(['name', 'email', 'phone', 'password', 'date_of_birth', 'nickname', 'playing_level', 'avatar_path'])]
+#[Hidden(['password', 'remember_token', 'date_of_birth', 'avatar_path'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -42,6 +46,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'date_of_birth' => 'date',
         ];
     }
 
@@ -102,5 +107,13 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function hasCompleteProfile(): bool
+    {
+        return $this->isAdmin() || (trim($this->name) !== ''
+            && $this->date_of_birth !== null
+            && $this->date_of_birth->lessThanOrEqualTo(today())
+            && $this->date_of_birth->greaterThanOrEqualTo(today()->subYears(120)));
     }
 }

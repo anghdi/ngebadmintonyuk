@@ -48,6 +48,11 @@ class UserFactory extends Factory
 
     public function member(): static
     {
-        return $this->state(fn (array $attributes) => ['role' => 'member']);
+        return $this->state(fn (array $attributes) => ['role' => 'member', 'date_of_birth' => '1995-05-20']);
+    }
+
+    public function incompleteProfile(): static
+    {
+        return $this->member()->state(fn (array $attributes) => ['date_of_birth' => null]);
     }
 }

@@ -14,6 +14,10 @@ class RegisterForPlaySessionAction
     /** @param array{phone?: string|null, payment_method: string} $data */
     public function handle(PlaySession $playSession, array $data, User $user): SessionRegistration
     {
+        if (! $user->hasCompleteProfile()) {
+            throw ValidationException::withMessages(['profile' => 'Lengkapi profil sebelum ikut sesi.']);
+        }
+
         try {
             return DB::transaction(function () use ($playSession, $data, $user): SessionRegistration {
                 $lockedSession = PlaySession::query()->lockForUpdate()->findOrFail($playSession->id);
