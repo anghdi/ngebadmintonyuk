@@ -1091,3 +1091,51 @@
     .app-update { align-items: stretch; flex-direction: column; gap: .65rem; }
     .app-update-actions { justify-content: flex-end; }
 }
+
+@layer components {
+    .story-studio { max-width: 1100px; margin-inline: auto; }
+    .story-studio .page-heading { margin-bottom: 1.25rem; }
+    .story-preview canvas[data-draggable] { touch-action: none; cursor: grab; }
+    .story-preview canvas[data-draggable]:active { cursor: grabbing; }
+    .story-preview { display: grid; justify-items: center; gap: 1rem; border-radius: 16px; background: #e8ecf2; padding: 1.25rem; }
+    .story-preview-meta { display: flex; width: 100%; justify-content: space-between; gap: 1rem; color: #657084; font-size: .65rem; font-weight: 700; letter-spacing: .06em; }
+    .story-preview canvas { display: block; width: min(100%, 320px); height: auto; aspect-ratio: 9 / 16; border-radius: 8px; box-shadow: 0 12px 30px rgb(16 38 86 / 15%); }
+    .story-preview > p { margin: 0; color: #657084; font-size: .72rem; text-align: center; }
+    .story-controls { min-width: 0; }
+    .story-control-section { display: grid; gap: .85rem; border-bottom: 1px solid #e1e5ed; padding-block: 1rem; }
+    .story-control-section:first-child { padding-top: 0; }
+    .story-control-section h2 { display: flex; align-items: baseline; gap: .7rem; margin: 0; color: #8791a3; font-size: .7rem; }
+    .story-control-section h2 span { color: #172a63; font-size: .95rem; }
+    .story-control-section small, .story-export small { color: #737b8c; font-size: .7rem; line-height: 1.5; }
+    .story-control-section .btn { gap: .4rem; min-height: 44px; }
+    .story-theme { position: relative; display: grid; gap: .5rem; border: 1px solid #dce1eb; border-radius: 10px; padding: .55rem; cursor: pointer; }
+    .story-theme input { position: absolute; right: .75rem; bottom: .6rem; width: 16px; height: 16px; accent-color: #2455f5; }
+    .story-theme:has(input:checked) { border-color: #2455f5; outline: 2px solid rgb(36 85 245 / 12%); }
+    .story-theme:focus-within { outline: 3px solid rgb(36 85 245 / 25%); }
+    .story-theme b { padding-right: 1.25rem; font-size: .7rem; }
+    .story-swatch { display: block; height: 68px; border-radius: 5px; background: linear-gradient(125deg, #102656 0 65%, #ffd23f 65% 74%, #2455f5 74%); }
+    .story-swatch-yellow { background: linear-gradient(125deg, #ffd23f 0 65%, #102656 65% 74%, #2455f5 74%); }
+    .story-control-section fieldset[data-story-adjust] { display: grid; gap: .7rem; min-width: 0; }
+    .story-control-section fieldset:disabled { opacity: .45; }
+    .story-control-section fieldset[data-story-adjust] label { display: grid; gap: .3rem; font-size: .72rem; }
+    .story-control-section input[type=range] { width: 100%; min-height: 28px; padding: 0; border: 0; accent-color: #2455f5; }
+    .story-reset { justify-self: start; min-height: 36px; border: 0; background: transparent; color: #2455f5; font: inherit; font-size: .72rem; font-weight: 700; cursor: pointer; }
+    .story-design-picker { display: grid; gap: .85rem; margin-bottom: 1.5rem; }
+    .story-design-picker h2 { display: flex; gap: .7rem; align-items: baseline; margin: 0; color: #172a63; font-size: .95rem; }
+    .story-design-picker h2 > span { color: #8791a3; font-size: .7rem; }
+    .story-design-picker fieldset { max-width: 510px; }
+    .story-design-picker .story-theme { min-width: 0; gap: .3rem; }
+    .story-design-picker canvas { display: block; width: 100%; height: auto; border-radius: 4px; }
+    .story-design-picker b { overflow-wrap: anywhere; padding-right: 0; font-size: .7rem; }
+    .story-design-picker small { color: #737b8c; font-size: .65rem; }
+    .story-design-picker input { bottom: .55rem; }
+    .story-export { display: grid; gap: .6rem; padding-top: 1rem; }
+    .story-export p { margin: 0; color: #657084; font-size: .72rem; }
+    .story-export button:disabled { opacity: .45; cursor: not-allowed; }
+    .story-export [hidden] { display: none; }
+}
+
+@media (max-width: 640px) {
+    .story-preview { padding: .8rem; }
+    .story-preview canvas { width: min(100%, 250px); }
+}

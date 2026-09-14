@@ -46,6 +46,7 @@
             <a @class(['active' => request()->routeIs('dashboard')]) href="{{ route('dashboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="home" /></span> Beranda</a>
             <a @class(['active' => request()->routeIs('public-sessions.*')]) href="{{ route('public-sessions.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="calendar" /></span> Jadwal Main</a>
             <a @class(['active' => request()->routeIs('scoreboard')]) href="{{ route('scoreboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="score" /></span> Papan Skor</a>
+            <a @class(['active' => request()->routeIs('story-studio')]) href="{{ route('story-studio') }}"><span class="nav-icon-wrap"><x-nav-icon name="camera" /></span> Story Studio</a>
             <a @class(['active' => request()->routeIs('top-ups.*')]) href="{{ route('top-ups.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="wallet" /></span> {{ auth()->user()->isAdmin() ? 'Verifikasi Top Up' : 'Top Up Kuota' }}</a>
             @if(auth()->user()->isAdmin())
                 <p>KOMUNITAS</p>

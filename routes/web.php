@@ -52,6 +52,7 @@ Route::middleware(['auth', RequireCurrentPushSetup::class, RequireMemberNotifica
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::view('/papan-skor', 'scoreboard')->name('scoreboard');
+    Route::view('/story-studio', 'story-studio')->name('story-studio');
     Route::post('/push-subscriptions', [PushSubscriptionController::class, 'store'])->middleware('throttle:10,1')->name('push-subscriptions.store');
     Route::delete('/push-subscriptions', [PushSubscriptionController::class, 'destroy'])->middleware('throttle:10,1')->name('push-subscriptions.destroy');
     Route::get('/top-ups', [TopUpRequestController::class, 'index'])->name('top-ups.index');

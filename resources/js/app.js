@@ -1,11 +1,13 @@
 import { installMemberNotifications } from './member-notifications.js';
 import { installAppVersionUpdates } from './app-version.js';
+import { installStoryStudio } from './story-studio.js';
 import { addBadmintonPoint } from './scoreboard.js';
 import { isIosDevice, resolvePwaInstallMode } from './pwa-install.js';
 import { installServerLoading } from './server-loading.js';
 
 const serverLoading = installServerLoading(window, document);
 installAppVersionUpdates(window, document);
+installStoryStudio(window, document);
 
 document.querySelectorAll('form[data-confirm]').forEach((form) => {
     form.addEventListener('submit', (event) => {

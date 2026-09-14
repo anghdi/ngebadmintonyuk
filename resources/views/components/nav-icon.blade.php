@@ -11,6 +11,9 @@
         @case('score')
             <path d="M4 5h6v14H4zM14 5h6v14h-6zM7 9v6M17 9v6M5 12h4M15 12h4" />
             @break
+        @case('camera')
+            <path d="M4 6h4l2-3h4l2 3h4v14H4Z" /><circle cx="12" cy="13" r="4" />
+            @break
         @case('wallet')
             <path d="M4 6h14a2 2 0 0 1 2 2v11H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12" /><path d="M15 11h6v4h-6a2 2 0 0 1 0-4Z" />
             @break
