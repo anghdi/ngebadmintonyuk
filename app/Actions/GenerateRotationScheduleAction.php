@@ -11,9 +11,9 @@ class GenerateRotationScheduleAction
 {
     public function __construct(private RotationScheduleService $schedules) {}
 
-    public function handle(PlaySession $session, int $setsPerMatch, int $expectedVersion, string $fingerprint): void
+    public function handle(PlaySession $session, int $setsPerMatch, int $expectedVersion, string $fingerprint, int $sessionDurationMinutes = 180, int $minutesPerSet = 15): void
     {
-        DB::transaction(function () use ($session, $setsPerMatch, $expectedVersion, $fingerprint): void {
+        DB::transaction(function () use ($session, $setsPerMatch, $expectedVersion, $fingerprint, $sessionDurationMinutes, $minutesPerSet): void {
             $locked = PlaySession::query()->lockForUpdate()->findOrFail($session->id);
             $registrations = $locked->registrations()->oldest('id')->limit($locked->max_players)->get();
             $roster = $this->schedules->roster($registrations);
@@ -32,14 +32,23 @@ class GenerateRotationScheduleAction
                 throw ValidationException::withMessages(['sets_per_match' => 'List atau jadwal telah berubah. Muat ulang halaman sebelum generate.']);
             }
 
-            $targetGames = $setsPerMatch === 1 ? 3 : 2;
-            $roundCount = min(80, (int) ceil(count($roster) * $targetGames / $slots));
+            if ($sessionDurationMinutes < 1 || $sessionDurationMinutes > 1440 || $minutesPerSet < 1 || $minutesPerSet > 120) {
+                throw ValidationException::withMessages(['session_duration_minutes' => 'Periksa durasi sesi dan menit per set.']);
+            }
+            $minutesPerRound = $setsPerMatch * $minutesPerSet;
+            $roundCount = min(80, intdiv($sessionDurationMinutes, $minutesPerRound));
+            if ($roundCount < 1) {
+                throw ValidationException::withMessages(['session_duration_minutes' => 'Durasi sesi tidak cukup untuk satu ronde.']);
+            }
             $locked->rotation_schedule = $this->schedules->generate($roster, $locked->court_count, $roundCount) + [
                 'version' => $expectedVersion + 1,
                 'published_at' => null,
                 'sets_per_match' => $setsPerMatch,
                 'points_per_set' => 21,
-                'play_until' => '23:00',
+                'session_duration_minutes' => $sessionDurationMinutes,
+                'minutes_per_set' => $minutesPerSet,
+                'minutes_per_round' => $minutesPerRound,
+                'play_until' => $locked->scheduled_at->copy()->addMinutes($sessionDurationMinutes)->format('H:i'),
             ];
             $locked->save();
         });

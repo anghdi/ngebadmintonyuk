@@ -22,28 +22,29 @@ test('admin publishes all rounds from the main list including unpaid members and
     $roster = $service->roster($session->registrations()->oldest('id')->limit(8)->get());
 
     $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation', $session), [
-        'sets_per_match' => 1, 'expected_version' => 0, 'roster_fingerprint' => $service->fingerprint($roster, 2),
+        'session_duration_minutes' => 180, 'minutes_per_set' => 15, 'changeover_minutes' => 3, 'sets_per_match' => 1, 'expected_version' => 0, 'roster_fingerprint' => $service->fingerprint($roster, 2),
     ])->assertRedirect()->assertSessionHasNoErrors();
 
     $schedule = $session->refresh()->rotation_schedule;
-    expect($schedule['rounds'])->toHaveCount(3)
+    expect($schedule['rounds'])->toHaveCount(12)
         ->and(array_column($schedule['roster'], 'id'))->not->toContain($waiting->id)
         ->and(array_column($schedule['roster'], 'guest_id'))->toContain($guest->id)
-        ->and(array_values($schedule['games']))->each->toBe(3);
+        ->and(array_values($schedule['games']))->each->toBe(12);
     expect(Attendance::count())->toBe(0)->and(Income::count())->toBe(0);
     expect($session->registrations()->where('payment_status', 'paid')->count())->toBe(0);
 
-    $this->get(route('play-sessions.show', $session))->assertOk()->assertSee('Review 3 ronde')->assertSee('Publikasikan rotasi');
+    $this->get(route('play-sessions.show', $session))->assertOk()->assertSee('Review 12 ronde')->assertSee('Publikasikan rotasi')
+        ->assertDontSee('name="changeover_minutes"', false);
     $this->actingAsNotifiedMember($member)->get(route('rotations.show', $session))->assertNotFound();
     $this->get(route('rotations.index'))->assertOk()->assertSee('Belum ada rotasi');
-    $this->get(route('public-sessions.show', $session))->assertOk()->assertSee('Menunggu rotasi disetujui admin')->assertDontSee('Ronde 3');
+    $this->get(route('public-sessions.show', $session))->assertOk()->assertSee('Menunggu rotasi disetujui admin')->assertDontSee('Ronde 12');
     $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 1])->assertSessionHasNoErrors();
     $this->actingAsNotifiedMember($member)->get(route('rotations.show', $session))
-        ->assertOk()->assertSee('Ronde 3')->assertSee('Kamu main')->assertSee('Pasanganmu:')->assertSee($guest->name)->assertDontSee($guest->phone ?? 'PRIVATE_PHONE');
+        ->assertOk()->assertSee('Ronde 12')->assertSee('Kamu main')->assertSee('Lapangan A')->assertSee('Lapangan B')->assertSee('Pasanganmu:')->assertSee($guest->name)->assertDontSee($guest->phone ?? 'PRIVATE_PHONE');
     $this->get(route('rotations.index'))->assertOk()->assertSee($session->venue_name)->assertDontSee('Belum ada rotasi');
     $session->update(['scheduled_at' => now()->subHour()]);
     $this->get(route('public-sessions.show', $session))->assertOk()->assertSee('Lihat rotasi main');
-    $this->get(route('rotations.show', $session))->assertOk()->assertSee('Ronde 3');
+    $this->get(route('rotations.show', $session))->assertOk()->assertSee('Ronde 12');
     $session->update(['status' => 'completed']);
     $this->get(route('public-sessions.show', $session))->assertOk();
     $session->update(['status' => 'cancelled']);
@@ -89,6 +90,30 @@ test('four players rotate through different partners', function () {
     expect(array_unique($pairs))->toHaveCount(6);
 });
 
+test('two courts rotate players across A and B with varied partners', function (int $players) {
+    $roster = array_map(fn (int $id): array => ['id' => $id, 'name' => 'Player '.$id, 'user_id' => $id, 'guest_id' => null], range(1, $players));
+    $schedule = app(RotationScheduleService::class)->generate($roster, 2, 12);
+    $visits = array_fill_keys(range(1, $players), ['A' => 0, 'B' => 0]);
+    $partners = array_fill_keys(range(1, $players), []);
+    foreach ($schedule['rounds'] as $round) {
+        expect(array_column($round['courts'], 'label'))->toBe(['A', 'B']);
+        foreach ($round['courts'] as $court) {
+            foreach (['team_a', 'team_b'] as $team) {
+                [$a, $b] = $court[$team];
+                $visits[$a][$court['label']]++;
+                $visits[$b][$court['label']]++;
+                $partners[$a][] = $b;
+                $partners[$b][] = $a;
+            }
+        }
+    }
+    foreach ($visits as $id => $counts) {
+        expect(min($counts))->toBeGreaterThan(0)
+            ->and(abs($counts['A'] - $counts['B']))->toBeLessThanOrEqual(1)
+            ->and(count(array_unique($partners[$id])))->toBeGreaterThan(1);
+    }
+})->with([8, 12, 17]);
+
 test('changed main roster hides old schedule but waiting and payment changes do not', function () {
     $session = PlaySession::factory()->create(['max_players' => 4]);
     $registrations = SessionRegistration::factory()->for($session)->count(4)->create();
@@ -111,7 +136,7 @@ test('generation validates roster rounds status and prevents concurrent overwrit
     $session = PlaySession::factory()->create(['max_players' => 12]);
     $registrations = SessionRegistration::factory()->for($session)->count(12)->create();
     $service = app(RotationScheduleService::class);
-    $data = ['sets_per_match' => 0, 'expected_version' => 0, 'roster_fingerprint' => $service->fingerprint($service->roster($registrations), 1)];
+    $data = ['session_duration_minutes' => 180, 'minutes_per_set' => 15, 'changeover_minutes' => 3, 'sets_per_match' => 0, 'expected_version' => 0, 'roster_fingerprint' => $service->fingerprint($service->roster($registrations), 1)];
     $this->actingAs(User::factory()->admin()->create());
     $this->post(route('play-sessions.rotation', $session), $data)->assertSessionHasErrors('sets_per_match');
     $data['sets_per_match'] = 1;
@@ -126,7 +151,7 @@ test('generation validates roster rounds status and prevents concurrent overwrit
     $small = PlaySession::factory()->create(['court_count' => 2]);
     $smallRoster = SessionRegistration::factory()->for($small)->count(7)->create();
     $this->post(route('play-sessions.rotation', $small), [
-        'sets_per_match' => 2, 'expected_version' => 0, 'roster_fingerprint' => $service->fingerprint($service->roster($smallRoster), 2),
+        'session_duration_minutes' => 180, 'minutes_per_set' => 15, 'changeover_minutes' => 3, 'sets_per_match' => 2, 'expected_version' => 0, 'roster_fingerprint' => $service->fingerprint($service->roster($smallRoster), 2),
     ])->assertSessionHasErrors('sets_per_match');
     expect($small->refresh()->rotation_schedule)->toBeNull();
 });
@@ -174,27 +199,60 @@ test('match format automatically generates fair turns without a manual round cou
     $registrations = SessionRegistration::factory()->for($session)->count($players)->create();
     $service = app(RotationScheduleService::class);
     $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation', $session), [
-        'sets_per_match' => $sets, 'expected_version' => 0,
+        'session_duration_minutes' => 180, 'minutes_per_set' => 15, 'changeover_minutes' => 3, 'sets_per_match' => $sets, 'expected_version' => 0,
         'roster_fingerprint' => $service->fingerprint($service->roster($registrations), $courts),
         'round_count' => 80,
     ])->assertSessionHasNoErrors();
     $schedule = $session->refresh()->rotation_schedule;
     expect($schedule['rounds'])->toHaveCount($expectedRounds)
         ->and($schedule['sets_per_match'])->toBe($sets)->and($schedule['points_per_set'])->toBe(21)
-        ->and($schedule['play_until'])->toBe('23:00')->and($schedule['published_at'])->toBeNull();
+        ->and($schedule['play_until'])->toBe($session->scheduled_at->copy()->addMinutes(180)->format('H:i'))->and($schedule['published_at'])->toBeNull();
     expect(min($schedule['games']))->toBeGreaterThan(0);
     expect(max($schedule['games']) - min($schedule['games']))->toBeLessThanOrEqual(1);
     $this->get(route('play-sessions.show', $session))->assertOk()->assertSee('Format pertandingan')
-        ->assertDontSee('name="round_count"', false)->assertSee($sets.' set × 21 poin')->assertSee('batas main 23.00');
-})->with([[12, 1, 1, 9], [12, 1, 2, 6], [12, 2, 1, 5], [12, 2, 2, 3], [5, 1, 1, 4], [200, 1, 1, 80]]);
+        ->assertDontSee('name="round_count"', false)->assertSee($sets.' set × 21 poin')->assertSee('Durasi sesi 180 menit');
+})->with([[12, 1, 1, 12], [12, 1, 2, 6], [12, 2, 1, 12], [12, 2, 2, 6], [5, 1, 1, 12], [20, 1, 1, 12]]);
 
 test('unsupported match formats cannot create a rotation draft', function (mixed $sets) {
     $session = PlaySession::factory()->create();
     $registrations = SessionRegistration::factory()->for($session)->count(4)->create();
     $service = app(RotationScheduleService::class);
     $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation', $session), [
-        'sets_per_match' => $sets, 'expected_version' => 0,
+        'session_duration_minutes' => 180, 'minutes_per_set' => 15, 'changeover_minutes' => 3, 'sets_per_match' => $sets, 'expected_version' => 0,
         'roster_fingerprint' => $service->fingerprint($service->roster($registrations), 1),
     ])->assertSessionHasErrors('sets_per_match');
     expect($session->refresh()->rotation_schedule)->toBeNull();
 })->with([null, 0, 3, 1.5]);
+
+test('rotation duration controls rounds and rejects invalid timing', function (int $duration, int $minutes, int $changeover, ?int $rounds, ?string $error) {
+    $session = PlaySession::factory()->create(['court_count' => 1, 'scheduled_at' => today()->setTime(22, 0)]);
+    $registrations = SessionRegistration::factory()->for($session)->count(4)->create();
+    $service = app(RotationScheduleService::class);
+    $response = $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation', $session), [
+        'sets_per_match' => 1,
+        'session_duration_minutes' => $duration,
+        'minutes_per_set' => $minutes,
+        'changeover_minutes' => $changeover,
+        'expected_version' => 0,
+        'roster_fingerprint' => $service->fingerprint($service->roster($registrations), 1),
+    ]);
+    if ($error !== null) {
+        $response->assertSessionHasErrors($error);
+        expect($session->refresh()->rotation_schedule)->toBeNull();
+    } else {
+        $response->assertSessionHasNoErrors();
+        $schedule = $session->refresh()->rotation_schedule;
+        expect($schedule['rounds'])->toHaveCount($rounds)
+            ->and($schedule['minutes_per_round'])->toBe($minutes)
+            ->and($schedule['play_until'])->toBe($session->scheduled_at->copy()->addMinutes($duration)->format('H:i'));
+    }
+})->with([
+    'partial round excluded' => [50, 15, 3, 3, null],
+    'no changeover' => [60, 15, 0, 4, null],
+    'cross midnight' => [180, 15, 3, 12, null],
+    'round limit' => [1440, 1, 0, 80, null],
+    'not enough time' => [10, 15, 3, null, 'session_duration_minutes'],
+    'zero duration' => [0, 15, 3, null, 'session_duration_minutes'],
+    'zero set time' => [180, 0, 3, null, 'minutes_per_set'],
+    'legacy changeover ignored' => [180, 15, 3, 12, null],
+]);

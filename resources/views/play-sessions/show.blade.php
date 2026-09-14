@@ -11,10 +11,15 @@
             <input type="hidden" name="expected_version" value="{{ $rotationSchedule['version'] ?? 0 }}">
             <input type="hidden" name="roster_fingerprint" value="{{ $rotationFingerprint }}">
             <label class="min-w-0">Format pertandingan<select name="sets_per_match" required><option value="1" @selected((int) old('sets_per_match', $rotationSchedule['sets_per_match'] ?? 1) === 1)>1 set × 21 poin</option><option value="2" @selected((int) old('sets_per_match', $rotationSchedule['sets_per_match'] ?? 1) === 2)>2 set × 21 poin</option></select></label>
+            <label class="min-w-0">Durasi sesi (menit)<input type="number" name="session_duration_minutes" min="1" max="1440" value="{{ old('session_duration_minutes', $rotationSchedule['session_duration_minutes'] ?? 180) }}" required></label>
+            <label class="min-w-0">Perkiraan menit per set<input type="number" name="minutes_per_set" min="1" max="120" value="{{ old('minutes_per_set', $rotationSchedule['minutes_per_set'] ?? 15) }}" required></label>
             <button class="btn primary" @disabled($confirmedRegistrations->count() < $playSession->court_count * 4)>{{ $rotationSchedule ? 'Generate ulang' : 'Generate rotasi' }}</button>
         </form>
         <p class="mt-3 text-sm text-slate-500">Dari list utama, termasuk tamu. Minimal {{ $playSession->court_count * 4 }} pemain. Waiting tidak ikut.</p>
-        <p class="mt-2 text-xs text-slate-500">Giliran otomatis: sekitar 3 kali main untuk 1 set, 2 kali untuk 2 set. Ikuti urutan; batas main 23.00.</p>
+        <p class="mt-2 text-xs text-slate-500">Ronde = durasi sesi ÷ (jumlah set × menit per set), dibulatkan ke bawah, maksimal 80 ronde. Lapangan bermain bersamaan. Durasi aktual bisa berbeda.</p>
+        @foreach(['session_duration_minutes', 'minutes_per_set'] as $field)
+            @error($field)<p class="mt-2 text-sm text-red-700" role="alert">{{ $message }}</p>@enderror
+        @endforeach
         @error('sets_per_match')<p class="mt-2 text-sm text-red-700" role="alert">{{ $message }}</p>@enderror
     @endif
     @if($rotationStale)

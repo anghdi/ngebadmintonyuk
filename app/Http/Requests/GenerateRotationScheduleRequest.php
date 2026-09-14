@@ -24,6 +24,8 @@ class GenerateRotationScheduleRequest extends FormRequest
     {
         return [
             'sets_per_match' => ['required', 'integer', 'between:1,2'],
+            'session_duration_minutes' => ['required', 'integer', 'between:1,1440'],
+            'minutes_per_set' => ['required', 'integer', 'between:1,120'],
             'expected_version' => ['required', 'integer', 'min:0'],
             'roster_fingerprint' => ['required', 'string', 'size:64'],
         ];

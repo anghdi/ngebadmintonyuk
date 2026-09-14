@@ -1,5 +1,7 @@
 # Acuan proyek saat ini — 7 September 2026
 
+**Baseline produk terbaru:** [PRD 15 September 2026](12-prd-terbaru.md), mencakup analisis fitur terkini, kriteria penerimaan dan prioritas validasi rilis. Ringkasan di bawah merupakan konteks tahap sebelumnya.
+
 NgeBadmintonYuk sekarang mencakup operasional komunitas dan keuangan NgeKas, dengan akses admin dan member. Scope aktif meliputi registrasi akun, dashboard per peran, kategori, pemasukan/pengeluaran, laporan PDF, member, membership/kuota, top-up manual, jadwal publik, pendaftaran/waiting list, pembayaran peserta, absensi, inventori shuttlecock, push notification, PWA, dan papan skor.
 
 Baca [konteks final](11-final-context.md) sebagai titik masuk dan [matriks fitur](10-current-features.md) untuk bukti kode, pengujian, serta pekerjaan yang belum tercakup.

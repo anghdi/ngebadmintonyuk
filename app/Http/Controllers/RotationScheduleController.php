@@ -16,7 +16,7 @@ class RotationScheduleController extends Controller
      */
     public function __invoke(GenerateRotationScheduleRequest $request, PlaySession $playSession, GenerateRotationScheduleAction $generate): RedirectResponse
     {
-        $generate->handle($playSession, $request->integer('sets_per_match'), $request->integer('expected_version'), $request->string('roster_fingerprint')->toString());
+        $generate->handle($playSession, $request->integer('sets_per_match'), $request->integer('expected_version'), $request->string('roster_fingerprint')->toString(), $request->integer('session_duration_minutes'), $request->integer('minutes_per_set'));
 
         return redirect()->to(route('play-sessions.show', $playSession).'#rotasi')->with('success', 'Draf rotasi dibuat. Review sebelum dipublikasikan.');
     }

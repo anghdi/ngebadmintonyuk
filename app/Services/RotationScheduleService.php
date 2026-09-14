@@ -53,6 +53,8 @@ class RotationScheduleService
         $ids = array_column($roster, 'id');
         $games = array_fill_keys($ids, 0);
         $lastPlayed = array_fill_keys($ids, 0);
+        $courtVisits = array_fill_keys($ids, [1 => 0, 2 => 0]);
+        $lastCourt = array_fill_keys($ids, 0);
         $partners = [];
         $opponents = [];
         $rounds = [];
@@ -62,7 +64,7 @@ class RotationScheduleService
             usort($ranked, fn (int $a, int $b): int => [$games[$a], $lastPlayed[$a], $a] <=> [$games[$b], $lastPlayed[$b], $b]);
             $selected = array_slice($ranked, 0, $courtCount * 4);
             $bestCourts = [];
-            $bestScore = PHP_INT_MAX;
+            $bestScore = null;
 
             foreach ($this->pairings($selected) as $teams) {
                 $partnerScore = 0;
@@ -80,13 +82,36 @@ class RotationScheduleService
                         }
                         $courts[] = ['number' => count($courts) + 1, 'team_a' => $teams[$a], 'team_b' => $teams[$b]];
                     }
-                    if ($score < $bestScore) {
-                        $bestScore = $score;
-                        $bestCourts = $courts;
+                    $courtOrders = $courtCount === 2 ? [$courts, array_reverse($courts)] : [$courts];
+                    foreach ($courtOrders as $orderedCourts) {
+                        $balancePenalty = 0;
+                        $repeatPenalty = 0;
+                        foreach ($orderedCourts as $index => &$court) {
+                            $court['number'] = $index + 1;
+                            $court['label'] = $index === 0 ? 'A' : 'B';
+                            foreach ([...$court['team_a'], ...$court['team_b']] as $id) {
+                                if ($courtCount === 2) {
+                                    $visits = $courtVisits[$id];
+                                    $visits[$court['number']]++;
+                                    $balancePenalty += abs($visits[1] - $visits[2]);
+                                    $repeatPenalty += (int) ($lastCourt[$id] === $court['number']);
+                                }
+                            }
+                        }
+                        unset($court);
+                        $candidateScore = [$balancePenalty, $partnerScore, $repeatPenalty, $score];
+                        if ($bestScore === null || $candidateScore < $bestScore) {
+                            $bestScore = $candidateScore;
+                            $bestCourts = $orderedCourts;
+                        }
                     }
                 }
             }
             foreach ($bestCourts as $court) {
+                foreach ([...$court['team_a'], ...$court['team_b']] as $id) {
+                    $courtVisits[$id][$court['number']]++;
+                    $lastCourt[$id] = $court['number'];
+                }
                 foreach (['team_a', 'team_b'] as $team) {
                     [$a, $b] = $court[$team];
                     $key = $this->pairKey($a, $b);
