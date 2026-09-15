@@ -16,3 +16,6 @@ Admin generation requires sets_per_match 1 or 2, each set 21 points. Compute rou
 
 ## PRD timing formula supersedes target-game rotation rounds
 The 15 September 2026 PRD supersedes the earlier targetGames formula. Calculate round_count as floor(session_duration_minutes / (sets_per_match * minutes_per_set)), capped at 80. Defaults are 180 session minutes and 15 minutes per set, so 1 set yields 12 rounds and 2 sets yields 6; court count controls simultaneous matches, not round count. Do not add changeover time. Persist timing inputs and estimated play_until; reject durations that cannot fit one round. For two courts, label A/B and optimize each player's A/B use alongside fair play counts and varied partners/opponents.
+
+## Rotation mixes the complete confirmed roster
+After the ordered confirmed roster is fixed for capacity and fingerprinting, shuffle all included players before scheduling. Use that mixed order only as the fairness tie-breaker so registration order never forms the first playing group; keep balanced game counts, varied partners/opponents, and A/B court balance. Persist mix_order for audit and generate a fresh mix on regeneration.

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\PlaySession;
 use App\Models\SessionRegistration;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class RotationScheduleService
@@ -50,8 +51,16 @@ class RotationScheduleService
      */
     public function generate(array $roster, int $courtCount, int $roundCount): array
     {
-        $ids = array_column($roster, 'id');
-        $games = array_fill_keys($ids, 0);
+        $listedIds = array_column($roster, 'id');
+        $ids = Arr::shuffle($listedIds);
+        $playersPerTurn = $courtCount * 4;
+        $keptFirstGroup = count($ids) > $playersPerTurn
+            && array_diff(array_slice($ids, 0, $playersPerTurn), array_slice($listedIds, 0, $playersPerTurn)) === [];
+        if ($ids === $listedIds || $keptFirstGroup) {
+            $ids = [...array_slice($ids, 1), $ids[0]];
+        }
+        $mixOrder = array_flip($ids);
+        $games = array_fill_keys($listedIds, 0);
         $lastPlayed = array_fill_keys($ids, 0);
         $courtVisits = array_fill_keys($ids, [1 => 0, 2 => 0]);
         $lastCourt = array_fill_keys($ids, 0);
@@ -61,8 +70,8 @@ class RotationScheduleService
 
         for ($round = 1; $round <= $roundCount; $round++) {
             $ranked = $ids;
-            usort($ranked, fn (int $a, int $b): int => [$games[$a], $lastPlayed[$a], $a] <=> [$games[$b], $lastPlayed[$b], $b]);
-            $selected = array_slice($ranked, 0, $courtCount * 4);
+            usort($ranked, fn (int $a, int $b): int => [$games[$a], $lastPlayed[$a], $mixOrder[$a]] <=> [$games[$b], $lastPlayed[$b], $mixOrder[$b]]);
+            $selected = array_slice($ranked, 0, $playersPerTurn);
             $bestCourts = [];
             $bestScore = null;
 
@@ -136,6 +145,7 @@ class RotationScheduleService
             'generated_at' => now()->toIso8601String(),
             'court_count' => $courtCount,
             'roster' => $roster,
+            'mix_order' => $ids,
             'rounds' => $rounds,
             'games' => $games,
         ];

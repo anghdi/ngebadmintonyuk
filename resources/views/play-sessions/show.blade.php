@@ -15,7 +15,7 @@
             <label class="min-w-0">Perkiraan menit per set<input type="number" name="minutes_per_set" min="1" max="120" value="{{ old('minutes_per_set', $rotationSchedule['minutes_per_set'] ?? 15) }}" required></label>
             <button class="btn primary" @disabled($confirmedRegistrations->count() < $playSession->court_count * 4)>{{ $rotationSchedule ? 'Generate ulang' : 'Generate rotasi' }}</button>
         </form>
-        <p class="mt-3 text-sm text-slate-500">Dari list utama, termasuk tamu. Minimal {{ $playSession->court_count * 4 }} pemain. Waiting tidak ikut.</p>
+        <p class="mt-3 text-sm text-slate-500">Seluruh pemain utama diacak saat generate, termasuk tamu. Minimal {{ $playSession->court_count * 4 }} pemain. Waiting tidak ikut.</p>
         <p class="mt-2 text-xs text-slate-500">Ronde = durasi sesi ÷ (jumlah set × menit per set), dibulatkan ke bawah, maksimal 80 ronde. Lapangan bermain bersamaan. Durasi aktual bisa berbeda.</p>
         @foreach(['session_duration_minutes', 'minutes_per_set'] as $field)
             @error($field)<p class="mt-2 text-sm text-red-700" role="alert">{{ $message }}</p>@enderror

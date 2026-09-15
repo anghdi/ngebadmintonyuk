@@ -76,6 +76,21 @@ test('rotation gives every player a fair unique turn on each round', function (i
     expect(min($counts))->toBeGreaterThan(0)->and($schedule['games'])->toBe($counts);
 })->with([[4, 1], [5, 1], [7, 1], [12, 1], [17, 1], [8, 2], [9, 2], [12, 2], [17, 2], [200, 2]]);
 
+test('rotation mixes the full roster before choosing the first turn', function () {
+    $listedIds = range(1, 12);
+    $roster = array_map(fn (int $id): array => ['id' => $id, 'name' => 'Player '.$id, 'user_id' => $id, 'guest_id' => null], $listedIds);
+
+    $schedule = app(RotationScheduleService::class)->generate($roster, 2, 3);
+    $firstTurnPlayers = collect($schedule['rounds'][0]['courts'])
+        ->flatMap(fn (array $court): array => [...$court['team_a'], ...$court['team_b']])
+        ->all();
+
+    expect($schedule['mix_order'])->toContain(...$listedIds)
+        ->and($schedule['mix_order'])->not->toBe($listedIds)
+        ->and($firstTurnPlayers)->toEqualCanonicalizing(array_slice($schedule['mix_order'], 0, 8))
+        ->and($firstTurnPlayers)->not->toEqualCanonicalizing(range(1, 8));
+});
+
 test('four players rotate through different partners', function () {
     $roster = array_map(fn (int $id): array => ['id' => $id, 'name' => 'Player '.$id, 'user_id' => null, 'guest_id' => null], range(1, 4));
     $schedule = app(RotationScheduleService::class)->generate($roster, 1, 3);
