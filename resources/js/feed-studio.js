@@ -3,7 +3,6 @@ export const POST_HEIGHT = 1350;
 export const GUTTER_SAFE_ZONE = 96;
 
 const VARIANTS = ['editorial', 'kinetic', 'sideline'];
-const SEED_COPY = ['Lagi nyari temen main?', 'NgeBadminton YUK!', 'Ramean lebih seru.'];
 const PALETTES = {
     'off-white': { background: '#f7f4ec', ink: '#102656', muted: '#53617a', contrast: '#2455f5' },
     'royal-blue': { background: '#2455f5', ink: '#ffffff', muted: '#dfe7ff', contrast: '#102656' },
@@ -107,14 +106,18 @@ function drawConnectionGeometry(context, width, connection, variant, palette) {
     context.lineCap = 'round';
     context.beginPath();
     context.moveTo(path.start.x, path.start.y + 18);
-    context.bezierCurveTo(path.controls[0].x, path.controls[0].y, path.controls[1].x, path.controls[1].y, path.end.x, path.end.y - 18);
+    context.lineTo(path.start.x, POST_HEIGHT - 135);
+    context.bezierCurveTo(path.controls[0].x, path.controls[0].y, path.controls[1].x, path.controls[1].y, path.end.x, 135);
+    context.lineTo(path.end.x, path.end.y - 18);
     context.stroke();
     context.strokeStyle = palette.ink;
     context.globalAlpha = 0.72;
     context.lineWidth = 5;
     context.beginPath();
     context.moveTo(path.start.x - 34, path.start.y + 18);
-    context.bezierCurveTo(path.controls[0].x - 34, path.controls[0].y, path.controls[1].x - 34, path.controls[1].y, path.end.x - 34, path.end.y - 18);
+    context.lineTo(path.start.x - 34, POST_HEIGHT - 135);
+    context.bezierCurveTo(path.controls[0].x - 34, path.controls[0].y, path.controls[1].x - 34, path.controls[1].y, path.end.x - 34, 135);
+    context.lineTo(path.end.x - 34, path.end.y - 18);
     context.stroke();
     context.restore();
 }
@@ -127,33 +130,118 @@ function drawBrandLockup(context, safe, palette, label = 'NGE BADMINTON YUK!') {
     context.fillText(label, safe.x, safe.y + 62);
 }
 
+export function resolveSeedTrajectory(connection, width = POST_WIDTH * 3, height = POST_HEIGHT) {
+    const outgoing = connection?.court_line_exit?.[0] ?? { x: 0.78, edge: 'top', direction: 'diagonal-right' };
+    const finalControlOffset = {
+        'diagonal-left': width * 0.1,
+        'diagonal-right': width * -0.1,
+        vertical: 0,
+    }[outgoing.direction] ?? width * -0.1;
+
+    return {
+        start: { x: width * 0.15, y: height * 0.52 },
+        controls: [
+            { x: width * 0.34, y: height * 0.67 },
+            { x: Number(outgoing.x) * width + finalControlOffset, y: height * 0.86 },
+        ],
+        end: { x: Number(outgoing.x) * width, y: -24 },
+        outgoing,
+    };
+}
+
+function drawSeedCourt(context, width) {
+    const horizon = 920;
+    context.fillStyle = '#2455f5';
+    context.fillRect(0, horizon, width, POST_HEIGHT - horizon);
+
+    context.strokeStyle = '#f7f4ec';
+    context.lineWidth = 10;
+    context.beginPath();
+    context.moveTo(0, 1000);
+    context.lineTo(width, 1000);
+    context.moveTo(width * 0.5, horizon);
+    context.lineTo(width * 0.5, POST_HEIGHT);
+    context.moveTo(width * 0.32, horizon);
+    context.lineTo(width * 0.08, POST_HEIGHT);
+    context.moveTo(width * 0.68, horizon);
+    context.lineTo(width * 0.92, POST_HEIGHT);
+    context.stroke();
+}
+
+function drawSeedNet(context, width) {
+    const left = width * 0.37;
+    const right = width * 0.63;
+    const top = 940;
+    const bottom = 1045;
+
+    context.fillStyle = '#102656';
+    context.fillRect(left - 12, top - 10, 24, bottom - top + 30);
+    context.fillRect(right - 12, top - 10, 24, bottom - top + 30);
+    context.strokeStyle = '#102656';
+    context.lineWidth = 9;
+    context.strokeRect(left, top, right - left, bottom - top);
+    context.strokeStyle = 'rgba(36, 85, 245, .72)';
+    context.lineWidth = 2;
+    for (let x = left + 16; x < right; x += 18) {
+        context.beginPath();
+        context.moveTo(x, top + 8);
+        context.lineTo(x, bottom - 5);
+        context.stroke();
+    }
+    for (let y = top + 14; y < bottom; y += 14) {
+        context.beginPath();
+        context.moveTo(left + 6, y);
+        context.lineTo(right - 6, y);
+        context.stroke();
+    }
+}
+
+function drawSeedTrajectory(context, connection, width) {
+    const trajectory = resolveSeedTrajectory(connection, width);
+    context.strokeStyle = '#ffd000';
+    context.lineWidth = 16;
+    context.lineCap = 'round';
+    context.beginPath();
+    context.moveTo(trajectory.start.x, trajectory.start.y);
+    context.bezierCurveTo(
+        trajectory.controls[0].x,
+        trajectory.controls[0].y,
+        trajectory.controls[1].x,
+        trajectory.controls[1].y,
+        trajectory.end.x,
+        135,
+    );
+    context.lineTo(trajectory.end.x, trajectory.end.y);
+    context.stroke();
+}
+
 export function drawSeedMaster(context, canvas, connection = {}) {
     const width = POST_WIDTH * 3;
     canvas.width = width;
     canvas.height = POST_HEIGHT;
     context.fillStyle = PALETTES['off-white'].background;
     context.fillRect(0, 0, width, POST_HEIGHT);
-    context.fillStyle = '#2455f5';
-    context.fillRect(POST_WIDTH, 0, POST_WIDTH, POST_HEIGHT);
-    context.fillStyle = '#102656';
-    context.fillRect(POST_WIDTH * 2 + 1010, 0, 70, POST_HEIGHT);
-    drawConnectionGeometry(context, width, connection, 'kinetic', PALETTES['off-white']);
+    drawSeedCourt(context, width);
+    drawSeedNet(context, width);
+    drawSeedTrajectory(context, connection, width);
 
-    SEED_COPY.forEach((copy, panel) => {
-        const safe = panelSafeArea(panel);
-        const palette = panel === 1 ? PALETTES['royal-blue'] : PALETTES['off-white'];
-        drawBrandLockup(context, safe, palette, panel === 1 ? 'ROW 0 · EST. 2026' : 'NGE BADMINTON YUK!');
-        context.fillStyle = palette.ink;
-        context.font = `${panel === 1 ? 900 : 800} ${panel === 1 ? 94 : 84}px "Plus Jakarta Sans", sans-serif`;
-        wrapText(context, copy, safe.x, 630, safe.width, panel === 1 ? 104 : 96, 3);
-        context.fillStyle = palette.muted;
-        context.font = '700 25px "Plus Jakarta Sans", sans-serif';
-        context.fillText(panel === 0 ? 'CARI LAWAN · CARI KAWAN' : panel === 1 ? 'PLAY · CONNECT · REPEAT' : 'SATU LAPANGAN, BANYAK CERITA', safe.x, 1120);
-    });
-    context.fillStyle = '#ffd23f';
-    context.beginPath();
-    context.arc(POST_WIDTH * 2 + 700, 250, 58, 0, Math.PI * 2);
-    context.fill();
+    const left = panelSafeArea(0);
+    context.fillStyle = '#102656';
+    context.font = '800 92px "Plus Jakarta Sans", sans-serif';
+    wrapText(context, 'Lagi nyari temen main?', left.x, 420, left.width, 102, 2);
+
+    const center = panelSafeArea(1);
+    context.fillStyle = '#2455f5';
+    context.font = '900 76px "Plus Jakarta Sans", sans-serif';
+    context.textAlign = 'center';
+    context.fillText('NgeBadminton YUK!', center.x + center.width / 2, 510);
+
+    const right = panelSafeArea(2);
+    context.fillStyle = '#102656';
+    context.font = '800 92px "Plus Jakarta Sans", sans-serif';
+    context.textAlign = 'left';
+    wrapText(context, 'Ramean lebih seru.', right.x, 420, right.width, 102, 2);
+    context.textAlign = 'start';
 }
 
 function drawMaster(context, canvas, design, image, settings) {
@@ -246,7 +334,11 @@ export function installFeedStudio(windowObject, documentObject) {
     let variantIndex = Math.max(0, VARIANTS.indexOf(design.variant));
     const render = () => {
         design.variant = VARIANTS[variantIndex];
-        drawMaster(context, canvas, design, image, settings);
+        if (design.isSeed) {
+            drawSeedMaster(context, canvas, design.connection);
+        } else {
+            drawMaster(context, canvas, design, image, settings);
+        }
         const grid = root.querySelector('[data-feed-grid]');
         grid.querySelectorAll('[data-feed-new]').forEach((item) => item.remove());
         for (let slice = design.postCount - 1; slice >= 0; slice--) {
@@ -264,7 +356,7 @@ export function installFeedStudio(windowObject, documentObject) {
         settings[input.dataset.feedSetting] = Number(input.value);
         render();
     }));
-    root.querySelector('[data-feed-regenerate]').addEventListener('click', () => {
+    root.querySelector('[data-feed-regenerate]')?.addEventListener('click', () => {
         variantIndex = (variantIndex + 1) % VARIANTS.length;
         render();
         status.textContent = `Komposisi ${design.variant} dipilih.`;

@@ -94,6 +94,34 @@ test('export assets are saved to feed history and match the post count', functio
     ])->assertUnprocessable();
 });
 
+test('seed row opens the native canvas exporter and saves three instagram files', function () {
+    Storage::fake('local');
+    $administrator = User::factory()->admin()->create();
+    app(CreateFeedDesignAction::class)->ensureSeed($administrator);
+    $seed = FeedDesign::query()->where('is_seed', true)->sole();
+
+    $this->actingAs($administrator)->get(route('feed-studio.show', $seed))
+        ->assertOk()
+        ->assertSee('Export for Instagram')
+        ->assertSee('"isSeed":true', false)
+        ->assertDontSee('CROP FOTO');
+
+    $this->post(route('feed-studio.assets', $seed), [
+        'assets' => [
+            UploadedFile::fake()->image('right.png', 1080, 1350),
+            UploadedFile::fake()->image('center.png', 1080, 1350),
+            UploadedFile::fake()->image('left.png', 1080, 1350),
+        ],
+        'thumbnail' => UploadedFile::fake()->image('thumbnail.png', 432, 540),
+        'layout_variant' => 'editorial',
+        'zoom' => 1,
+        'position_x' => 0,
+        'position_y' => 0,
+    ])->assertNoContent();
+
+    expect($seed->refresh()->exported_assets)->toHaveCount(3);
+});
+
 test('feed studio editor exposes master canvas grid preview and upload order', function () {
     $administrator = User::factory()->admin()->create();
     app(CreateFeedDesignAction::class)->ensureSeed($administrator);

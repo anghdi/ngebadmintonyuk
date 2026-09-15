@@ -9,16 +9,17 @@ import {
     resolveConnectionPath,
     resolveHeroPanel,
     resolvePhotoBox,
+    resolveSeedTrajectory,
 } from '../../resources/js/feed-studio.js';
 
 test('seed is rendered as one connected master with the fixed three-part copy', () => {
     const text = [];
-    const moves = [];
     const curves = [];
+    const lines = [];
     const context = new Proxy({
         fillText(value) { text.push(value); },
         measureText(value) { return { width: value.length * 20 }; },
-        moveTo(...values) { moves.push(values); },
+        lineTo(...values) { lines.push(values); },
         bezierCurveTo(...values) { curves.push(values); },
     }, {
         get(target, key) { return key in target ? target[key] : () => {}; },
@@ -33,8 +34,23 @@ test('seed is rendered as one connected master with the fixed three-part copy', 
     assert.ok(text.includes('Lagi nyari temen main?'));
     assert.ok(text.includes('NgeBadminton YUK!'));
     assert.ok(text.includes('Ramean lebih seru.'));
-    assert.ok(moves.some(([, y]) => y > POST_HEIGHT));
-    assert.ok(curves.some((values) => values.at(-1) < 0));
+    assert.ok(curves.some((values) => values.at(-1) === 135));
+    assert.ok(lines.some(([, y]) => y < 0));
+});
+
+test('seed trajectory follows the stored exit coordinate and direction', () => {
+    const width = POST_WIDTH * 3;
+    const diagonal = resolveSeedTrajectory({
+        court_line_exit: [{ x: 0.78, edge: 'top', direction: 'diagonal-right' }],
+    });
+    const vertical = resolveSeedTrajectory({
+        court_line_exit: [{ x: 0.64, edge: 'top', direction: 'vertical' }],
+    });
+
+    assert.equal(diagonal.end.x, width * 0.78);
+    assert.ok(diagonal.controls[1].x < diagonal.end.x);
+    assert.equal(vertical.end.x, width * 0.64);
+    assert.equal(vertical.controls[1].x, vertical.end.x);
 });
 
 test('semantic content areas stay clear of every post gutter', () => {

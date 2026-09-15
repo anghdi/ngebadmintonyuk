@@ -8,7 +8,7 @@
         <div class="feed-seed-label"><strong>ROW 0</strong><span>Master canvas 3 × 1</span></div>
     </section>
     <section class="feed-seed-stage" aria-label="Seed Row master canvas">
-        <div class="feed-stage-head"><span>SEED ROW · MASTER CANVAS</span><span>3 × 1080 · 1350 px</span></div>
+        <div class="feed-stage-head"><span>SEED ROW · MASTER CANVAS</span><a class="btn soft" href="{{ route('feed-studio.show', $seed) }}">Export Seed Row</a></div>
         <div class="feed-canvas-scroll"><canvas width="3240" height="1350" data-feed-seed-canvas data-connection='@json($seed->connection_state)'></canvas></div>
     </section>
     <div class="section-heading"><div><span class="eyebrow">FEED HISTORY</span><h2>Desain terbaru</h2></div><small>{{ $designs->total() }} batch tersimpan</small></div>
