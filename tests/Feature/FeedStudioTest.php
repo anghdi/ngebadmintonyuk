@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\CreateFeedDesignAction;
 use App\Models\FeedDesign;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -18,7 +19,16 @@ test('feed studio is available to administrators only', function () {
         ->assertSee('Feed Studio')
         ->assertSee('ROW 0');
 
-    expect(FeedDesign::query()->where('is_seed', true)->sole()->headline)->toBe('NgeBadminton YUK!');
+    $seed = FeedDesign::query()->where('is_seed', true)->sole();
+    expect($seed->headline)->toBe('NgeBadminton YUK!')
+        ->and($seed->supporting_text)->toBe('Lagi nyari temen main? · Ramean lebih seru.')
+        ->and($seed->format)->toBe('connected_3')
+        ->and($seed->connection_state['visual_engine_version'])->toBe(2)
+        ->and($seed->connection_state['court_line_exit'][0])->toMatchArray([
+            'x' => 0.78,
+            'edge' => 'top',
+            'direction' => 'diagonal-right',
+        ]);
 });
 
 test('administrator creates a connected design with private source and connection state', function () {
@@ -40,11 +50,15 @@ test('administrator creates a connected design with private source and connectio
     ])->assertRedirect()->assertSessionHasNoErrors();
 
     $design = FeedDesign::query()->where('is_seed', false)->sole();
+    $seedExit = FeedDesign::query()->where('is_seed', true)->sole()->connection_state['court_line_exit'][0];
     Storage::disk('local')->assertExists($design->photo_path);
     expect($design->created_by)->toBe($administrator->id)
         ->and($design->row_number)->toBe(1)
         ->and($design->postCount())->toBe(3)
         ->and($design->connection_state['connection_mode'])->toBe('continuous')
+        ->and($design->connection_state['incoming_connection'][0]['edge'])->toBe('bottom')
+        ->and($design->connection_state['incoming_connection'][0]['x'])->toBe($seedExit['x'])
+        ->and($design->connection_state['incoming_connection'][0]['direction'])->toBe($seedExit['direction'])
         ->and($design->grid_position)->toBe(3);
 
     $this->get(route('feed-studio.photo', $design))->assertOk()->assertHeader('Cache-Control', 'max-age=3600, private');
@@ -82,6 +96,7 @@ test('export assets are saved to feed history and match the post count', functio
 
 test('feed studio editor exposes master canvas grid preview and upload order', function () {
     $administrator = User::factory()->admin()->create();
+    app(CreateFeedDesignAction::class)->ensureSeed($administrator);
     $design = FeedDesign::factory()->for($administrator, 'creator')->create(['format' => 'connected_3']);
 
     $this->actingAs($administrator)->get(route('feed-studio.show', $design))
@@ -89,5 +104,7 @@ test('feed studio editor exposes master canvas grid preview and upload order', f
         ->assertSee('MASTER CANVAS')
         ->assertSee('INSTAGRAM GRID')
         ->assertSee('Export for Instagram')
-        ->assertSee('data-feed-editor', false);
+        ->assertSee('data-feed-editor', false)
+        ->assertSee('data-feed-seed-grid', false)
+        ->assertDontSee('feed-grid-seed"', false);
 });

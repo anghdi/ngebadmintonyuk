@@ -33,7 +33,7 @@
     <section class="mt-8"><div class="section-heading"><div><span class="eyebrow">INSTAGRAM GRID</span><h2>Setelah konten di-upload</h2></div><small>Upload sesuai nomor</small></div><div class="feed-grid-preview" data-feed-grid>
         @foreach($history as $item)
             @if($item->is_seed)
-                @foreach(['Lagi nyari temen main?', 'NgeBadminton YUK!', 'Ramean lebih seru.'] as $seedCopy)<div class="feed-grid-old feed-grid-seed"><span>{{ $seedCopy }}</span></div>@endforeach
+                <canvas class="feed-grid-seed-master" width="3240" height="1080" data-feed-seed-canvas data-feed-seed-grid data-connection='@json($item->connection_state)' aria-label="Seed Row connected 3 × 1"></canvas>
             @else
                 @for($post = 0; $post < $item->postCount(); $post++)<div class="feed-grid-old"><img src="{{ route('feed-studio.thumbnail', $item) }}" alt=""></div>@endfor
             @endif

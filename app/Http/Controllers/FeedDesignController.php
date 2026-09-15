@@ -23,9 +23,10 @@ class FeedDesignController extends Controller
     public function index(CreateFeedDesignAction $create): View
     {
         $create->ensureSeed(request()->user());
-        $designs = FeedDesign::query()->with('creator')->latest('row_number')->paginate(12);
+        $seed = FeedDesign::query()->where('is_seed', true)->sole();
+        $designs = FeedDesign::query()->with('creator')->where('is_seed', false)->latest('row_number')->paginate(12);
 
-        return view('feed-studio.index', compact('designs'));
+        return view('feed-studio.index', compact('designs', 'seed'));
     }
 
     /**

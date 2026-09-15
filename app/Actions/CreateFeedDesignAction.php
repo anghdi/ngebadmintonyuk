@@ -51,7 +51,28 @@ class CreateFeedDesignAction
 
     public function ensureSeed(User $creator): void
     {
-        if (FeedDesign::query()->where('is_seed', true)->exists()) {
+        $seedState = [
+            'visual_engine_version' => 2,
+            'background' => 'off-white',
+            'accent' => 'yellow',
+            'density' => 'low',
+            'alignment' => 'editorial',
+            'photo_presence' => false,
+            'connection_mode' => 'continuous',
+            'incoming_connection' => [],
+            'court_line_exit' => [['x' => 0.78, 'edge' => 'top', 'direction' => 'diagonal-right']],
+        ];
+        $seed = FeedDesign::query()->where('is_seed', true)->first();
+
+        if ($seed !== null) {
+            $seed->update([
+                'format' => 'connected_3',
+                'content_type' => 'hero',
+                'headline' => 'NgeBadminton YUK!',
+                'supporting_text' => 'Lagi nyari temen main? · Ramean lebih seru.',
+                'connection_state' => $seedState,
+            ]);
+
             return;
         }
 
@@ -65,11 +86,7 @@ class CreateFeedDesignAction
             'grid_position' => 0,
             'is_seed' => true,
             'layout_settings' => ['zoom' => 1, 'x' => 0, 'y' => 0],
-            'connection_state' => [
-                'background' => 'off-white', 'accent' => 'yellow', 'density' => 'low',
-                'alignment' => 'editorial', 'photo_presence' => false, 'connection_mode' => 'continuous',
-                'court_line_exit' => [['x' => 0.78, 'edge' => 'top', 'direction' => 'diagonal']],
-            ],
+            'connection_state' => $seedState,
         ]);
     }
 

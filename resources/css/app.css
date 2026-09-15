@@ -1174,18 +1174,16 @@
 
 @layer components {
     .feed-studio-page { max-width: 1180px; margin-inline: auto; }
-    .feed-studio-hero { display: grid; grid-template-columns: minmax(0, 1fr) 220px; align-items: center; gap: 2rem; overflow: hidden; margin-bottom: 2rem; border-radius: 18px; background: #102656; color: white; padding: clamp(1.25rem, 4vw, 2.5rem); }
+    .feed-studio-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2rem; overflow: hidden; margin-bottom: 1rem; border-radius: 18px; background: #102656; color: white; padding: clamp(1.25rem, 4vw, 2.5rem); }
     .feed-studio-hero > div:first-child { max-width: 650px; }
     .feed-studio-hero span { color: #ffd23f; font-size: .62rem; font-weight: 800; letter-spacing: .13em; }
     .feed-studio-hero h2 { margin: .55rem 0; color: white; font-size: clamp(1.35rem, 3vw, 2.25rem); line-height: 1.12; }
     .feed-studio-hero p { margin: 0; color: #dce4f4; font-size: .78rem; }
-    .feed-seed-mini { position: relative; display: grid; min-height: 160px; align-content: end; overflow: hidden; border-radius: 12px; background: #f7f4ec; color: #102656; padding: 1rem; }
-    .feed-seed-mini::before, .feed-seed-mini::after { position: absolute; width: 170px; height: 2px; background: #2455f5; content: ''; transform: rotate(-28deg); }
-    .feed-seed-mini::before { top: 38px; left: -20px; }
-    .feed-seed-mini::after { top: 72px; right: -75px; }
-    .feed-seed-mini i { position: absolute; top: 22px; right: 22px; width: 28px; height: 28px; border-radius: 50%; background: #ffd23f; }
-    .feed-seed-mini strong { position: relative; font-size: .6rem; letter-spacing: .1em; }
-    .feed-seed-mini span { position: relative; color: #102656; font-size: .9rem; font-weight: 800; letter-spacing: 0; }
+    .feed-seed-label { display: grid; gap: .15rem; min-width: 150px; border-left: 3px solid #ffd23f; padding-left: 1rem; }
+    .feed-seed-label strong { font-size: .85rem; }
+    .feed-seed-label span { color: #dce4f4; font-size: .65rem; letter-spacing: 0; }
+    .feed-seed-stage { min-width: 0; margin-bottom: 2rem; border-radius: 14px; background: #e7ebf2; padding: 1rem; }
+    .feed-seed-stage canvas { display: block; width: 100%; min-width: 760px; height: auto; border-radius: 5px; box-shadow: 0 12px 30px rgb(16 38 86 / 14%); }
     .feed-history-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
     .feed-history-card { display: grid; min-width: 0; gap: .7rem; align-content: start; }
     .feed-history-visual { position: relative; display: grid; overflow: hidden; border-radius: 10px; background: #102656; color: white; aspect-ratio: 4 / 5; place-items: center; }
@@ -1214,9 +1212,7 @@
     .feed-grid-preview > * { display: grid; width: 100%; height: auto; border: 1px solid white; background: #dce2eb; aspect-ratio: 1; object-fit: cover; place-items: center; }
     .feed-grid-preview canvas { object-fit: cover; object-position: center; }
     .feed-grid-old span { color: #738096; font-size: .62rem; font-weight: 700; }
-    .feed-grid-seed { background: #f7f4ec; padding: .7rem; text-align: center; }
-    .feed-grid-seed:nth-last-child(2) { background: #2455f5; }
-    .feed-grid-seed:nth-last-child(2) span { color: white; }
+    .feed-grid-preview > .feed-grid-seed-master { grid-column: 1 / -1; aspect-ratio: 3 / 1; }
     [data-feed-order] li { display: flex; align-items: center; gap: .65rem; border-bottom: 1px solid #edf0f4; padding-bottom: .5rem; }
     [data-feed-order] b { display: grid; width: 28px; height: 28px; border-radius: 50%; background: #102656; color: white; font-size: .6rem; place-items: center; }
 }
@@ -1228,7 +1224,9 @@
 
 @media (max-width: 640px) {
     .feed-studio-hero { grid-template-columns: 1fr; }
-    .feed-seed-mini { min-height: 130px; }
+    .feed-seed-label { min-width: 0; }
+    .feed-seed-stage { margin-inline: -.5rem; padding-inline: .5rem; }
+    .feed-seed-stage canvas { min-width: 620px; }
     .feed-history-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
     .feed-canvas-scroll { margin-inline: -.5rem; padding-inline: .5rem; }
     .feed-canvas-scroll canvas { min-width: 520px; }
