@@ -48,6 +48,8 @@ test('seed trajectory follows the stored exit coordinate and direction', () => {
     });
 
     assert.equal(diagonal.end.x, width * 0.78);
+    assert.ok(diagonal.start.y > POST_HEIGHT * 0.5);
+    assert.ok(diagonal.controls.every(({ y }) => y > POST_HEIGHT * 0.5));
     assert.ok(diagonal.controls[1].x < diagonal.end.x);
     assert.equal(vertical.end.x, width * 0.64);
     assert.equal(vertical.controls[1].x, vertical.end.x);

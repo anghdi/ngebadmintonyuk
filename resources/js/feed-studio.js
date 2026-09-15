@@ -139,10 +139,10 @@ export function resolveSeedTrajectory(connection, width = POST_WIDTH * 3, height
     }[outgoing.direction] ?? width * -0.1;
 
     return {
-        start: { x: width * 0.15, y: height * 0.52 },
+        start: { x: width * 0.15, y: height * 0.55 },
         controls: [
-            { x: width * 0.34, y: height * 0.67 },
-            { x: Number(outgoing.x) * width + finalControlOffset, y: height * 0.86 },
+            { x: width * 0.34, y: height * 0.69 },
+            { x: Number(outgoing.x) * width + finalControlOffset, y: height * 0.64 },
         ],
         end: { x: Number(outgoing.x) * width, y: -24 },
         outgoing,
@@ -240,7 +240,7 @@ export function drawSeedMaster(context, canvas, connection = {}) {
     context.fillStyle = '#102656';
     context.font = '800 92px "Plus Jakarta Sans", sans-serif';
     context.textAlign = 'left';
-    wrapText(context, 'Ramean lebih seru.', right.x, 420, right.width, 102, 2);
+    wrapText(context, 'Ramean lebih seru.', right.x + 344, 420, right.width - 344, 102, 2);
     context.textAlign = 'start';
 }
 
