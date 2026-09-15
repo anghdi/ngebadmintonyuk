@@ -1,6 +1,7 @@
 import { installMemberNotifications } from './member-notifications.js';
 import { installAppVersionUpdates } from './app-version.js';
 import { installStoryStudio } from './story-studio.js';
+import { installFeedStudio } from './feed-studio.js';
 import { installRequiredProfileDialog } from './profile-required.js';
 import { addBadmintonPoint } from './scoreboard.js';
 import { isIosDevice, resolvePwaInstallMode } from './pwa-install.js';
@@ -10,6 +11,7 @@ const serverLoading = installServerLoading(window, document);
 installRequiredProfileDialog(document);
 installAppVersionUpdates(window, document);
 installStoryStudio(window, document);
+installFeedStudio(window, document);
 
 document.querySelectorAll('form[data-confirm]').forEach((form) => {
     form.addEventListener('submit', (event) => {

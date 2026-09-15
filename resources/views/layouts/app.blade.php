@@ -49,7 +49,11 @@
                 <a @class(['active' => request()->routeIs('rotations.*')]) href="{{ route('rotations.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="session" /></span> Rotasi Main</a>
             @endif
             <a @class(['active' => request()->routeIs('scoreboard')]) href="{{ route('scoreboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="score" /></span> Papan Skor</a>
-            <a @class(['active' => request()->routeIs('story-studio')]) href="{{ route('story-studio') }}"><span class="nav-icon-wrap"><x-nav-icon name="camera" /></span> Story Studio</a>
+            @if(auth()->user()->isAdmin())
+                <a @class(['active' => request()->routeIs('feed-studio.*')]) href="{{ route('feed-studio.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="camera" /></span> Feed Studio</a>
+            @else
+                <a @class(['active' => request()->routeIs('story-studio')]) href="{{ route('story-studio') }}"><span class="nav-icon-wrap"><x-nav-icon name="camera" /></span> Story Studio</a>
+            @endif
             @if(! auth()->user()->isAdmin())
                 <a @class(['active' => request()->routeIs('profile.*')]) href="{{ route('profile.edit') }}"><span class="nav-icon-wrap"><x-nav-icon name="users" /></span> Profil Saya</a>
             @endif

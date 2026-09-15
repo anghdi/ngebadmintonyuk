@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommunityProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FeedDesignController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\MemberReportController;
@@ -76,6 +77,10 @@ Route::middleware(['auth', RequireCurrentPushSetup::class, RequireMemberNotifica
     Route::get('/top-ups/{topUpRequest}/proof', [TopUpRequestController::class, 'proof'])->name('top-ups.proof');
 
     Route::middleware('can:admin')->withoutMiddleware(RequireMemberNotifications::class)->group(function () {
+        Route::get('/feed-studio/{feedDesign}/photo', [FeedDesignController::class, 'photo'])->name('feed-studio.photo');
+        Route::get('/feed-studio/{feedDesign}/thumbnail', [FeedDesignController::class, 'thumbnail'])->name('feed-studio.thumbnail');
+        Route::post('/feed-studio/{feedDesign}/assets', [FeedDesignController::class, 'saveAssets'])->middleware('throttle:10,1')->name('feed-studio.assets');
+        Route::resource('feed-studio', FeedDesignController::class)->parameters(['feed-studio' => 'feedDesign']);
         Route::put('/top-up-settings', [TopUpSettingController::class, 'update'])->name('top-up-settings.update');
         Route::put('/top-ups/{topUpRequest}', [TopUpRequestController::class, 'update'])->name('top-ups.update');
         Route::delete('/top-ups/{topUpRequest}', [TopUpRequestController::class, 'destroy'])->name('top-ups.destroy');
