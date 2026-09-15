@@ -2,10 +2,13 @@
 
 use App\Actions\GenerateRotationScheduleAction;
 use App\Actions\PublishRotationScheduleAction;
+use App\Contracts\PushNotificationSender;
 use App\Models\Attendance;
 use App\Models\Guest;
 use App\Models\Income;
 use App\Models\PlaySession;
+use App\Models\PushNotification;
+use App\Models\PushSubscription;
 use App\Models\SessionRegistration;
 use App\Models\User;
 use App\Services\RotationScheduleService;
@@ -156,7 +159,7 @@ test('changed main roster hides old schedule but waiting and payment changes do 
     $service = app(RotationScheduleService::class);
     $roster = $service->roster($registrations);
     app(GenerateRotationScheduleAction::class)->handle($session, 1, 0, $service->fingerprint($roster, 1));
-    app(PublishRotationScheduleAction::class)->handle($session, 1);
+    app(PublishRotationScheduleAction::class)->handle($session, 1, User::factory()->admin()->create());
     $session->refresh();
     SessionRegistration::factory()->for($session)->create();
     $registrations[0]->update(['payment_status' => 'paid', 'attendance_status' => 'present']);
@@ -228,6 +231,59 @@ test('publishing rejects stale drafts and regeneration requires a new review', f
     $registrations[0]->update(['name' => 'Replaced player']);
     $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 2])->assertSessionHasErrors('rotation');
     expect($session->refresh()->rotation_schedule['published_at'])->toBeNull();
+});
+
+test('publishing rotation notifies confirmed member devices only once', function () {
+    $administrator = User::factory()->admin()->create();
+    $session = PlaySession::factory()->create(['max_players' => 4, 'scheduled_at' => '2026-09-20 19:00:00']);
+    $confirmedMembers = User::factory()->member()->count(3)->create();
+    $waitingMember = User::factory()->member()->create();
+    $outsider = User::factory()->member()->create();
+
+    foreach ($confirmedMembers as $member) {
+        SessionRegistration::factory()->for($session)->for($member)->create(['name' => $member->name]);
+    }
+    SessionRegistration::factory()->for($session)->create(['name' => 'Guest']);
+    SessionRegistration::factory()->for($session)->for($waitingMember)->create(['name' => $waitingMember->name]);
+
+    $confirmedSubscriptions = $confirmedMembers->map(fn (User $member) => PushSubscription::factory()->for($member)->create());
+    PushSubscription::factory()->for($waitingMember)->create();
+    PushSubscription::factory()->for($outsider)->create();
+    $sender = new class implements PushNotificationSender
+    {
+        /** @var list<int> */
+        public array $userIds = [];
+
+        /** @var list<string> */
+        public array $urls = [];
+
+        public function send(PushSubscription $subscription, string $title, string $body, string $url): string
+        {
+            $this->userIds[] = $subscription->user_id;
+            $this->urls[] = $url;
+
+            return self::Sent;
+        }
+    };
+    $this->app->instance(PushNotificationSender::class, $sender);
+
+    $service = app(RotationScheduleService::class);
+    $roster = $service->roster($session->registrations()->oldest('id')->limit(4)->get());
+    app(GenerateRotationScheduleAction::class)->handle($session, 1, 0, $service->fingerprint($roster, 1));
+
+    $this->actingAs($administrator)
+        ->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 1])
+        ->assertSessionHasNoErrors();
+    $this->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 1])
+        ->assertSessionHasNoErrors();
+
+    $notification = PushNotification::query()->where('type', 'rotation_published')->sole();
+    expect($sender->userIds)->toEqualCanonicalizing($confirmedSubscriptions->pluck('user_id')->all())
+        ->and($sender->urls)->each->toBe(route('rotations.show', $session))
+        ->and($notification->recipient_count)->toBe(3)
+        ->and($notification->device_count)->toBe(3)
+        ->and($notification->success_count)->toBe(3)
+        ->and($notification->body)->toBe('Cek pasangan dan lawanmu untuk sesi 20/09/2026.');
 });
 
 test('match format automatically generates fair turns without a manual round count', function (int $players, int $courts, int $sets, int $expectedRounds) {

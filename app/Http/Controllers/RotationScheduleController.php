@@ -23,7 +23,7 @@ class RotationScheduleController extends Controller
 
     public function publish(PublishRotationScheduleRequest $request, PlaySession $playSession, PublishRotationScheduleAction $publish): RedirectResponse
     {
-        $publish->handle($playSession, $request->integer('expected_version'));
+        $publish->handle($playSession, $request->integer('expected_version'), $request->user());
 
         return redirect()->to(route('play-sessions.show', $playSession).'#rotasi')->with('success', 'Rotasi dipublikasikan untuk member.');
     }
