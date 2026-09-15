@@ -70,7 +70,9 @@
                         </div>
                     @endif
                     @if((int) $membership->attendances_count === 0 && (int) $membership->top_up_requests_count === 0)
-                        <form method="post" action="{{ route('memberships.destroy', [$member, $membership]) }}" class="membership-delete" onsubmit="return confirm('Hapus paket ini?')">@csrf @method('delete')<button class="link danger">Hapus paket</button></form>
+                        <form method="post" action="{{ route('memberships.destroy', [$member, $membership]) }}" class="membership-delete" onsubmit="return confirm('Hapus paket kuota ini?')">@csrf @method('delete')<button class="link danger">Hapus paket kuota</button></form>
+                    @else
+                        <p class="membership-delete text-sm text-slate-500">Paket dengan riwayat kehadiran atau top up disimpan sebagai arsip.</p>
                     @endif
                 </details>
             @empty

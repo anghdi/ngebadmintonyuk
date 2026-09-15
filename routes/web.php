@@ -20,6 +20,7 @@ use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RotationScheduleController;
+use App\Http\Controllers\RotationSchedulePdfController;
 use App\Http\Controllers\SessionRegistrationController;
 use App\Http\Controllers\ShuttlecockInventoryController;
 use App\Http\Controllers\StockMovementController;
@@ -77,6 +78,7 @@ Route::middleware(['auth', RequireCurrentPushSetup::class, RequireMemberNotifica
     Route::middleware('can:admin')->withoutMiddleware(RequireMemberNotifications::class)->group(function () {
         Route::put('/top-up-settings', [TopUpSettingController::class, 'update'])->name('top-up-settings.update');
         Route::put('/top-ups/{topUpRequest}', [TopUpRequestController::class, 'update'])->name('top-ups.update');
+        Route::delete('/top-ups/{topUpRequest}', [TopUpRequestController::class, 'destroy'])->name('top-ups.destroy');
         Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
         foreach (['incomes', 'expenses'] as $uri) {
             Route::resource($uri, TransactionController::class)->parameters([$uri => 'transaction']);
@@ -97,6 +99,7 @@ Route::middleware(['auth', RequireCurrentPushSetup::class, RequireMemberNotifica
         Route::resource('play-sessions', PlaySessionController::class)->only(['index', 'store', 'show', 'edit', 'update', 'destroy']);
         Route::post('/play-sessions/{playSession}/rotation', RotationScheduleController::class)->middleware('throttle:10,1')->name('play-sessions.rotation');
         Route::post('/play-sessions/{playSession}/rotation/publish', [RotationScheduleController::class, 'publish'])->middleware('throttle:10,1')->name('play-sessions.rotation.publish');
+        Route::get('/play-sessions/{playSession}/rotation/pdf', RotationSchedulePdfController::class)->name('play-sessions.rotation.pdf');
         Route::put('/play-sessions/{playSession}/members/{member}/attendance', [AttendanceController::class, 'update'])->name('attendances.update');
         Route::post('/play-sessions/{playSession}/registrations', [SessionRegistrationController::class, 'storeByAdmin'])->name('session-registrations.store');
         Route::post('/play-sessions/{playSession}/guests', [SessionRegistrationController::class, 'storeGuest'])->name('session-guests.store');

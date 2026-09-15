@@ -43,12 +43,12 @@ Semua modul berikut tersedia dalam kode. Kriteria penerimaan menjadi baseline ya
 | FR-02 | Profil pemain | Member memperbarui nama/tanggal lahir dan atribut opsional; foto disimpan privat. Profil sesama pemain hanya menampilkan nama, nickname, level dan foto, tanpa email/telepon/tanggal lahir/kuota. | [MemberProfileTest](../tests/Feature/MemberProfileTest.php), [CommunityProfileTest](../tests/Feature/CommunityProfileTest.php) |
 | FR-03 | Jadwal dan peserta | Katalog/detail sesi publik dan admin tersedia dengan filter bulan; daftar utama dan waiting list berbagi batas kapasitas; akun tidak terdaftar dua kali di sesi sama. | [PlaySessionRegistrationTest](../tests/Feature/PlaySessionRegistrationTest.php), [PlaySessionMonthFilterTest](../tests/Feature/PlaySessionMonthFilterTest.php) |
 | FR-04 | Tamu | Admin membuat/mengubah kontak dan menambahkan tamu ke sesi; kapasitas dan sanksi berlaku; perubahan kontak tidak menulis ulang snapshot histori. Tamu tidak memakai membership. | [GuestManagementTest](../tests/Feature/GuestManagementTest.php) |
-| FR-05 | Membership dan absensi | Saldo kuota berasal dari ledger; hadir bermetode membership memakai satu kredit yang memenuhi syarat; koreksi mengembalikan kredit; no-show tidak memakai kuota. | [MembershipManagementTest](../tests/Feature/MembershipManagementTest.php), [CashQuotaLifecycleTest](../tests/Feature/CashQuotaLifecycleTest.php) |
-| FR-06 | Top-up | Bukti transfer privat dan harga paket tersimpan saat pengajuan; approval hanya sekali dan secara atomik membuat satu income serta +4 kredit. Penolakan tidak menambah kredit/kas. | [MembershipRegistrationTest](../tests/Feature/MembershipRegistrationTest.php), [CashQuotaLifecycleTest](../tests/Feature/CashQuotaLifecycleTest.php) |
+| FR-05 | Membership dan absensi | Saldo kuota berasal dari ledger; hadir bermetode membership memakai satu kredit yang memenuhi syarat; koreksi mengembalikan kredit; no-show tidak memakai kuota. Admin dapat menghapus paket kuota yang belum mempunyai riwayat kehadiran atau top-up; paket berisi riwayat dipertahankan sebagai arsip. | [MembershipManagementTest](../tests/Feature/MembershipManagementTest.php), [CashQuotaLifecycleTest](../tests/Feature/CashQuotaLifecycleTest.php) |
+| FR-06 | Top-up | Bukti transfer privat dan harga paket tersimpan saat pengajuan; approval hanya sekali dan secara atomik membuat satu income serta +4 kredit. Admin dapat menghapus pengajuan berstatus pending atau rejected beserta bukti privatnya. Pengajuan approved tidak dapat dihapus karena terhubung ke kas dan ledger kuota. | [MembershipRegistrationTest](../tests/Feature/MembershipRegistrationTest.php), [CashQuotaLifecycleTest](../tests/Feature/CashQuotaLifecycleTest.php) |
 | FR-07 | Pembayaran sesi | Cash/transfer pemain utama dapat dikonfirmasi dan membuat satu linked income; waiting list belum boleh dibayar; membership tidak membuat income baru. Income terkait terlindung dari perubahan manual. | [PlaySessionRegistrationTest](../tests/Feature/PlaySessionRegistrationTest.php), [CashQuotaLifecycleTest](../tests/Feature/CashQuotaLifecycleTest.php) |
 | FR-08 | Kas dan laporan | Kategori dan transaksi detail tersedia; total dihitung dari detail; saldo dari pemasukan dikurangi pengeluaran; filter periode dan PDF menggunakan data laporan yang konsisten. | [FinanceTest](../tests/Feature/FinanceTest.php) |
 | FR-09 | Laporan member/tamu | Admin memperoleh kehadiran, pembayaran, top-up dan kuota; summary seluruh hasil filter tidak terbatas halaman; PDF memakai filter yang sama; tamu dipisah. Preview ulang tahun hari ini sampai tujuh hari mendatang tidak mengirim otomatis. | [MemberReportTest](../tests/Feature/MemberReportTest.php) |
-| FR-10 | Rotasi ganda | Admin memilih 1 atau 2 set × 21 poin untuk 1–2 lapangan; generate membuat draft; admin meninjau dan publish versi yang sama; daftar utama termasuk tamu, waiting list dikecualikan; roster/lapangan berubah membuat jadwal usang tersembunyi. | [SessionRotationTest](../tests/Feature/SessionRotationTest.php) |
+| FR-10 | Rotasi ganda | Admin memilih 1 atau 2 set × 21 poin untuk 1–2 lapangan; generate membuat draft; admin meninjau tabel pertandingan yang hanya memuat giliran, lapangan, dan kedua pasangan lalu publish versi yang sama. Daftar utama termasuk tamu, waiting list dikecualikan; roster/lapangan berubah membuat jadwal usang tersembunyi. Admin dapat mengunduh draft atau jadwal terpublikasi sebagai PDF A4 landscape. | [SessionRotationTest](../tests/Feature/SessionRotationTest.php) |
 | FR-11 | Inventori | Item dan pergerakan shuttlecock tersedia; saldo dihitung dari mutasi; mutasi tidak boleh membuat stok negatif. | [ShuttlecockInventoryTest](../tests/Feature/ShuttlecockInventoryTest.php) |
 | FR-12 | Notifikasi dan PWA | Broadcast admin dan aktivitas registrasi memakai layanan push; izin hanya diminta setelah tindakan pengguna; kegagalan setup menyediakan retry; instalasi browser/iOS memiliki alur panduan. | [PushNotificationTest](../tests/Feature/PushNotificationTest.php), [tes JavaScript](../tests/JavaScript) |
 | FR-13 | Papan skor | Aturan 21 poin, selisih dua, batas 30 dan best of three tersedia; state tersimpan lokal di perangkat. | [ScoreboardTest](../tests/Feature/ScoreboardTest.php), [scoreboard.test.js](../tests/JavaScript/scoreboard.test.js) |
@@ -62,9 +62,13 @@ Semua modul berikut tersedia dalam kode. Kriteria penerimaan menjadi baseline ya
 - Kuota dihitung dari membership_transactions. Kelayakan paket mengikuti status, masa berlaku dan kecocokan sesi; Paket Komunitas menjadi fallback sesuai implementasi.
 - Harga top-up dapat diatur admin; default Rp110.000. Kredit setiap approval tetap empat. Persetujuan historis tidak di-backfill otomatis.
 - Kas top-up dicatat saat persetujuan. Hadir menggunakan membership tidak mencatat kas lagi. Cash/transfer tidak mengurangi kuota.
+- Penghapusan top-up hanya tersedia untuk admin dan hanya berlaku pada status pending atau rejected. Penghapusan juga membersihkan bukti transfer dari penyimpanan privat. Top-up approved, income terkait, dan mutasi kuotanya wajib dipertahankan sebagai riwayat transaksi.
+- Paket kuota hanya dapat dihapus jika belum memiliki kehadiran atau pengajuan top-up. Paket yang sudah mempunyai riwayat tidak dihapus; admin dapat menonaktifkannya dan melakukan koreksi saldo melalui mutasi ledger.
 - Perubahan paid menjadi unpaid adalah koreksi catatan. Komunitas tidak memiliki alur refund; koreksi bukan bukti uang dikembalikan.
 - Rotasi adalah rencana giliran, bukan catatan hasil, absensi atau kas. Jumlah ronde = floor(durasi sesi / (jumlah set * menit per set)), maksimal 80. Default durasi 180 menit dan 15 menit per set, tanpa tambahan waktu pergantian. Dua lapangan diberi label A/B; algoritma memprioritaskan giliran yang merata, pemerataan penggunaan A/B, serta variasi pasangan dan lawan. Waktu selesai merupakan perkiraan dari waktu mulai ditambah durasi sesi. Durasi yang tidak cukup untuk satu ronde ditolak.
 - Publikasi rotasi harus eksplisit; regenerasi menarik publikasi lama. Daftar rotasi pribadi difilter berdasarkan keikutsertaan, sedangkan endpoint detail saat ini dapat diakses pengguna terautentikasi dengan jadwal terpublikasi. Jangan menganggap ada pembatasan peserta atau waktu mulai pada endpoint detail tanpa mengubah implementasi dan tes.
+- Review admin memakai istilah **giliran** untuk membedakannya dari hasil pertandingan. Setiap baris mewakili satu pertandingan dan hanya menampilkan nomor giliran, label lapangan, Pasangan A, dan Pasangan B; pemain yang sedang tidak bermain tidak dicantumkan.
+- PDF rotasi hanya dapat diunduh admin. Isinya mengikuti draft aktif atau jadwal terpublikasi, menampilkan metadata sesi, format pertandingan, kedua pasangan, dan nomor halaman. Jadwal usang akibat perubahan roster atau jumlah lapangan tidak boleh diekspor.
 - Stok belum terhubung otomatis ke expense. Kas uang, kuota main dan stok adalah tiga perhitungan berbeda.
 
 ## 6. Alur utama
@@ -79,11 +83,14 @@ flowchart TD
     F --> G[Membership hadir memakai satu kredit]
     A --> H[Ajukan top-up dan bukti transfer]
     H --> I[Admin review]
+    I --> Q[Pending atau rejected dapat dihapus admin]
     I --> J[Approved: income dan empat kredit]
     K[Admin tambah tamu] --> C
     C --> L[Generate draft rotasi dari pemain utama]
-    L --> M[Admin review dan publish]
-    M --> N[Pemain melihat rotasi]
+    L --> M[Admin review tabel pertandingan]
+    M --> N[Unduh PDF bila diperlukan]
+    M --> O[Publish versi yang sama]
+    O --> P[Pemain melihat rotasi]
 ```
 
 ## 7. Kebutuhan nonfungsional dan batas verifikasi
@@ -93,7 +100,7 @@ flowchart TD
 | Integritas | Mutasi kas/kuota yang terkait harus atomik dan tidak menggandakan efek. Kapasitas serta versi rotasi memiliki lock/check; uji concurrency pada database target masih perlu dilakukan. |
 | Privasi | Bukti transfer dan avatar privat; pembatasan admin/member dan profil peer harus tetap lulus tes. |
 | Perangkat | Validasi nyata pada Android Chrome dan iOS/Safari/PWA untuk login, push, upload, install, skor dan export story. Belum dibuktikan oleh audit ini. |
-| Pelaporan | Rekonsiliasi angka kas, top-up, kehadiran dan ledger dengan contoh data operasional; periksa hasil PDF secara visual. |
+| Pelaporan | Rekonsiliasi angka kas, top-up, kehadiran dan ledger dengan contoh data operasional; periksa PDF laporan serta rotasi secara visual. PDF rotasi harus mengulang header tabel, menjaga baris tetap utuh, membungkus nama panjang, dan menampilkan nomor halaman. |
 | Operasional | Bukti migration pada database target, backup/restore, konfigurasi push/storage/HTTPS dan observasi kegagalan sebelum rilis. Audit ini tidak menjalankan migration produksi. |
 | Performa | Belum ada hasil load test atau SLA. Tetapkan target waktu respons dan jumlah pengguna bersamaan sebelum pengujian beban. |
 
@@ -130,7 +137,9 @@ Hasil pemeriksaan lokal 15 September 2026:
 - Inventaris route berhasil melalui php artisan route:list --except-vendor --json.
 - node --test tests/JavaScript/*.test.js: **34 tes lulus, nol gagal**.
 - Validasi tautan seluruh dokumen melalui ProjectContextTest dengan filter current documentation links resolve: **1 tes lulus, 155 assertions**, termasuk PRD ini.
-- Run awal php artisan test --compact: 168 tes, 3 lulus, 1 gagal dan 164 error. Error berasal dari APP_KEY tidak tersedia dan driver SQLite CLI tidak aktif. Kegagalan integritas Graphify: app/Models/Guest.php belum tercakup dalam graph; graph perlu diregenerasi sebelum dianggap mencerminkan kode terbaru.
-- Run ulang Pest langsung memakai APP_KEY dummy khusus proses dan extension SQLite khusus proses selesai: **161 dari 168 tes lulus, 7 gagal, 2.886 assertions**. Tidak ada perubahan .env/php.ini. Kegagalan yang terlihat mencakup integritas Graphify dan assertion teks halaman setup notifikasi; tujuh kegagalan perlu ditelusuri sebelum menyatakan suite backend bersih. Audit ini tidak memperbaiki kode aplikasi.
+- Run awal php artisan test --compact: 168 tes, 3 lulus, 1 gagal dan 164 error. Error berasal dari APP_KEY tidak tersedia dan driver SQLite CLI tidak aktif. Run ulang Pest dengan konfigurasi proses memperlihatkan 161 dari 168 tes lulus; hasil ini dipertahankan sebagai riwayat audit awal, bukan status verifikasi terbaru.
+- Verifikasi perubahan rotasi terbaru: **39 tes SessionRotation lulus dengan 2.192 assertions** menggunakan extension SQLite khusus proses; Pint lulus; build Vite berhasil dengan Node 24.19.0; AI Slop memperoleh **100/100** tanpa temuan. PDF contoh A4 landscape berisi 12 giliran pada dua lapangan berhasil dirender menjadi dua halaman dan diperiksa secara visual.
+- Verifikasi penghapusan paket/top-up: **24 tes terkait kas, kuota, dan membership lulus dengan 132 assertions**. Cakupan baru memastikan pending/rejected dapat dihapus bersama bukti, member tidak berwenang menghapus, dan approved tetap melindungi pemasukan serta ledger. Pint dan AI Slop lulus; quality gate **100/100** tanpa temuan.
+- Graphify diregenerasi setelah penambahan ekspor PDF rotasi: **1.881 node, 3.069 relasi, dan 209 komunitas**. `RotationSchedulePdfController` serta `rotations/pdf.blade.php` sudah tercakup. Dua tes integritas konteks proyek lulus dengan **6.620 assertions**; `boost.json` dan `pint.json` tetap dilaporkan sebagai berkas konfigurasi tanpa node, bukan modul aplikasi yang hilang.
 
 Batas audit: tidak memeriksa database/data produksi, melakukan deployment, mengirim push nyata, atau melakukan UAT visual perangkat. Riwayat hasil tes pada dokumen lama tidak dipakai sebagai hasil run terbaru.

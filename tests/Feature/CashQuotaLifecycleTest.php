@@ -11,6 +11,7 @@ use App\Models\TopUpRequest;
 use App\Models\TopUpSetting;
 use App\Models\User;
 use App\Services\ReportService;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
@@ -229,4 +230,43 @@ test('quota controls and recorded top up income are visible in the existing page
     $this->get(route('top-ups.index'))->assertSuccessful()->assertSee('Lihat pemasukan');
     $this->actingAsNotifiedMember($this->member)->get(route('public-sessions.show', $this->playSession))
         ->assertSuccessful()->assertSee('Kuota membership');
+});
+
+test('administrator can delete pending or rejected top ups and their proof', function (string $status) {
+    Storage::fake('local');
+    $this->topUp->update(['status' => $status, 'proof_path' => 'top-up-proofs/proof.pdf']);
+    Storage::disk('local')->put($this->topUp->proof_path, 'proof');
+
+    $this->actingAs($this->administrator);
+    $this->get(route('top-ups.index'))
+        ->assertSuccessful()
+        ->assertSee('Hapus pengajuan');
+
+    $this
+        ->delete(route('top-ups.destroy', $this->topUp))
+        ->assertRedirect()
+        ->assertSessionHasNoErrors();
+
+    $this->assertModelMissing($this->topUp);
+    Storage::disk('local')->assertMissing('top-up-proofs/proof.pdf');
+})->with(['pending', 'rejected']);
+
+test('approved top ups and their accounting history cannot be deleted', function () {
+    app(ReviewTopUpRequestAction::class)->handle($this->topUp, ['status' => 'approved'], $this->administrator);
+
+    $this->actingAs($this->administrator)
+        ->delete(route('top-ups.destroy', $this->topUp))
+        ->assertSessionHasErrors('top_up');
+
+    $this->assertModelExists($this->topUp);
+    expect($this->topUp->refresh()->income)->not->toBeNull()
+        ->and($this->membership->transactions()->sum('quantity'))->toBe(4);
+});
+
+test('members cannot delete top up requests', function () {
+    $this->actingAsNotifiedMember($this->member)
+        ->deleteJson(route('top-ups.destroy', $this->topUp))
+        ->assertForbidden();
+
+    $this->assertModelExists($this->topUp);
 });

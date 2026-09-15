@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\CreateTopUpRequestAction;
+use App\Actions\DeleteTopUpRequestAction;
 use App\Actions\ReviewTopUpRequestAction;
 use App\Http\Requests\ReviewTopUpRequest;
 use App\Http\Requests\StoreTopUpRequest;
@@ -53,6 +54,14 @@ class TopUpRequestController extends Controller
             : 'Pengajuan top up ditolak.';
 
         return back()->with('success', $message);
+    }
+
+    public function destroy(Request $request, TopUpRequest $topUpRequest, DeleteTopUpRequestAction $deleteTopUpRequest): RedirectResponse
+    {
+        abort_unless($request->user()->isAdmin(), 403);
+        $deleteTopUpRequest->handle($topUpRequest);
+
+        return back()->with('success', 'Pengajuan top up berhasil dihapus.');
     }
 
     public function proof(Request $request, TopUpRequest $topUpRequest): StreamedResponse

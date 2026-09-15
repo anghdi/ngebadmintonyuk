@@ -40,3 +40,6 @@ All non-admin members, including existing accounts, must fill a name and valid d
 
 ## Admin-managed guests may join without member accounts
 This supersedes the account-only rule for admin additions only. Admin keeps reusable Guest contacts and may add guest_id registrations with no user_id, birth date or push subscription. Public self-registration still requires a complete member account. Guests share atomic capacity, waiting order, linked cash/transfer income and three-no-show sanctions keyed by guest_id. Guest attendance stays on SessionRegistration and never consumes membership credits; contact edits do not rewrite historical snapshots.
+
+## Top up deletion preserves settled accounting
+Admin may permanently delete only pending or rejected top-up requests; delete their private proof file too. Approved top ups must remain because they are linked to income and membership ledger history. Membership packages with attendance or top-up history remain archival and cannot be deleted.

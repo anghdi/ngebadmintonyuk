@@ -54,6 +54,12 @@
                             @endif
                             @if($topUpRequest->review_notes)<small>{{ $topUpRequest->review_notes }}</small>@endif
                         @endif
+                        @if($topUpRequest->status !== 'approved')
+                            <form method="post" action="{{ route('top-ups.destroy', $topUpRequest) }}" class="mt-3" onsubmit="return confirm('Hapus pengajuan top up ini? Bukti transfer juga akan dihapus.')">
+                                @csrf @method('delete')
+                                <button class="link danger">Hapus pengajuan</button>
+                            </form>
+                        @endif
                     </td>
                 </tr>
             @empty

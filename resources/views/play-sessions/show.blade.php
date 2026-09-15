@@ -25,7 +25,10 @@
     @if($rotationStale)
         <p class="mt-4 text-sm text-amber-800">List berubah. Generate ulang sebelum publikasi.</p>
     @elseif($rotationSchedule)
-        <p class="mt-4 text-sm font-medium {{ $rotationPublished ? 'text-teal-700' : 'text-amber-800' }}">{{ $rotationPublished ? 'Dipublikasikan · member dapat melihat' : 'Draf · belum terlihat oleh member' }}</p>
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-sm font-medium {{ $rotationPublished ? 'text-teal-700' : 'text-amber-800' }}">{{ $rotationPublished ? 'Dipublikasikan · member dapat melihat' : 'Draf · belum terlihat oleh member' }}</p>
+            <a class="btn soft" data-no-loading href="{{ route('play-sessions.rotation.pdf', $playSession) }}">Unduh PDF</a>
+        </div>
         <x-rotation-review :schedule="$rotationSchedule" />
         @if(!$rotationPublished && $playSession->status === 'scheduled')
             <form class="mt-4" method="post" action="{{ route('play-sessions.rotation.publish', $playSession) }}" data-confirm="Publikasikan jadwal ini untuk member?">

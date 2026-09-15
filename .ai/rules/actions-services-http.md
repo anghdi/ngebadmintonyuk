@@ -13,3 +13,6 @@ Supersedes immediate publication: generate stores a draft with published_at null
 
 ## Rotation chooses set format instead of manual rounds
 Admin generation requires sets_per_match 1 or 2, each set 21 points. Compute rounds from the live confirmed roster and court count: ceil(players * targetGames / (4 * courts)), capped at 80; targetGames is 3 for one set or 2 for two sets. Persist the chosen format and 23:00 play-until label in the draft. This is a fair ordered queue, not a match-duration estimate or a guarantee all rounds fit in three hours. Never use client round_count; review and explicit publication remain required.
+
+## PRD timing formula supersedes target-game rotation rounds
+The 15 September 2026 PRD supersedes the earlier targetGames formula. Calculate round_count as floor(session_duration_minutes / (sets_per_match * minutes_per_set)), capped at 80. Defaults are 180 session minutes and 15 minutes per set, so 1 set yields 12 rounds and 2 sets yields 6; court count controls simultaneous matches, not round count. Do not add changeover time. Persist timing inputs and estimated play_until; reject durations that cannot fit one round. For two courts, label A/B and optimize each player's A/B use alongside fair play counts and varied partners/opponents.

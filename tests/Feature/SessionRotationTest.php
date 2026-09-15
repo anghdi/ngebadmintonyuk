@@ -33,7 +33,7 @@ test('admin publishes all rounds from the main list including unpaid members and
     expect(Attendance::count())->toBe(0)->and(Income::count())->toBe(0);
     expect($session->registrations()->where('payment_status', 'paid')->count())->toBe(0);
 
-    $this->get(route('play-sessions.show', $session))->assertOk()->assertSee('Review 12 ronde')->assertSee('Publikasikan rotasi')
+    $this->get(route('play-sessions.show', $session))->assertOk()->assertSee('12 giliran')->assertSee('Publikasikan rotasi')
         ->assertDontSee('name="changeover_minutes"', false);
     $this->actingAsNotifiedMember($member)->get(route('rotations.show', $session))->assertNotFound();
     $this->get(route('rotations.index'))->assertOk()->assertSee('Belum ada rotasi');
@@ -210,7 +210,7 @@ test('match format automatically generates fair turns without a manual round cou
     expect(min($schedule['games']))->toBeGreaterThan(0);
     expect(max($schedule['games']) - min($schedule['games']))->toBeLessThanOrEqual(1);
     $this->get(route('play-sessions.show', $session))->assertOk()->assertSee('Format pertandingan')
-        ->assertDontSee('name="round_count"', false)->assertSee($sets.' set × 21 poin')->assertSee('Durasi sesi 180 menit');
+        ->assertDontSee('name="round_count"', false)->assertSee($sets.' set × 21 poin')->assertSee('180 menit · ±'.($sets * 15).' menit/giliran');
 })->with([[12, 1, 1, 12], [12, 1, 2, 6], [12, 2, 1, 12], [12, 2, 2, 6], [5, 1, 1, 12], [20, 1, 1, 12]]);
 
 test('unsupported match formats cannot create a rotation draft', function (mixed $sets) {
@@ -256,3 +256,51 @@ test('rotation duration controls rounds and rejects invalid timing', function (i
     'zero set time' => [180, 0, 3, null, 'minutes_per_set'],
     'legacy changeover ignored' => [180, 15, 3, 12, null],
 ]);
+
+test('admin reviews a clean rotation table and downloads it as pdf', function () {
+    $session = PlaySession::factory()->create([
+        'court_count' => 1,
+        'max_players' => 4,
+        'venue_name' => 'GOR Komunitas',
+    ]);
+    $registrations = collect(['Pemain Satu', 'Pasangan Satu', 'Pemain Dua', 'Pasangan Dua'])
+        ->map(fn (string $name) => SessionRegistration::factory()->for($session)->create(['name' => $name]));
+    $service = app(RotationScheduleService::class);
+    app(GenerateRotationScheduleAction::class)->handle(
+        $session,
+        1,
+        0,
+        $service->fingerprint($service->roster($registrations), 1),
+    );
+
+    $this->actingAs(User::factory()->admin()->create());
+
+    $this->get(route('play-sessions.show', $session))
+        ->assertOk()
+        ->assertSee('Setiap baris satu pertandingan')
+        ->assertSee('Unduh PDF')
+        ->assertDontSee('Istirahat');
+
+    $this->get(route('play-sessions.rotation.pdf', $session))
+        ->assertOk()
+        ->assertHeader('content-type', 'application/pdf')
+        ->assertDownload('rotasi-bermain-'.$session->scheduled_at->format('Y-m-d').'-gor-komunitas.pdf');
+});
+
+test('rotation pdf is restricted to admins and rejects stale schedules', function () {
+    $session = PlaySession::factory()->create(['max_players' => 4]);
+
+    $this->get(route('play-sessions.rotation.pdf', $session))->assertRedirect(route('login'));
+    $this->actingAsNotifiedMember(User::factory()->member()->create())
+        ->get(route('play-sessions.rotation.pdf', $session))
+        ->assertForbidden();
+
+    $registrations = SessionRegistration::factory()->for($session)->count(4)->create();
+    $service = app(RotationScheduleService::class);
+    app(GenerateRotationScheduleAction::class)->handle($session, 1, 0, $service->fingerprint($service->roster($registrations), 1));
+    $registrations->first()->update(['name' => 'Roster berubah']);
+
+    $this->actingAs(User::factory()->admin()->create())
+        ->get(route('play-sessions.rotation.pdf', $session))
+        ->assertNotFound();
+});
