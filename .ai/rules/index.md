@@ -25,3 +25,4 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/{Services,Http}/** | .ai/rules/services-http.md |
 | app/{Services,Http}/**, resources/{js,views,css}/** | .ai/rules/services-httpjsviewscss.md |
 | app/Services/RotationScheduleService.php, app/Services/FeedLayoutStateService.php | .ai/rules/services.md |
+| resources/{views,js,css}/** | .ai/rules/viewsjscss.md |

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\CreateFeedDesignAction;
 use App\Actions\DeleteFeedDesignAction;
+use App\Actions\PublishFeedDesignAction;
 use App\Actions\SaveFeedDesignAssetsAction;
 use App\Actions\UpdateFeedDesignAction;
 use App\Http\Requests\SaveFeedDesignAssetsRequest;
@@ -24,9 +25,19 @@ class FeedDesignController extends Controller
     {
         $create->ensureSeed(request()->user());
         $seed = FeedDesign::query()->where('is_seed', true)->sole();
-        $designs = FeedDesign::query()->with('creator')->where('is_seed', false)->latest('row_number')->paginate(12);
+        $designs = FeedDesign::query()->with(['creator', 'connectedFrom'])->where('is_seed', false)->latest('row_number')->paginate(12);
+        $connectionHistory = FeedDesign::query()
+            ->with('connectedFrom')
+            ->latest('row_number')
+            ->limit(12)
+            ->get()
+            ->sortBy('row_number');
+        $connectionAnchor = FeedDesign::query()
+            ->where(fn ($query) => $query->where('is_seed', true)->orWhereNotNull('exported_at'))
+            ->latest('row_number')
+            ->first();
 
-        return view('feed-studio.index', compact('designs', 'seed'));
+        return view('feed-studio.index', compact('designs', 'seed', 'connectionHistory', 'connectionAnchor'));
     }
 
     /**
@@ -55,13 +66,15 @@ class FeedDesignController extends Controller
      */
     public function show(FeedDesign $feedDesign): View
     {
-        $history = FeedDesign::query()
-            ->whereKeyNot($feedDesign->id)
-            ->where('row_number', '<', $feedDesign->row_number)
-            ->where(fn ($query) => $query->whereNotNull('thumbnail_path')->orWhere('is_seed', true))
-            ->latest('row_number')
-            ->limit(9)
-            ->get();
+        $history = collect();
+        $ancestor = $feedDesign->connectedFrom()->first();
+
+        while ($ancestor !== null && $history->count() < 9) {
+            if ($ancestor->is_seed || $ancestor->thumbnail_path !== null) {
+                $history->push($ancestor);
+            }
+            $ancestor = $ancestor->connectedFrom()->first();
+        }
 
         return view('feed-studio.export', compact('feedDesign', 'history'));
     }
@@ -71,6 +84,8 @@ class FeedDesignController extends Controller
      */
     public function edit(FeedDesign $feedDesign): View
     {
+        abort_if($feedDesign->published_at !== null, 422, 'Batch yang sudah dipublikasikan tidak dapat diubah.');
+
         return view('feed-studio.edit', compact('feedDesign'));
     }
 
@@ -125,9 +140,18 @@ class FeedDesignController extends Controller
 
     public function saveAssets(SaveFeedDesignAssetsRequest $request, FeedDesign $feedDesign, SaveFeedDesignAssetsAction $save): Response
     {
+        abort_if($feedDesign->published_at !== null, 422, 'Batch yang sudah dipublikasikan tidak dapat diekspor ulang.');
         abort_if(count($request->file('assets')) !== $feedDesign->postCount(), 422);
         $save->handle($feedDesign, $request->file('assets'), $request->file('thumbnail'), $request->validated());
 
         return response()->noContent();
+    }
+
+    public function publish(FeedDesign $feedDesign, PublishFeedDesignAction $publish): RedirectResponse
+    {
+        abort_if($feedDesign->is_seed, 422);
+        $publish->handle($feedDesign);
+
+        return redirect()->route('feed-studio.show', $feedDesign)->with('success', 'Batch ditandai sudah dipublikasikan.');
     }
 }

@@ -40,50 +40,105 @@ class FeedLayoutStateService
     }
 
     /** @return list<string> */
-    public function synchronizeFollowingRows(FeedDesign $previous): array
+    public function synchronizeDescendants(FeedDesign $parent): array
+    {
+        return array_values(array_unique($this->synchronizeChildren($parent, [])));
+    }
+
+    /** @return list<string> */
+    public function reconnectChildren(FeedDesign $removed, ?FeedDesign $replacement): array
     {
         $invalidatedAssetPaths = [];
-        $gridPosition = $previous->grid_position + $previous->postCount();
-
-        $followingRows = FeedDesign::query()
-            ->where('row_number', '>', $previous->row_number)
-            ->where('is_seed', false)
+        $children = FeedDesign::query()
+            ->where('connected_from_id', $removed->id)
             ->oldest('row_number')
+            ->lockForUpdate()
             ->get();
 
-        foreach ($followingRows as $followingRow) {
-            $connectionState = $this->next(
-                $previous,
-                $followingRow->layout_variant,
-                $followingRow->photo_path !== null,
-                $followingRow->postCount(),
-            );
-            $connectionChanged = $followingRow->connection_state !== $connectionState;
-            $updates = [
-                'grid_position' => $gridPosition,
-                'connection_state' => $connectionState,
+        foreach ($children as $child) {
+            $invalidatedAssetPaths = [
+                ...$invalidatedAssetPaths,
+                ...$this->synchronizeBranch($child, $replacement, []),
             ];
-
-            if ($connectionChanged) {
-                $invalidatedAssetPaths = [
-                    ...$invalidatedAssetPaths,
-                    ...array_filter([
-                        $followingRow->thumbnail_path,
-                        ...($followingRow->exported_assets ?? []),
-                    ]),
-                ];
-                $updates['exported_assets'] = null;
-                $updates['thumbnail_path'] = null;
-            }
-
-            if ($followingRow->grid_position !== $gridPosition || $connectionChanged) {
-                $followingRow->update($updates);
-            }
-
-            $gridPosition += $followingRow->postCount();
-            $previous = $followingRow;
         }
 
         return array_values(array_unique($invalidatedAssetPaths));
+    }
+
+    /**
+     * @param  list<int>  $visited
+     * @return list<string>
+     */
+    private function synchronizeChildren(FeedDesign $parent, array $visited): array
+    {
+        if (in_array($parent->id, $visited, true)) {
+            return [];
+        }
+
+        $visited[] = $parent->id;
+        $invalidatedAssetPaths = [];
+        $children = FeedDesign::query()
+            ->where('connected_from_id', $parent->id)
+            ->oldest('row_number')
+            ->lockForUpdate()
+            ->get();
+
+        foreach ($children as $child) {
+            $invalidatedAssetPaths = [
+                ...$invalidatedAssetPaths,
+                ...$this->synchronizeBranch($child, $parent, $visited),
+            ];
+        }
+
+        return $invalidatedAssetPaths;
+    }
+
+    /**
+     * @param  list<int>  $visited
+     * @return list<string>
+     */
+    private function synchronizeBranch(FeedDesign $design, ?FeedDesign $parent, array $visited): array
+    {
+        if (in_array($design->id, $visited, true)) {
+            return [];
+        }
+
+        $gridPosition = ($parent?->grid_position ?? 0) + ($parent?->postCount() ?? 0);
+        $connectionState = $this->next(
+            $parent,
+            $design->layout_variant,
+            $design->photo_path !== null,
+            $design->postCount(),
+        );
+        $connectionChanged = $design->connection_state !== $connectionState;
+        $parentChanged = $design->connected_from_id !== $parent?->id;
+        $invalidatedAssetPaths = [];
+        $updates = [
+            'connected_from_id' => $parent?->id,
+            'grid_position' => $gridPosition,
+            'connection_state' => $connectionState,
+        ];
+
+        if ($connectionChanged || $parentChanged) {
+            $invalidatedAssetPaths = array_filter([
+                $design->thumbnail_path,
+                ...($design->exported_assets ?? []),
+            ]);
+            $updates = [
+                ...$updates,
+                'exported_assets' => null,
+                'thumbnail_path' => null,
+                'exported_at' => null,
+            ];
+        }
+
+        if ($design->grid_position !== $gridPosition || $connectionChanged || $parentChanged) {
+            $design->update($updates);
+        }
+
+        return [
+            ...$invalidatedAssetPaths,
+            ...$this->synchronizeChildren($design, $visited),
+        ];
     }
 }

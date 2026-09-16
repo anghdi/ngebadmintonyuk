@@ -83,6 +83,7 @@ Route::middleware(['auth', RequireCurrentPushSetup::class, RequireMemberNotifica
         Route::get('/feed-studio/{feedDesign}/thumbnail', [FeedDesignController::class, 'thumbnail'])->name('feed-studio.thumbnail');
         Route::get('/feed-studio/{feedDesign}/assets/{assetIndex}', [FeedDesignController::class, 'asset'])->whereNumber('assetIndex')->name('feed-studio.asset');
         Route::post('/feed-studio/{feedDesign}/assets', [FeedDesignController::class, 'saveAssets'])->middleware('throttle:10,1')->name('feed-studio.assets');
+        Route::post('/feed-studio/{feedDesign}/publish', [FeedDesignController::class, 'publish'])->name('feed-studio.publish');
         Route::resource('feed-studio', FeedDesignController::class)->parameters(['feed-studio' => 'feedDesign']);
         Route::put('/top-up-settings', [TopUpSettingController::class, 'update'])->name('top-up-settings.update');
         Route::put('/top-ups/{topUpRequest}', [TopUpRequestController::class, 'update'])->name('top-ups.update');

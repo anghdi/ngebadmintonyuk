@@ -19,3 +19,6 @@ Approved top ups atomically grant exactly four ledger credits and create one lin
 
 ## No refund workflow
 The user confirmed that the community has no refunds. Existing paid-to-unpaid operations are corrections of payment records, not money-return transactions. Do not introduce a refund workflow or describe refunds as an existing operational process.
+
+## Feed Studio follows an exported parent lifecycle
+Feed batches move from draft to exported to manually published. New batches connect to the latest exported batch (Seed Row is the fallback) through connected_from_id; publishing requires exported assets and a published parent, except when the parent is Seed Row. Published batches are immutable and cannot be deleted or re-exported.

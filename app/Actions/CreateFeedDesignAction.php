@@ -20,8 +20,13 @@ class CreateFeedDesignAction
     public function handle(array $data, User $creator, ?UploadedFile $photo): FeedDesign
     {
         return DB::transaction(function () use ($data, $creator, $photo): FeedDesign {
-            $previous = FeedDesign::query()->latest('row_number')->lockForUpdate()->first();
-            $rowNumber = ($previous?->row_number ?? -1) + 1;
+            $latestDesign = FeedDesign::query()->latest('row_number')->lockForUpdate()->first();
+            $previous = FeedDesign::query()
+                ->where(fn ($query) => $query->where('is_seed', true)->orWhereNotNull('exported_at'))
+                ->latest('row_number')
+                ->lockForUpdate()
+                ->first();
+            $rowNumber = ($latestDesign?->row_number ?? -1) + 1;
             $photoPath = $photo?->storeAs('feed-studio/source', Str::uuid().'.'.$photo->extension(), 'local');
             $postCount = match ($data['format']) {
                 'connected_2' => 2,
@@ -33,9 +38,10 @@ class CreateFeedDesignAction
                 return FeedDesign::query()->create([
                     ...Arr::except($data, ['photo', 'zoom', 'position_x', 'position_y']),
                     'created_by' => $creator->id,
+                    'connected_from_id' => $previous?->id,
                     'photo_path' => $photoPath,
                     'row_number' => $rowNumber,
-                    'grid_position' => FeedDesign::query()->sum(DB::raw("CASE WHEN format = 'connected_3' THEN 3 WHEN format = 'connected_2' THEN 2 ELSE 1 END")),
+                    'grid_position' => ($previous?->grid_position ?? 0) + ($previous?->postCount() ?? 0),
                     'layout_settings' => $this->settings($data),
                     'connection_state' => $this->layoutState->next($previous, $data['layout_variant'], $photo !== null, $postCount),
                 ]);

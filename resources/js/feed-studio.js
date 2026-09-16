@@ -530,7 +530,7 @@ export function installFeedStudio(windowObject, documentObject) {
         status.textContent = `Komposisi ${design.variant} dipilih.`;
     });
     const exportButton = root.querySelector('[data-feed-export]');
-    exportButton.addEventListener('click', async () => {
+    exportButton?.addEventListener('click', async () => {
         if (exportButton.disabled) return;
         const originalLabel = exportButton.textContent;
         exportButton.disabled = true;
@@ -567,6 +567,16 @@ export function installFeedStudio(windowObject, documentObject) {
             const response = await windowObject.fetch(root.dataset.assetsUrl, { method: 'POST', headers: { 'X-CSRF-TOKEN': root.dataset.csrf, Accept: 'application/json' }, body: data });
             if (!response.ok) throw new Error('Riwayat export tidak dapat disimpan.');
             status.textContent = 'File diunduh dan tersimpan di Feed History.';
+            if (!design.isSeed) {
+                const workflowStatus = root.querySelector('[data-feed-workflow-status]');
+                if (workflowStatus) {
+                    workflowStatus.textContent = 'Sudah diekspor';
+                    workflowStatus.classList.remove('muted', 'active');
+                    workflowStatus.classList.add('warning');
+                }
+                root.querySelector('[data-feed-publish-form]')?.classList.remove('hidden');
+                root.querySelector('[data-feed-next-row]')?.classList.remove('hidden');
+            }
         } catch {
             status.textContent = downloaded
                 ? 'File sudah diunduh, tetapi riwayat export belum tersimpan.'

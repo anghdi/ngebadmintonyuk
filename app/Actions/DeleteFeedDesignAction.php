@@ -14,21 +14,17 @@ class DeleteFeedDesignAction
     public function handle(FeedDesign $feedDesign): void
     {
         abort_if($feedDesign->is_seed, 422, 'Seed Row tidak dapat dihapus.');
+        abort_if($feedDesign->published_at !== null, 422, 'Batch yang sudah dipublikasikan tidak dapat dihapus.');
         $paths = array_filter([$feedDesign->photo_path, $feedDesign->thumbnail_path, ...($feedDesign->exported_assets ?? [])]);
-        $previous = FeedDesign::query()
-            ->where('row_number', '<', $feedDesign->row_number)
-            ->latest('row_number')
-            ->first();
 
-        DB::transaction(function () use ($feedDesign, $previous, &$paths): void {
-            $feedDesign->delete();
+        DB::transaction(function () use ($feedDesign, &$paths): void {
+            $design = FeedDesign::query()->with('connectedFrom')->lockForUpdate()->findOrFail($feedDesign->id);
+            $paths = [
+                ...$paths,
+                ...$this->layoutState->reconnectChildren($design, $design->connectedFrom),
+            ];
 
-            if ($previous !== null) {
-                $paths = [
-                    ...$paths,
-                    ...$this->layoutState->synchronizeFollowingRows($previous),
-                ];
-            }
+            $design->delete();
         });
 
         Storage::disk('local')->delete(array_values(array_unique($paths)));

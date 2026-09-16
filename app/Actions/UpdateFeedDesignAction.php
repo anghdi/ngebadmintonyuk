@@ -18,6 +18,7 @@ class UpdateFeedDesignAction
     /** @param array<string, mixed> $data */
     public function handle(FeedDesign $feedDesign, array $data, ?UploadedFile $photo): void
     {
+        abort_if($feedDesign->published_at !== null, 422, 'Batch yang sudah dipublikasikan tidak dapat diubah.');
         $oldPhoto = $feedDesign->photo_path;
         $newPhoto = $photo?->storeAs('feed-studio/source', Str::uuid().'.'.$photo->extension(), 'local');
         $oldAssetPaths = array_filter([$feedDesign->thumbnail_path, ...($feedDesign->exported_assets ?? [])]);
@@ -45,11 +46,12 @@ class UpdateFeedDesignAction
                     ),
                     'exported_assets' => null,
                     'thumbnail_path' => null,
+                    'exported_at' => null,
                 ]);
 
                 $oldAssetPaths = [
                     ...$oldAssetPaths,
-                    ...$this->layoutState->synchronizeFollowingRows($feedDesign),
+                    ...$this->layoutState->synchronizeDescendants($feedDesign),
                 ];
             });
         } catch (Throwable $exception) {
