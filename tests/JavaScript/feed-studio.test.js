@@ -6,6 +6,7 @@ import {
     POST_WIDTH,
     drawFeedMaster,
     drawSeedMaster,
+    installFeedPhotoPreview,
     panelSafeArea,
     resolveConnectionPath,
     resolveContentLayout,
@@ -13,6 +14,55 @@ import {
     resolvePhotoBox,
     resolveSeedTrajectory,
 } from '../../resources/js/feed-studio.js';
+
+test('replacing a photo updates the form preview without a page refresh', () => {
+    let changeHandler;
+    const classes = new Set(['hidden']);
+    const input = {
+        files: [],
+        addEventListener(event, handler) {
+            if (event === 'change') changeHandler = handler;
+        },
+    };
+    const preview = {
+        src: '/old-photo?v=1',
+        getAttribute() { return this.src; },
+        classList: {
+            remove(value) { classes.delete(value); },
+            toggle(value, active) { active ? classes.add(value) : classes.delete(value); },
+        },
+    };
+    const documentObject = {
+        querySelector(selector) {
+            return selector === '[data-feed-photo-input]' ? input : preview;
+        },
+    };
+    const revoked = [];
+    const windowObject = {
+        URL: {
+            createObjectURL: () => 'blob:new-photo',
+            revokeObjectURL: (url) => revoked.push(url),
+        },
+    };
+
+    installFeedPhotoPreview(windowObject, documentObject);
+    input.files = [{ name: 'replacement.webp' }];
+    changeHandler();
+
+    assert.equal(preview.src, 'blob:new-photo');
+    assert.equal(classes.has('hidden'), false);
+
+    input.files = [];
+    changeHandler();
+    assert.deepEqual(revoked, ['blob:new-photo']);
+    assert.equal(preview.src, '/old-photo?v=1');
+});
+
+test('exports the current Instagram portrait ratio', () => {
+    assert.equal(POST_WIDTH, 1080);
+    assert.equal(POST_HEIGHT, 1440);
+    assert.equal(POST_WIDTH / POST_HEIGHT, 3 / 4);
+});
 
 test('seed is rendered as one connected master with the fixed three-part copy', () => {
     const text = [];
@@ -71,6 +121,8 @@ test('a portrait hero always belongs to exactly one panel', () => {
         assert.equal(box.panel, resolveHeroPanel(3, variant));
         assert.ok(box.x >= box.panel * POST_WIDTH + GUTTER_SAFE_ZONE);
         assert.ok(box.x + box.width <= (box.panel + 1) * POST_WIDTH - GUTTER_SAFE_ZONE);
+        assert.ok(box.y >= GUTTER_SAFE_ZONE);
+        assert.ok(box.y + box.height <= POST_HEIGHT - GUTTER_SAFE_ZONE);
     }
 });
 

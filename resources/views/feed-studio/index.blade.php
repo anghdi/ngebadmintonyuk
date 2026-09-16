@@ -9,15 +9,15 @@
     </section>
     <section class="feed-seed-stage" aria-label="Seed Row master canvas">
         <div class="feed-stage-head"><span>SEED ROW · MASTER CANVAS</span><a class="btn soft" href="{{ route('feed-studio.show', $seed) }}">Export Seed Row</a></div>
-        <div class="feed-canvas-scroll"><canvas width="3240" height="1350" data-feed-seed-canvas data-connection='@json($seed->connection_state)'></canvas></div>
+        <div class="feed-canvas-scroll"><canvas width="3240" height="1440" data-feed-seed-canvas data-connection='@json($seed->connection_state)'></canvas></div>
     </section>
     <div class="section-heading"><div><span class="eyebrow">FEED HISTORY</span><h2>Desain terbaru</h2></div><small>{{ $designs->total() }} batch tersimpan</small></div>
     <div class="feed-history-grid">
         @foreach($designs as $design)
             <article class="feed-history-card">
                 <a class="feed-history-visual" href="{{ route('feed-studio.edit', $design) }}">
-                    @if($design->thumbnail_path)<img src="{{ route('feed-studio.thumbnail', $design) }}" alt="Thumbnail {{ $design->headline }}">
-                    @elseif($design->photo_path)<img src="{{ route('feed-studio.photo', $design) }}" alt="Foto {{ $design->headline }}">
+                    @if($design->thumbnail_path)<img src="{{ route('feed-studio.thumbnail', $design).'?v='.$design->updated_at->getTimestamp() }}" alt="Thumbnail {{ $design->headline }}">
+                    @elseif($design->photo_path)<img src="{{ route('feed-studio.photo', $design).'?v='.$design->updated_at->getTimestamp() }}" alt="Foto {{ $design->headline }}">
                     @else<span>{{ $design->headline }}</span>@endif
                     <b>{{ $design->postCount() }} POST</b>
                 </a>

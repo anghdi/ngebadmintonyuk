@@ -1,5 +1,5 @@
 export const POST_WIDTH = 1080;
-export const POST_HEIGHT = 1350;
+export const POST_HEIGHT = 1440;
 export const GUTTER_SAFE_ZONE = 96;
 
 const VARIANTS = ['editorial', 'kinetic', 'sideline'];
@@ -22,8 +22,8 @@ export function resolveHeroPanel(postCount, variant) {
 export function resolvePhotoBox(postCount, variant) {
     const panel = resolveHeroPanel(postCount, variant);
     const safe = panelSafeArea(panel);
-    if (postCount === 1) return { panel, x: safe.x, y: 142, width: safe.width, height: 560 };
-    return { panel, x: safe.x, y: 142, width: safe.width, height: 1066 };
+    if (postCount === 1) return { panel, x: safe.x, y: 142, width: safe.width, height: 620 };
+    return { panel, x: safe.x, y: 142, width: safe.width, height: 1156 };
 }
 
 export function resolveContentLayout(postCount, variant, hasPhoto) {
@@ -56,20 +56,31 @@ export function resolveConnectionPath(connection, width, height, variant) {
 
 function wrapText(context, text, { x, y, maxWidth, lineHeight, maxLines = 3 }) {
     const words = String(text || '').split(/\s+/).filter(Boolean);
+    const lines = [];
     let line = '';
-    let lineNumber = 0;
+
     for (const word of words) {
         const candidate = line ? `${line} ${word}` : word;
         if (context.measureText(candidate).width > maxWidth && line) {
-            context.fillText(line, x, y + lineNumber * lineHeight);
+            lines.push(line);
             line = word;
-            lineNumber++;
-            if (lineNumber >= maxLines - 1) break;
         } else {
             line = candidate;
         }
     }
-    if (lineNumber < maxLines && line) context.fillText(line, x, y + lineNumber * lineHeight);
+
+    if (line) lines.push(line);
+    const visibleLines = lines.slice(0, maxLines);
+
+    if (lines.length > maxLines) {
+        let lastLine = lines.slice(maxLines - 1).join(' ');
+        while (lastLine.length > 1 && context.measureText(`${lastLine}…`).width > maxWidth) {
+            lastLine = lastLine.slice(0, -1).trimEnd();
+        }
+        visibleLines[maxLines - 1] = `${lastLine}…`;
+    }
+
+    visibleLines.forEach((visibleLine, lineNumber) => context.fillText(visibleLine, x, y + lineNumber * lineHeight));
 }
 
 function loadImage(windowObject, source) {
@@ -133,7 +144,7 @@ function drawBrandLockup(context, safe, palette, label = 'NGE BADMINTON YUK!') {
     context.fillStyle = '#ffd23f';
     context.fillRect(safe.x, safe.y + 8, 72, 13);
     context.fillStyle = palette.ink;
-    context.font = '800 25px "Plus Jakarta Sans", sans-serif';
+    context.font = '800 25px "Instrument Sans", sans-serif';
     context.fillText(label, safe.x, safe.y + 62);
 }
 
@@ -244,24 +255,26 @@ export function drawSeedMaster(context, canvas, connection = {}) {
     canvas.height = POST_HEIGHT;
     context.fillStyle = PALETTES['off-white'].background;
     context.fillRect(0, 0, width, POST_HEIGHT);
+    context.fillStyle = PALETTES['royal-blue'].background;
+    context.fillRect(POST_WIDTH, 0, POST_WIDTH, 920);
     drawSeedCourt(context, width);
     drawSeedNet(context, width);
     drawSeedTrajectory(context, connection, width);
 
     const left = panelSafeArea(0);
     context.fillStyle = '#102656';
-    context.font = '800 92px "Plus Jakarta Sans", sans-serif';
+    context.font = '800 92px "Instrument Sans", sans-serif';
     wrapText(context, 'Lagi nyari temen main?', { x: left.x, y: 420, maxWidth: left.width, lineHeight: 102, maxLines: 2 });
 
     const center = panelSafeArea(1);
-    context.fillStyle = '#2455f5';
-    context.font = '900 76px "Plus Jakarta Sans", sans-serif';
+    context.fillStyle = '#f7f4ec';
+    context.font = '900 80px "Instrument Sans", sans-serif';
     context.textAlign = 'center';
     context.fillText('NgeBadminton YUK!', center.x + center.width / 2, 510);
 
     const right = panelSafeArea(2);
     context.fillStyle = '#102656';
-    context.font = '800 92px "Plus Jakarta Sans", sans-serif';
+    context.font = '800 92px "Instrument Sans", sans-serif';
     context.textAlign = 'left';
     wrapText(context, 'Ramean lebih seru.', { x: right.x + 344, y: 420, maxWidth: right.width - 344, lineHeight: 102, maxLines: 2 });
     context.textAlign = 'start';
@@ -293,7 +306,7 @@ export function drawFeedMaster(context, canvas, design, image, settings) {
             const headlineY = singleWithPhoto ? 830 : compactPanel ? 380 : 430;
             drawSemanticBackdrop(context, safe, panelPalette, headlineTop, singleWithPhoto ? 188 : compactPanel ? 390 : 410);
             context.fillStyle = panelPalette.ink;
-            context.font = `900 ${singleWithPhoto ? 66 : design.postCount > 1 ? 82 : 88}px "Plus Jakarta Sans", sans-serif`;
+            context.font = `900 ${singleWithPhoto ? 66 : design.postCount > 1 ? 82 : 88}px "Instrument Sans", sans-serif`;
             wrapText(context, design.headline, { x: safe.x, y: headlineY, maxWidth: safe.width, lineHeight: singleWithPhoto ? 76 : 94, maxLines: singleWithPhoto ? 2 : compactPanel ? 3 : 4 });
         }
 
@@ -302,7 +315,7 @@ export function drawFeedMaster(context, canvas, design, image, settings) {
             const supportingY = singleWithPhoto ? 990 : compactPanel ? 720 : 470;
             drawSemanticBackdrop(context, safe, panelPalette, supportingTop, compactPanel ? 230 : 420);
             context.fillStyle = panelPalette.muted;
-            context.font = compactPanel ? '600 30px "Plus Jakarta Sans", sans-serif' : '800 54px "Plus Jakarta Sans", sans-serif';
+            context.font = compactPanel ? '600 30px "Instrument Sans", sans-serif' : '800 54px "Instrument Sans", sans-serif';
             wrapText(context, design.supportingText, { x: safe.x, y: supportingY, maxWidth: safe.width, lineHeight: compactPanel ? 43 : 66, maxLines: compactPanel ? 3 : 5 });
         }
 
@@ -312,7 +325,7 @@ export function drawFeedMaster(context, canvas, design, image, settings) {
             const detailsY = singleWithPhoto ? 1110 : compactPanel ? 970 : 900;
             drawSemanticBackdrop(context, safe, panelPalette, detailsTop, design.cta ? 210 : 150);
             context.fillStyle = panelPalette.ink;
-            context.font = '700 28px "Plus Jakarta Sans", sans-serif';
+            context.font = '700 28px "Instrument Sans", sans-serif';
             wrapText(context, details.join('  ·  '), { x: safe.x, y: detailsY, maxWidth: safe.width, lineHeight: 40, maxLines: 2 });
         }
 
@@ -323,7 +336,7 @@ export function drawFeedMaster(context, canvas, design, image, settings) {
             context.roundRect(safe.x, ctaY, Math.min(330, safe.width), 82, 41);
             context.fill();
             context.fillStyle = '#102656';
-            context.font = '800 25px "Plus Jakarta Sans", sans-serif';
+            context.font = '800 25px "Instrument Sans", sans-serif';
             wrapText(context, design.cta.toUpperCase(), { x: safe.x + 36, y: ctaY + 52, maxWidth: Math.min(258, safe.width - 72), lineHeight: 30, maxLines: 1 });
         }
     }
@@ -337,8 +350,8 @@ function renderSeedCanvases(documentObject) {
             drawSeedMaster(master.getContext('2d'), master, connection);
             const slice = Number(canvas.dataset.feedSeedSlice || 0);
             canvas.width = POST_WIDTH;
-            canvas.height = POST_WIDTH;
-            canvas.getContext('2d').drawImage(master, slice * POST_WIDTH, 135, POST_WIDTH, POST_WIDTH, 0, 0, POST_WIDTH, POST_WIDTH);
+            canvas.height = POST_HEIGHT;
+            canvas.getContext('2d').drawImage(master, slice * POST_WIDTH, 0, POST_WIDTH, POST_HEIGHT, 0, 0, POST_WIDTH, POST_HEIGHT);
             return;
         }
         drawSeedMaster(canvas.getContext('2d'), canvas, connection);
@@ -346,7 +359,14 @@ function renderSeedCanvases(documentObject) {
 }
 
 function canvasBlob(canvas) {
-    return new Promise((resolve) => canvas.toBlob(resolve, 'image/png', 0.96));
+    return new Promise((resolve, reject) => canvas.toBlob((blob) => {
+        if (blob) {
+            resolve(blob);
+            return;
+        }
+
+        reject(new Error('Canvas tidak dapat dikonversi menjadi PNG.'));
+    }, 'image/png', 0.96));
 }
 
 function download(windowObject, documentObject, blob, name) {
@@ -360,7 +380,35 @@ function download(windowObject, documentObject, blob, name) {
     windowObject.setTimeout(() => windowObject.URL.revokeObjectURL(url), 30000);
 }
 
+export function installFeedPhotoPreview(windowObject, documentObject) {
+    const input = documentObject.querySelector('[data-feed-photo-input]');
+    const preview = documentObject.querySelector('[data-feed-photo-preview]');
+    if (!input || !preview) return;
+
+    const originalSource = preview.getAttribute('src') || '';
+    let objectUrl = null;
+
+    input.addEventListener('change', () => {
+        if (objectUrl) {
+            windowObject.URL.revokeObjectURL(objectUrl);
+            objectUrl = null;
+        }
+
+        const [file] = input.files || [];
+        if (!file) {
+            preview.src = originalSource;
+            preview.classList.toggle('hidden', originalSource === '');
+            return;
+        }
+
+        objectUrl = windowObject.URL.createObjectURL(file);
+        preview.src = objectUrl;
+        preview.classList.remove('hidden');
+    });
+}
+
 export function installFeedStudio(windowObject, documentObject) {
+    installFeedPhotoPreview(windowObject, documentObject);
     renderSeedCanvases(documentObject);
     const root = documentObject.querySelector('[data-feed-editor]');
     if (!root) return;
@@ -383,9 +431,9 @@ export function installFeedStudio(windowObject, documentObject) {
         for (let slice = design.postCount - 1; slice >= 0; slice--) {
             const preview = documentObject.createElement('canvas');
             preview.width = POST_WIDTH;
-            preview.height = POST_WIDTH;
+            preview.height = POST_HEIGHT;
             preview.dataset.feedNew = '';
-            preview.getContext('2d').drawImage(canvas, slice * POST_WIDTH, 135, POST_WIDTH, POST_WIDTH, 0, 0, POST_WIDTH, POST_WIDTH);
+            preview.getContext('2d').drawImage(canvas, slice * POST_WIDTH, 0, POST_WIDTH, POST_HEIGHT, 0, 0, POST_WIDTH, POST_HEIGHT);
             grid.insertBefore(preview, grid.firstChild);
         }
         const uploadOrder = root.querySelector('[data-feed-order]');
@@ -421,34 +469,40 @@ export function installFeedStudio(windowObject, documentObject) {
         exportButton.textContent = 'Menyiapkan export…';
         root.setAttribute('aria-busy', 'true');
         status.textContent = 'Menyiapkan file export…';
-        const assets = [];
-        for (let uploadIndex = 0; uploadIndex < design.postCount; uploadIndex++) {
-            const sliceIndex = design.postCount - uploadIndex - 1;
-            const slice = documentObject.createElement('canvas');
-            slice.width = POST_WIDTH;
-            slice.height = POST_HEIGHT;
-            slice.getContext('2d').drawImage(canvas, sliceIndex * POST_WIDTH, 0, POST_WIDTH, POST_HEIGHT, 0, 0, POST_WIDTH, POST_HEIGHT);
-            const blob = await canvasBlob(slice);
-            assets.push(blob);
-            download(windowObject, documentObject, blob, `${String(uploadIndex + 1).padStart(2, '0')}-upload-${uploadIndex === 0 ? 'first' : uploadIndex === design.postCount - 1 ? 'last' : 'second'}.png`);
-        }
-        const thumbnail = documentObject.createElement('canvas');
-        thumbnail.width = 432;
-        thumbnail.height = 540;
-        thumbnail.getContext('2d').drawImage(canvas, 0, 0, POST_WIDTH, POST_HEIGHT, 0, 0, 432, 540);
-        const data = new FormData();
-        assets.forEach((blob, index) => data.append('assets[]', blob, `${index + 1}.png`));
-        data.append('thumbnail', await canvasBlob(thumbnail), 'thumbnail.png');
-        data.append('layout_variant', design.variant);
-        data.append('zoom', settings.zoom);
-        data.append('position_x', settings.x);
-        data.append('position_y', settings.y);
+        let downloaded = false;
+
         try {
+            const assets = [];
+            for (let uploadIndex = 0; uploadIndex < design.postCount; uploadIndex++) {
+                const sliceIndex = design.postCount - uploadIndex - 1;
+                const slice = documentObject.createElement('canvas');
+                slice.width = POST_WIDTH;
+                slice.height = POST_HEIGHT;
+                slice.getContext('2d').drawImage(canvas, sliceIndex * POST_WIDTH, 0, POST_WIDTH, POST_HEIGHT, 0, 0, POST_WIDTH, POST_HEIGHT);
+                const blob = await canvasBlob(slice);
+                assets.push(blob);
+                download(windowObject, documentObject, blob, `${String(uploadIndex + 1).padStart(2, '0')}-upload-${uploadIndex === 0 ? 'first' : uploadIndex === design.postCount - 1 ? 'last' : 'second'}.png`);
+            }
+            downloaded = true;
+
+            const thumbnail = documentObject.createElement('canvas');
+            thumbnail.width = 432;
+            thumbnail.height = 576;
+            thumbnail.getContext('2d').drawImage(canvas, 0, 0, POST_WIDTH, POST_HEIGHT, 0, 0, 432, 576);
+            const data = new FormData();
+            assets.forEach((blob, index) => data.append('assets[]', blob, `${index + 1}.png`));
+            data.append('thumbnail', await canvasBlob(thumbnail), 'thumbnail.png');
+            data.append('layout_variant', design.variant);
+            data.append('zoom', settings.zoom);
+            data.append('position_x', settings.x);
+            data.append('position_y', settings.y);
             const response = await windowObject.fetch(root.dataset.assetsUrl, { method: 'POST', headers: { 'X-CSRF-TOKEN': root.dataset.csrf, Accept: 'application/json' }, body: data });
-            if (!response.ok) throw new Error();
+            if (!response.ok) throw new Error('Riwayat export tidak dapat disimpan.');
             status.textContent = 'File diunduh dan tersimpan di Feed History.';
         } catch {
-            status.textContent = 'File sudah diunduh, tetapi riwayat export belum tersimpan.';
+            status.textContent = downloaded
+                ? 'File sudah diunduh, tetapi riwayat export belum tersimpan.'
+                : 'Export gagal disiapkan. Coba muat ulang halaman.';
         } finally {
             exportButton.disabled = false;
             exportButton.textContent = originalLabel;

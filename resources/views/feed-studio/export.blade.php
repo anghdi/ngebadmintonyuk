@@ -16,7 +16,7 @@
         'variant' => $feedDesign->layout_variant,
         'settings' => $feedDesign->layout_settings,
         'connection' => $feedDesign->connection_state,
-        'photoUrl' => $feedDesign->photo_path ? route('feed-studio.photo', $feedDesign) : null,
+        'photoUrl' => $feedDesign->photo_path ? route('feed-studio.photo', $feedDesign).'?v='.$feedDesign->updated_at->getTimestamp() : null,
     ];
 @endphp
 <div class="feed-studio-page" data-feed-editor
@@ -24,7 +24,7 @@
     data-assets-url="{{ route('feed-studio.assets', $feedDesign) }}" data-csrf="{{ csrf_token() }}">
     <div class="page-heading flex flex-wrap items-end justify-between gap-4"><div><span class="eyebrow">GRID PREVIEW & EXPORT</span><h1>{{ $feedDesign->headline }}</h1><p>Periksa crop, sambungan, dan urutan upload.</p></div><a class="btn soft" href="{{ $feedDesign->is_seed ? route('feed-studio.index') : route('feed-studio.edit', $feedDesign) }}">{{ $feedDesign->is_seed ? 'Kembali' : 'Edit konten' }}</a></div>
     <div class="feed-editor-layout">
-        <section class="feed-master-stage"><div class="feed-stage-head"><span>MASTER CANVAS</span><span>{{ $feedDesign->postCount() }} × 1080 · 1350 px</span></div><div class="feed-canvas-scroll"><canvas width="{{ 1080 * $feedDesign->postCount() }}" height="1350" data-feed-canvas></canvas></div><p data-feed-status role="status">Menyiapkan desain…</p></section>
+        <section class="feed-master-stage"><div class="feed-stage-head"><span>MASTER CANVAS</span><span>{{ $feedDesign->postCount() }} × 1080 · 1440 px</span></div><div class="feed-canvas-scroll"><canvas width="{{ 1080 * $feedDesign->postCount() }}" height="1440" data-feed-canvas></canvas></div><p data-feed-status role="status">Menyiapkan desain…</p></section>
         <aside class="feed-editor-controls">
             @unless($feedDesign->is_seed)
             <section><span class="eyebrow">CROP FOTO</span><label>Zoom<input type="range" min="1" max="3" step="0.01" value="{{ $feedDesign->layout_settings['zoom'] ?? 1 }}" data-feed-setting="zoom"></label><label>Horizontal<input type="range" min="-1" max="1" step="0.01" value="{{ $feedDesign->layout_settings['x'] ?? 0 }}" data-feed-setting="x"></label><label>Vertikal<input type="range" min="-1" max="1" step="0.01" value="{{ $feedDesign->layout_settings['y'] ?? 0 }}" data-feed-setting="y"></label></section>
@@ -37,14 +37,14 @@
         @foreach($history as $item)
             @if($item->is_seed)
                 @for($seedSlice = 0; $seedSlice < 3; $seedSlice++)
-                    <canvas width="1080" height="1080" data-feed-seed-canvas data-feed-seed-grid data-feed-seed-slice="{{ $seedSlice }}" data-connection='@json($item->connection_state)' aria-label="Seed Row post {{ $seedSlice + 1 }}"></canvas>
+                    <canvas width="1080" height="1440" data-feed-seed-canvas data-feed-seed-grid data-feed-seed-slice="{{ $seedSlice }}" data-connection='@json($item->connection_state)' aria-label="Seed Row post {{ $seedSlice + 1 }}"></canvas>
                 @endfor
             @elseif(filled($item->exported_assets))
                 @foreach(array_reverse($item->exported_assets, true) as $assetIndex => $assetPath)
-                    <img src="{{ route('feed-studio.asset', [$item, $assetIndex]) }}" alt="Post {{ $item->headline }}">
+                    <img src="{{ route('feed-studio.asset', [$item, $assetIndex]).'?v='.$item->updated_at->getTimestamp() }}" alt="Post {{ $item->headline }}">
                 @endforeach
             @else
-                @for($post = 0; $post < $item->postCount(); $post++)<div class="feed-grid-old"><img src="{{ route('feed-studio.thumbnail', $item) }}" alt=""></div>@endfor
+                @for($post = 0; $post < $item->postCount(); $post++)<div class="feed-grid-old"><img src="{{ route('feed-studio.thumbnail', $item).'?v='.$item->updated_at->getTimestamp() }}" alt=""></div>@endfor
             @endif
         @endforeach
     </div></section>

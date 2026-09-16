@@ -1,4 +1,10 @@
-@php($editing = isset($feedDesign))
+@php
+    $editing = isset($feedDesign);
+    $layoutSettings = $editing ? ($feedDesign->layout_settings ?? []) : [];
+@endphp
+<input type="hidden" name="zoom" value="{{ old('zoom', $layoutSettings['zoom'] ?? 1) }}">
+<input type="hidden" name="position_x" value="{{ old('position_x', $layoutSettings['x'] ?? 0) }}">
+<input type="hidden" name="position_y" value="{{ old('position_y', $layoutSettings['y'] ?? 0) }}">
 <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
     <div class="grid gap-5">
         <section class="card grid gap-4">
@@ -31,8 +37,13 @@
     </div>
     <aside class="card h-fit lg:sticky lg:top-24">
         <span class="eyebrow">FOTO UTAMA</span>
-        @if($editing && $feedDesign->photo_path)<img class="mt-3 aspect-[4/3] w-full rounded-xl object-cover" src="{{ route('feed-studio.photo', $feedDesign) }}" alt="Foto sumber desain">@endif
-        <div class="field mt-4"><label for="photo">{{ $editing ? 'Ganti foto' : 'Pilih foto' }}</label><input id="photo" type="file" name="photo" accept="image/jpeg,image/png,image/webp"><small>JPG, PNG, atau WebP. Maksimal 10 MB.</small></div>
+        <img
+            class="mt-3 aspect-[3/4] w-full rounded-xl object-cover {{ $editing && $feedDesign->photo_path ? '' : 'hidden' }}"
+            @if($editing && $feedDesign->photo_path) src="{{ route('feed-studio.photo', $feedDesign).'?v='.$feedDesign->updated_at->getTimestamp() }}" @endif
+            alt="Preview foto sumber desain"
+            data-feed-photo-preview
+        >
+        <div class="field mt-4"><label for="photo">{{ $editing ? 'Ganti foto' : 'Pilih foto' }}</label><input id="photo" type="file" name="photo" accept="image/jpeg,image/png,image/webp" data-feed-photo-input><small>JPG, PNG, atau WebP. Maksimal 10 MB.</small></div>
         <p class="mt-4 text-xs text-slate-500">Foto disimpan privat. Feed Studio mengatur crop di tahap editor.</p>
         <button class="btn primary full mt-5" type="submit">{{ $editing ? 'Simpan perubahan' : 'Generate layout' }}</button>
         @if($editing)<a class="btn soft full mt-2" href="{{ route('feed-studio.show', $feedDesign) }}">Preview grid & export</a>@endif

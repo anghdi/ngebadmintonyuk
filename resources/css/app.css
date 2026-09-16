@@ -1187,7 +1187,7 @@
     .feed-seed-stage canvas { display: block; width: 100%; min-width: 760px; height: auto; border-radius: 5px; box-shadow: 0 12px 30px rgb(16 38 86 / 14%); }
     .feed-history-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
     .feed-history-card { display: grid; min-width: 0; gap: .7rem; align-content: start; }
-    .feed-history-visual { position: relative; display: grid; overflow: hidden; border-radius: 10px; background: #102656; color: white; aspect-ratio: 4 / 5; place-items: center; }
+    .feed-history-visual { position: relative; display: grid; overflow: hidden; border-radius: 10px; background: #102656; color: white; aspect-ratio: 3 / 4; place-items: center; }
     .feed-history-visual img { width: 100%; height: 100%; object-fit: cover; }
     .feed-history-visual > span { max-width: 80%; font-size: 1rem; font-weight: 800; text-align: center; }
     .feed-history-visual > b { position: absolute; top: .6rem; right: .6rem; border-radius: 999px; background: #ffd23f; color: #102656; padding: .35rem .5rem; font-size: .55rem; }
@@ -1211,7 +1211,7 @@
     .feed-editor-controls input[type=range] { width: 100%; min-height: 26px; padding: 0; border: 0; accent-color: #2455f5; }
     .feed-editor-controls button:disabled { cursor: wait; opacity: .68; }
     .feed-grid-preview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 680px; overflow: hidden; border: 6px solid white; background: #e8ebf0; box-shadow: 0 0 0 1px #dce1eb; }
-    .feed-grid-preview > * { display: grid; width: 100%; height: auto; border: 1px solid white; background: #dce2eb; aspect-ratio: 1; object-fit: cover; place-items: center; }
+    .feed-grid-preview > * { display: grid; width: 100%; height: auto; border: 1px solid white; background: #dce2eb; aspect-ratio: 3 / 4; object-fit: cover; place-items: center; }
     .feed-grid-preview > :nth-child(n+10) { display: none; }
     .feed-grid-preview canvas { object-fit: cover; object-position: center; }
     .feed-grid-old span { color: #738096; font-size: .62rem; font-weight: 700; }

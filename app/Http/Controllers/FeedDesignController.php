@@ -101,7 +101,7 @@ class FeedDesignController extends Controller
 
         return response(Storage::disk('local')->get($feedDesign->photo_path), 200, [
             'Content-Type' => Storage::disk('local')->mimeType($feedDesign->photo_path) ?: 'application/octet-stream',
-            'Cache-Control' => 'private, max-age=3600',
+            'Cache-Control' => 'private, no-store',
         ]);
     }
 
@@ -109,7 +109,7 @@ class FeedDesignController extends Controller
     {
         abort_if($feedDesign->thumbnail_path === null || ! Storage::disk('local')->exists($feedDesign->thumbnail_path), 404);
 
-        return response(Storage::disk('local')->get($feedDesign->thumbnail_path), 200, ['Content-Type' => 'image/png', 'Cache-Control' => 'private, max-age=3600']);
+        return response(Storage::disk('local')->get($feedDesign->thumbnail_path), 200, ['Content-Type' => 'image/png', 'Cache-Control' => 'private, no-store']);
     }
 
     public function asset(FeedDesign $feedDesign, int $assetIndex): Response
@@ -119,7 +119,7 @@ class FeedDesignController extends Controller
 
         return response(Storage::disk('local')->get($path), 200, [
             'Content-Type' => 'image/png',
-            'Cache-Control' => 'private, max-age=3600',
+            'Cache-Control' => 'private, no-store',
         ]);
     }
 

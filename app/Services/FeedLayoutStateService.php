@@ -38,4 +38,52 @@ class FeedLayoutStateService
             'connection_mode' => $postCount === 1 ? 'rhythm' : 'continuous',
         ];
     }
+
+    /** @return list<string> */
+    public function synchronizeFollowingRows(FeedDesign $previous): array
+    {
+        $invalidatedAssetPaths = [];
+        $gridPosition = $previous->grid_position + $previous->postCount();
+
+        $followingRows = FeedDesign::query()
+            ->where('row_number', '>', $previous->row_number)
+            ->where('is_seed', false)
+            ->oldest('row_number')
+            ->get();
+
+        foreach ($followingRows as $followingRow) {
+            $connectionState = $this->next(
+                $previous,
+                $followingRow->layout_variant,
+                $followingRow->photo_path !== null,
+                $followingRow->postCount(),
+            );
+            $connectionChanged = $followingRow->connection_state !== $connectionState;
+            $updates = [
+                'grid_position' => $gridPosition,
+                'connection_state' => $connectionState,
+            ];
+
+            if ($connectionChanged) {
+                $invalidatedAssetPaths = [
+                    ...$invalidatedAssetPaths,
+                    ...array_filter([
+                        $followingRow->thumbnail_path,
+                        ...($followingRow->exported_assets ?? []),
+                    ]),
+                ];
+                $updates['exported_assets'] = null;
+                $updates['thumbnail_path'] = null;
+            }
+
+            if ($followingRow->grid_position !== $gridPosition || $connectionChanged) {
+                $followingRow->update($updates);
+            }
+
+            $gridPosition += $followingRow->postCount();
+            $previous = $followingRow;
+        }
+
+        return array_values(array_unique($invalidatedAssetPaths));
+    }
 }
