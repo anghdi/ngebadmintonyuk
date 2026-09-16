@@ -19,6 +19,8 @@ test('PWA manifest uses resized variants of the community logo', function () {
         '/pwa-icon-192.png',
         '/pwa-icon-512.png',
         '/pwa-maskable-512.png',
+    ])->and($manifest['related_applications'])->toBe([
+        ['platform' => 'webapp', 'url' => '/manifest.webmanifest', 'id' => '/'],
     ])->and(array_slice(getimagesize(public_path('pwa-icon-192.png')), 0, 2))->toBe([192, 192])
         ->and(array_slice(getimagesize(public_path('pwa-icon-512.png')), 0, 2))->toBe([512, 512])
         ->and(array_slice(getimagesize(public_path('pwa-maskable-512.png')), 0, 2))->toBe([512, 512])
@@ -142,9 +144,9 @@ test('member must activate notification permission after login', function () {
         ->assertRedirect(route('notifications.setup'));
     $this->get(route('notifications.setup'))
         ->assertSuccessful()->assertSee('data-push-setup="true"', escape: false)
-        ->assertSee('Aktifkan notifikasi dulu')
-        ->assertSee('ANDROID · CHROME')
-        ->assertSee('IPHONE / IPAD · SAFARI')
+        ->assertSee('Aktifkan notifikasi')
+        ->assertSee('Android · Chrome')
+        ->assertSee('iPhone/iPad · Safari')
         ->assertDontSee('Nanti saja');
 });
 

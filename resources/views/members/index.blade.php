@@ -10,7 +10,7 @@
         @forelse($members as $member)
             <tr>
                 <td><div class="identity-cell"><span>{{ $member->initials() }}</span><div><strong>{{ $member->name }}</strong><small>{{ $member->email }}{{ $member->phone ? ' · '.$member->phone : '' }}</small></div></div></td>
-                <td>{{ $member->created_at->translatedFormat('d M Y') }}</td>
+                <td><strong>{{ $member->memberSince()->translatedFormat('d M Y') }}</strong><small>{{ $member->membershipDuration() }}</small></td>
                 <td>{{ $member->memberships->count() }}</td>
                 <td><strong class="credit-count">{{ (int) $member->memberships->sum('balance') }}×</strong></td>
                 <td><a class="link" href="{{ route('members.show', $member) }}">Detail</a></td>

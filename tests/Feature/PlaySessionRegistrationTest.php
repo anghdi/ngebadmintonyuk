@@ -417,8 +417,8 @@ test('no show blocking follows the account when whatsapp is empty', function () 
     expect($playSession->registrations()->count())->toBe(0);
 });
 
-test('member dashboard presents compact activity cash and relevant notification summaries', function () {
-    $account = User::factory()->member()->create();
+test('member dashboard replaces notification status with a useful monthly report', function () {
+    $account = User::factory()->member()->create(['joined_at' => today()->subYear()->subMonths(2)]);
     Attendance::factory()->count(2)->for($account)->create(['status' => 'present']);
     Attendance::factory()->for($account)->create(['status' => 'absent']);
 
@@ -451,13 +451,15 @@ test('member dashboard presents compact activity cash and relevant notification 
 
     $response = $this->actingAsNotifiedMember($account)->get(route('dashboard'))
         ->assertSuccessful()
-        ->assertSee('Ringkasan aktivitas komunitasmu')
         ->assertSee('Laporan bulan berjalan')
+        ->assertSee('1 tahun 2 bulan bersama komunitas')
         ->assertSee('Saldo saat ini')
         ->assertSee('Sesi yang kamu ikuti')
-        ->assertSee('2</strong><span>kali bermain', escape: false)
+        ->assertSee('2</strong><span>kali', escape: false)
         ->assertViewHas('attendanceCount', 2)
-        ->assertSee('Riwayat notifikasi terkirim')
+        ->assertDontSee('Notifikasi perangkat')
+        ->assertDontSee('Notifikasi aktif pada perangkat ini')
+        ->assertSee('Notifikasi terkirim')
         ->assertSee('Informasi komunitas')
         ->assertDontSee('Notifikasi sesi lain')
         ->assertDontSee('Pengiriman gagal')

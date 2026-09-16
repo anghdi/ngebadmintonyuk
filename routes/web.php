@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AppInstallationController;
 use App\Http\Controllers\AppVersionController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
@@ -56,6 +57,7 @@ Route::middleware('guest')->group(function () {
 Route::bind('transaction', fn ($id) => request()->routeIs('incomes.*') ? Income::findOrFail($id) : Expense::findOrFail($id));
 Route::middleware(['auth', RequireCurrentPushSetup::class, RequireMemberNotifications::class])->group(function () {
     Route::get('/aktifkan-notifikasi', NotificationSetupController::class)->name('notifications.setup');
+    Route::post('/app-installation', AppInstallationController::class)->middleware('throttle:10,1')->name('app-installations.store');
     Route::post('/jadwal/{playSession}/daftar', [SessionRegistrationController::class, 'store'])->middleware([RequireCompleteMemberProfile::class, 'throttle:5,1'])->name('public-sessions.register');
     Route::delete('/jadwal/{playSession}/daftar/{registration}', [SessionRegistrationController::class, 'cancel'])->scopeBindings()->name('public-sessions.cancel');
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');

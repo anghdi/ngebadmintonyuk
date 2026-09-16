@@ -22,6 +22,7 @@ class UpdateMemberRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique(User::class)->ignore($this->route('member'))],
             'phone' => ['nullable', 'string', 'max:30'],
+            'joined_at' => ['required', Rule::date()->todayOrBefore()],
         ];
     }
 }

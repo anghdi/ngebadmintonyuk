@@ -142,6 +142,10 @@
     <button type="button" class="btn primary full" data-pwa-guide-close>Mengerti</button>
 </dialog>
 
+@if(! auth()->user()->isAdmin())
+    <x-pwa-app-gate />
+@endif
+
 
 
 @stack('scripts')

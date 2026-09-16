@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', $member->name)
 @section('content')
-<div class="page-head"><div><a class="back-link" href="{{ route('members.index') }}">← Semua member</a><h1>{{ $member->name }}</h1><p>{{ $member->email }}{{ $member->phone ? ' · '.$member->phone : '' }}</p></div><div class="actions"><span class="member-number">Member #{{ str_pad((string) $member->id, 4, '0', STR_PAD_LEFT) }}</span><form method="post" action="{{ route('members.destroy', $member) }}" onsubmit="return confirm('Hapus member beserta paket dan seluruh riwayatnya?')">@csrf @method('delete')<button class="btn danger-bg">Hapus member</button></form></div></div>
+<div class="page-head"><div><a class="back-link" href="{{ route('members.index') }}">← Semua member</a><h1>{{ $member->name }}</h1><p>{{ $member->email }}{{ $member->phone ? ' · '.$member->phone : '' }}</p><small>Member sejak {{ $member->memberSince()->translatedFormat('d M Y') }} · {{ $member->membershipDuration() }}</small></div><div class="actions"><span class="member-number">Member #{{ str_pad((string) $member->id, 4, '0', STR_PAD_LEFT) }}</span><form method="post" action="{{ route('members.destroy', $member) }}" onsubmit="return confirm('Hapus member beserta paket dan seluruh riwayatnya?')">@csrf @method('delete')<button class="btn danger-bg">Hapus member</button></form></div></div>
 
 <section class="card member-edit-card">
     <div><span class="eyebrow">Data member</span><h2>Informasi akun</h2></div>
@@ -11,6 +11,7 @@
         <label>Nama<input name="name" value="{{ old('name', $member->name) }}" required></label>
         <label>Email<input type="email" name="email" value="{{ old('email', $member->email) }}" required></label>
         <label>WhatsApp<input name="phone" value="{{ old('phone', $member->phone) }}"></label>
+        <label>Mulai bergabung<input type="date" name="joined_at" value="{{ old('joined_at', $member->memberSince()->toDateString()) }}" max="{{ today()->toDateString() }}" required>@error('joined_at')<span class="field-error">{{ $message }}</span>@enderror</label>
         <button class="btn primary">Simpan</button>
     </form>
 </section>

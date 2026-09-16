@@ -17,7 +17,7 @@ class RegistrationController extends Controller
 
     public function store(RegisterMemberRequest $request): RedirectResponse
     {
-        $member = User::create($request->validated());
+        $member = User::create($request->safe()->merge(['joined_at' => today()])->all());
         Auth::login($member, remember: true);
         $request->session()->regenerate();
 

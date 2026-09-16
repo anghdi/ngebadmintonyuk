@@ -73,11 +73,34 @@ test('a blocked post is not replayed after activation and foreign intended urls 
 
 test('setup is reachable without subscription and logout remains available', function () {
     $this->actingAs(User::factory()->member()->create())->get(route('notifications.setup'))
-        ->assertSuccessful()->assertSee('Aktifkan notifikasi dulu')
+        ->assertSuccessful()->assertSee('Aktifkan notifikasi')
         ->assertSee('iPhone/iPad')->assertSee('Keluar akun')
+        ->assertSee('data-pwa-known-installed="false"', false)
         ->assertDontSee('Nanti saja')->assertDontSee('id="sidebar"', false);
     $this->post(route('logout'))->assertRedirect();
     $this->assertGuest();
+});
+
+test('standalone app launch is recorded and browser gate is rendered on every member entry page', function () {
+    $member = User::factory()->member()->create();
+
+    $this->actingAs($member)
+        ->postJson(route('app-installations.store'))
+        ->assertSuccessful()
+        ->assertJson(['recorded' => true]);
+
+    expect($member->refresh()->pwa_installed_at)->not->toBeNull();
+
+    $this->get(route('notifications.setup'))
+        ->assertSuccessful()
+        ->assertSee('data-pwa-known-installed="true"', false)
+        ->assertSee('Buka dari aplikasi');
+});
+
+test('administrators cannot record a member app installation', function () {
+    $this->actingAs(User::factory()->admin()->create())
+        ->postJson(route('app-installations.store'))
+        ->assertForbidden();
 });
 
 test('guest schedule and administrator access do not require notifications', function () {

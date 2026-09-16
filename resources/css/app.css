@@ -90,6 +90,7 @@
     .pwa-install-dialog > img { width: 72px; height: 72px; margin: .2rem auto 1rem; object-fit: contain; }
     .pwa-install-dialog h2 { margin: .35rem 0 .6rem; font-size: 1.25rem; }
     .pwa-install-dialog p { margin: 0 0 1.25rem; font-size: .82rem; }
+    .pwa-install-dialog > small { display: block; color: #6b7280; font-size: .68rem; line-height: 1.5; }
     .pwa-dialog-close { position: absolute; top: .8rem; right: .8rem; display: grid; width: 38px; height: 38px; place-items: center; border: 0; border-radius: 11px; background: #eef1f7; color: #172a63; cursor: pointer; }
     main { min-width: 0; }
     header { position: sticky; top: 0; z-index: 15; display: flex; height: 76px; align-items: center; justify-content: flex-end; border-bottom: 1px solid rgb(218 221 231 / 78%); background: rgb(247 247 245 / 82%); padding: 0 2.25rem; backdrop-filter: blur(18px); }

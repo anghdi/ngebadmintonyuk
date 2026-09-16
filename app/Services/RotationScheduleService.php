@@ -66,12 +66,18 @@ class RotationScheduleService
         $lastCourt = array_fill_keys($ids, 0);
         $partners = [];
         $opponents = [];
+        $encounters = [];
         $rounds = [];
 
         for ($round = 1; $round <= $roundCount; $round++) {
-            $ranked = $ids;
-            usort($ranked, fn (int $a, int $b): int => [$games[$a], $lastPlayed[$a], $mixOrder[$a]] <=> [$games[$b], $lastPlayed[$b], $mixOrder[$b]]);
-            $selected = array_slice($ranked, 0, $playersPerTurn);
+            $selected = $this->selectPlayers(
+                $ids,
+                $playersPerTurn,
+                $games,
+                $lastPlayed,
+                $mixOrder,
+                $encounters,
+            );
             $bestCourts = [];
             $bestScore = null;
 
@@ -80,11 +86,21 @@ class RotationScheduleService
                 foreach ($this->pairings(array_keys($teams)) as $matches) {
                     $repeatedOpponentPairs = 0;
                     $opponentFrequency = 0;
+                    $maximumEncounterFrequency = 0;
+                    $repeatedEncounterPairs = 0;
+                    $encounterFrequency = 0;
                     $courts = [];
                     foreach ($matches as [$a, $b]) {
                         [$courtRepeatedPairs, $courtOpponentFrequency] = $this->opponentRepeatScore($teams[$a], $teams[$b], $opponents);
                         $repeatedOpponentPairs += $courtRepeatedPairs;
                         $opponentFrequency += $courtOpponentFrequency;
+                        [$courtMaximumFrequency, $courtRepeatedEncounters, $courtEncounterFrequency] = $this->encounterRepeatScore(
+                            [...$teams[$a], ...$teams[$b]],
+                            $encounters,
+                        );
+                        $maximumEncounterFrequency = max($maximumEncounterFrequency, $courtMaximumFrequency);
+                        $repeatedEncounterPairs += $courtRepeatedEncounters;
+                        $encounterFrequency += $courtEncounterFrequency;
                         $courts[] = ['number' => count($courts) + 1, 'team_a' => $teams[$a], 'team_b' => $teams[$b]];
                     }
                     $courtOrders = $courtCount === 2 ? [$courts, array_reverse($courts)] : [$courts];
@@ -106,12 +122,15 @@ class RotationScheduleService
                         }
                         unset($court);
                         $candidateScore = [
+                            $maximumEncounterFrequency,
+                            $repeatedEncounterPairs,
+                            $encounterFrequency,
+                            $repeatedPartnerPairs,
+                            $partnerFrequency,
                             $repeatedOpponentPairs,
                             $opponentFrequency,
                             $balancePenalty,
                             $repeatPenalty,
-                            $repeatedPartnerPairs,
-                            $partnerFrequency,
                         ];
                         if ($bestScore === null || $candidateScore < $bestScore) {
                             $bestScore = $candidateScore;
@@ -121,9 +140,14 @@ class RotationScheduleService
                 }
             }
             foreach ($bestCourts as $court) {
-                foreach ([...$court['team_a'], ...$court['team_b']] as $id) {
+                $courtPlayers = [...$court['team_a'], ...$court['team_b']];
+                foreach ($courtPlayers as $id) {
                     $courtVisits[$id][$court['number']]++;
                     $lastCourt[$id] = $court['number'];
+                }
+                foreach ($this->pairsWithin($courtPlayers) as [$a, $b]) {
+                    $key = $this->pairKey($a, $b);
+                    $encounters[$key] = ($encounters[$key] ?? 0) + 1;
                 }
                 foreach (['team_a', 'team_b'] as $team) {
                     [$a, $b] = $court[$team];
@@ -155,6 +179,70 @@ class RotationScheduleService
         ];
     }
 
+    /**
+     * @param  list<int>  $ids
+     * @param  array<int, int>  $games
+     * @param  array<int, int>  $lastPlayed
+     * @param  array<int, int>  $mixOrder
+     * @param  array<string, int>  $encounters
+     * @return list<int>
+     */
+    private function selectPlayers(
+        array $ids,
+        int $playersPerTurn,
+        array $games,
+        array $lastPlayed,
+        array $mixOrder,
+        array $encounters,
+    ): array {
+        $selected = [];
+        $remaining = $ids;
+
+        while (count($selected) < $playersPerTurn) {
+            usort($remaining, function (int $a, int $b) use ($games, $lastPlayed, $mixOrder, $encounters, $selected): int {
+                [$maximumA, $totalA] = $this->encounterLoad($a, $selected, $encounters);
+                [$maximumB, $totalB] = $this->encounterLoad($b, $selected, $encounters);
+
+                return [
+                    $games[$a],
+                    $maximumA,
+                    $totalA,
+                    $lastPlayed[$a],
+                    $mixOrder[$a],
+                ] <=> [
+                    $games[$b],
+                    $maximumB,
+                    $totalB,
+                    $lastPlayed[$b],
+                    $mixOrder[$b],
+                ];
+            });
+
+            $selected[] = array_shift($remaining);
+        }
+
+        return $selected;
+    }
+
+    /**
+     * @param  list<int>  $selected
+     * @param  array<string, int>  $encounters
+     * @return array{int, int}
+     */
+    private function encounterLoad(int $player, array $selected, array $encounters): array
+    {
+        $maximum = 0;
+        $total = 0;
+
+        foreach ($selected as $otherPlayer) {
+            $frequency = $encounters[$this->pairKey($player, $otherPlayer)] ?? 0;
+            $maximum = max($maximum, $frequency);
+            $total += $frequency;
+        }
+
+        return [$maximum, $total];
+    }
+
     /** @param list<int> $ids
      * @return list<list<array{int, int}>>
      */
@@ -179,6 +267,44 @@ class RotationScheduleService
     private function pairKey(int $a, int $b): string
     {
         return min($a, $b).':'.max($a, $b);
+    }
+
+    /**
+     * @param  list<int>  $players
+     * @return list<array{int, int}>
+     */
+    private function pairsWithin(array $players): array
+    {
+        $pairs = [];
+
+        foreach ($players as $index => $player) {
+            foreach (array_slice($players, $index + 1) as $otherPlayer) {
+                $pairs[] = [$player, $otherPlayer];
+            }
+        }
+
+        return $pairs;
+    }
+
+    /**
+     * @param  list<int>  $players
+     * @param  array<string, int>  $encounters
+     * @return array{int, int, int}
+     */
+    private function encounterRepeatScore(array $players, array $encounters): array
+    {
+        $maximumFrequency = 0;
+        $repeatedPairs = 0;
+        $frequency = 0;
+
+        foreach ($this->pairsWithin($players) as [$a, $b]) {
+            $pairFrequency = $encounters[$this->pairKey($a, $b)] ?? 0;
+            $maximumFrequency = max($maximumFrequency, $pairFrequency);
+            $repeatedPairs += (int) ($pairFrequency > 0);
+            $frequency += $pairFrequency;
+        }
+
+        return [$maximumFrequency, $repeatedPairs, $frequency];
     }
 
     /**

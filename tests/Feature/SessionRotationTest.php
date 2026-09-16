@@ -129,6 +129,52 @@ test('rotation avoids opponent rematches while new matchups are available', func
         ->and(array_unique($opponentPairs))->toHaveCount(24);
 });
 
+test('rotation spreads total encounters across the roster before repeating the same people', function () {
+    $roster = array_map(fn (int $id): array => ['id' => $id, 'name' => 'Player '.$id, 'user_id' => $id, 'guest_id' => null], range(1, 14));
+    $schedule = app(RotationScheduleService::class)->generate($roster, 2, 6);
+    $encounters = [];
+
+    foreach ($schedule['rounds'] as $round) {
+        foreach ($round['courts'] as $court) {
+            $players = [...$court['team_a'], ...$court['team_b']];
+            foreach ($players as $index => $player) {
+                foreach (array_slice($players, $index + 1) as $otherPlayer) {
+                    $pair = [$player, $otherPlayer];
+                    sort($pair);
+                    $key = implode(':', $pair);
+                    $encounters[$key] = ($encounters[$key] ?? 0) + 1;
+                }
+            }
+        }
+    }
+
+    expect(max($encounters))->toBeLessThanOrEqual(2)
+        ->and(count($encounters))->toBeGreaterThanOrEqual(68);
+});
+
+test('rotation caps repeated meetings during a long two court session', function () {
+    $roster = array_map(fn (int $id): array => ['id' => $id, 'name' => 'Player '.$id, 'user_id' => $id, 'guest_id' => null], range(1, 12));
+    $schedule = app(RotationScheduleService::class)->generate($roster, 2, 12);
+    $encounters = [];
+
+    foreach ($schedule['rounds'] as $round) {
+        foreach ($round['courts'] as $court) {
+            $players = [...$court['team_a'], ...$court['team_b']];
+            foreach ($players as $index => $player) {
+                foreach (array_slice($players, $index + 1) as $otherPlayer) {
+                    $pair = [$player, $otherPlayer];
+                    sort($pair);
+                    $key = implode(':', $pair);
+                    $encounters[$key] = ($encounters[$key] ?? 0) + 1;
+                }
+            }
+        }
+    }
+
+    expect(max($encounters))->toBeLessThanOrEqual(3)
+        ->and($encounters)->toHaveCount(66);
+});
+
 test('two courts rotate players across A and B with varied partners', function (int $players) {
     $roster = array_map(fn (int $id): array => ['id' => $id, 'name' => 'Player '.$id, 'user_id' => $id, 'guest_id' => null], range(1, $players));
     $schedule = app(RotationScheduleService::class)->generate($roster, 2, 12);

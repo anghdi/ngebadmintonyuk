@@ -4,7 +4,7 @@ import { installStoryStudio } from './story-studio.js';
 import { installFeedStudio } from './feed-studio.js';
 import { installRequiredProfileDialog } from './profile-required.js';
 import { addBadmintonPoint } from './scoreboard.js';
-import { isIosDevice, resolvePwaInstallMode } from './pwa-install.js';
+import { installPwaAppGate, isIosDevice, isStandalonePwa, resolvePwaInstallMode } from './pwa-install.js';
 import { installServerLoading } from './server-loading.js';
 
 const serverLoading = installServerLoading(window, document);
@@ -12,6 +12,7 @@ installRequiredProfileDialog(document);
 installAppVersionUpdates(window, document);
 installStoryStudio(window, document);
 installFeedStudio(window, document);
+const pwaAppGate = installPwaAppGate(window, document);
 
 document.querySelectorAll('form[data-confirm]').forEach((form) => {
     form.addEventListener('submit', (event) => {
@@ -48,8 +49,7 @@ const installGuide = document.querySelector('[data-pwa-guide]');
 
 if (installButton) {
     const ios = isIosDevice(navigator.userAgent, navigator.platform, navigator.maxTouchPoints);
-    const standalone = window.matchMedia('(display-mode: standalone)').matches
-        || navigator.standalone === true;
+    const standalone = isStandalonePwa(window);
     let deferredInstallPrompt;
 
     const updateInstallButton = () => {
@@ -188,7 +188,11 @@ document.querySelectorAll('[data-usage-guide]').forEach((guide) => {
     });
 });
 
-installMemberNotifications(window, document, serverLoading);
+Promise.resolve(pwaAppGate?.ready).then((browserBlocked) => {
+    if (!browserBlocked) {
+        installMemberNotifications(window, document, serverLoading);
+    }
+});
 
 const scoreboard = document.querySelector('[data-scoreboard]');
 

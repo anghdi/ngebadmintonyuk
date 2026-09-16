@@ -10,6 +10,13 @@
     "background_color": "#faf7f0",
     "theme_color": "#172a63",
     "categories": ["sports", "utilities"],
+    "related_applications": [
+        {
+            "platform": "webapp",
+            "url": "/manifest.webmanifest",
+            "id": "/"
+        }
+    ],
     "icons": [
         {
             "src": "/pwa-icon-192.png",

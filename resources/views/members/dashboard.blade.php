@@ -5,15 +5,13 @@
     <div>
         <span class="eyebrow">Aktivitas saya</span>
         <h1>Selamat datang, {{ str($member->name)->before(' ') }}.</h1>
-        <p>{{ now()->translatedFormat('l, d F Y') }}</p>
+        <p>Member sejak {{ $member->memberSince()->translatedFormat('d M Y') }} · {{ $member->membershipDuration() }} bersama komunitas</p>
     </div>
     <div class="actions">
         <a class="btn primary" href="{{ route('top-ups.index') }}">Top up kuota</a>
         <span class="member-number">Member #{{ str_pad((string) $member->id, 4, '0', STR_PAD_LEFT) }}</span>
     </div>
 </div>
-
-<x-push-notification-opt-in />
 
 <section class="member-summary-strip" aria-label="Ringkasan member">
     <div><small>Kuota</small><strong>{{ $remainingCredits }}</strong><span>tersedia</span></div>
@@ -23,7 +21,7 @@
 </section>
 
 <section class="member-cash-summary" aria-labelledby="member-cash-title">
-    <div><span class="eyebrow">Kas · {{ $today->translatedFormat('F Y') }}</span><h2 id="member-cash-title">Bulan berjalan</h2></div>
+    <div><span class="eyebrow">Laporan · {{ $today->translatedFormat('F Y') }}</span><h2 id="member-cash-title">Laporan bulan berjalan</h2></div>
     <dl>
         <div><dt>Masuk</dt><dd class="income">{{ rupiah($currentCashReport['totalIncome']) }}</dd></div>
         <div><dt>Keluar</dt><dd class="expense">{{ rupiah($currentCashReport['totalExpense']) }}</dd></div>

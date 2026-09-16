@@ -19,7 +19,7 @@ class RequireMemberNotifications
         $user = $request->user();
 
         if ($user === null || $user->isAdmin()
-            || $request->routeIs('notifications.setup', 'push-subscriptions.*', 'logout')) {
+            || $request->routeIs('notifications.setup', 'push-subscriptions.*', 'app-installations.store', 'logout')) {
             return $next($request);
         }
 

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { installMemberNotifications } from '../../resources/js/member-notifications.js';
 
-function browser({ setup = true, permission = 'default', subscription = true, supported = true, saveFails = false } = {}) {
+function browser({ setup = true, permission = 'default', subscription = true, supported = true, saveFails = false, card = true } = {}) {
     const events = {};
     const button = { dataset: {}, addEventListener: (name, callback) => { events[name] = callback; } };
     const status = {};
@@ -36,7 +36,7 @@ function browser({ setup = true, permission = 'default', subscription = true, su
     if (!supported) delete window.Notification;
     const document = { querySelector: (selector) => ({
         '[data-push-client]': { dataset },
-        '[data-push-opt-in]': { querySelector: (selector) => selector === '[data-push-toggle]' ? button : status },
+        '[data-push-opt-in]': card ? { querySelector: (selector) => selector === '[data-push-toggle]' ? button : status } : null,
         'meta[name="csrf-token"]': { content: 'csrf' },
     }[selector]) };
     const client = installMemberNotifications(window, document, { run: (callback) => callback() });
@@ -91,11 +91,11 @@ test('revoked permission and missing subscription invalidate the session and ret
     }
 });
 
-test('active member pages avoid repeated registration and expose no disable action', async () => {
-    const { client, calls, button } = browser({ setup: false, permission: 'granted' });
+test('active member pages avoid repeated registration without changing dashboard content', async () => {
+    const { client, calls, button } = browser({ setup: false, permission: 'granted', card: false });
     await client.ready;
-    assert.equal(button.textContent, 'Notifikasi aktif');
-    assert.equal(button.disabled, true);
+    assert.equal(button.textContent, undefined);
+    assert.equal(button.disabled, undefined);
     assert.deepEqual(calls.requests, []);
     assert.deepEqual(calls.redirects, []);
 });

@@ -67,6 +67,7 @@
         <button class="btn soft full">Keluar akun</button>
     </form>
 </main>
+<x-pwa-app-gate />
 <x-app-update />
 <x-server-loading />
 </body>

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\CarbonInterface;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -19,9 +20,11 @@ use Illuminate\Support\Str;
  * @property string $email
  * @property string|null $phone
  * @property Carbon|null $date_of_birth
+ * @property Carbon|null $joined_at
  * @property string|null $nickname
  * @property string|null $playing_level
  * @property string|null $avatar_path
+ * @property Carbon|null $pwa_installed_at
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string $role
@@ -29,7 +32,7 @@ use Illuminate\Support\Str;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'phone', 'password', 'date_of_birth', 'nickname', 'playing_level', 'avatar_path'])]
+#[Fillable(['name', 'email', 'phone', 'password', 'date_of_birth', 'joined_at', 'nickname', 'playing_level', 'avatar_path'])]
 #[Hidden(['password', 'remember_token', 'date_of_birth', 'avatar_path'])]
 class User extends Authenticatable
 {
@@ -47,6 +50,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'date_of_birth' => 'date',
+            'joined_at' => 'date',
+            'pwa_installed_at' => 'datetime',
         ];
     }
 
@@ -115,5 +120,30 @@ class User extends Authenticatable
             && $this->date_of_birth !== null
             && $this->date_of_birth->lessThanOrEqualTo(today())
             && $this->date_of_birth->greaterThanOrEqualTo(today()->subYears(120)));
+    }
+
+    public function memberSince(): CarbonInterface
+    {
+        return $this->joined_at ?? $this->created_at ?? now();
+    }
+
+    public function membershipDuration(): string
+    {
+        $memberSince = $this->memberSince()->copy()->startOfDay();
+        $today = today()->startOfDay();
+        $years = (int) $memberSince->diffInYears($today);
+        $months = (int) $memberSince->copy()->addYears($years)->diffInMonths($today);
+
+        if ($years > 0) {
+            return $years.' tahun'.($months > 0 ? ' '.$months.' bulan' : '');
+        }
+
+        if ($months > 0) {
+            return $months.' bulan';
+        }
+
+        $days = (int) $memberSince->diffInDays($today);
+
+        return $days > 0 ? $days.' hari' : 'Hari pertama';
     }
 }

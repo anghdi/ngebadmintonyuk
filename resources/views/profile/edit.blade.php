@@ -7,7 +7,7 @@
     </div>
     <section class="profile-summary">
         <span class="profile-avatar">@if($member->avatar_path)<img src="{{ route('profile.avatar') }}" alt="Foto {{ $member->name }}">@else{{ $member->initials() }}@endif</span>
-        <div class="profile-summary-name"><strong>{{ $member->nickname ?: $member->name }}</strong><span>Bergabung {{ $member->created_at->translatedFormat('M Y') }}</span></div>
+        <div class="profile-summary-name"><strong>{{ $member->nickname ?: $member->name }}</strong><span>Member sejak {{ $member->memberSince()->translatedFormat('M Y') }} · {{ $member->membershipDuration() }}</span></div>
         <div class="profile-stat"><strong>{{ $attendanceCount }}</strong><span>Kali hadir</span></div>
         <div class="profile-stat"><strong>{{ $remainingCredits }}</strong><span>Kuota main</span></div>
     </section>
