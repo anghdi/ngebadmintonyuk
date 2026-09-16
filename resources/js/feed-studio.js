@@ -22,7 +22,23 @@ export function resolveHeroPanel(postCount, variant) {
 export function resolvePhotoBox(postCount, variant) {
     const panel = resolveHeroPanel(postCount, variant);
     const safe = panelSafeArea(panel);
+    if (postCount === 1) return { panel, x: safe.x, y: 142, width: safe.width, height: 560 };
     return { panel, x: safe.x, y: 142, width: safe.width, height: 1066 };
+}
+
+export function resolveContentLayout(postCount, variant, hasPhoto) {
+    const heroPanel = hasPhoto ? resolveHeroPanel(postCount, variant) : null;
+    const contentPanels = Array.from({ length: postCount }, (_, panel) => panel).filter((panel) => panel !== heroPanel);
+
+    if (postCount === 1) {
+        return { heroPanel, headlinePanel: 0, supportingPanel: 0, detailsPanel: 0, ctaPanel: 0 };
+    }
+
+    const headlinePanel = contentPanels[0] ?? 0;
+    const supportingPanel = contentPanels[1] ?? headlinePanel;
+    const detailsPanel = contentPanels.at(-1) ?? headlinePanel;
+
+    return { heroPanel, headlinePanel, supportingPanel, detailsPanel, ctaPanel: detailsPanel };
 }
 
 export function resolveConnectionPath(connection, width, height, variant) {
@@ -38,7 +54,7 @@ export function resolveConnectionPath(connection, width, height, variant) {
     return { start, end, controls: bends[variant] ?? bends.editorial, incoming, outgoing };
 }
 
-function wrapText(context, text, x, y, maxWidth, lineHeight, maxLines = 3) {
+function wrapText(context, text, { x, y, maxWidth, lineHeight, maxLines = 3 }) {
     const words = String(text || '').split(/\s+/).filter(Boolean);
     let line = '';
     let lineNumber = 0;
@@ -83,8 +99,8 @@ function drawPhoto(context, image, box, settings) {
     }
     context.restore();
     context.strokeStyle = '#ffd23f';
-    context.lineWidth = 12;
-    context.strokeRect(box.x + 18, box.y + 18, box.width - 36, box.height - 36);
+    context.lineWidth = 8;
+    context.strokeRect(box.x + 14, box.y + 14, box.width - 28, box.height - 28);
 }
 
 function drawConnectionGeometry(context, width, connection, variant, palette) {
@@ -102,22 +118,13 @@ function drawConnectionGeometry(context, width, connection, variant, palette) {
     context.stroke();
     context.globalAlpha = 1;
     context.strokeStyle = '#ffd23f';
-    context.lineWidth = 22;
+    context.lineWidth = 16;
     context.lineCap = 'round';
     context.beginPath();
     context.moveTo(path.start.x, path.start.y + 18);
     context.lineTo(path.start.x, POST_HEIGHT - 135);
     context.bezierCurveTo(path.controls[0].x, path.controls[0].y, path.controls[1].x, path.controls[1].y, path.end.x, 135);
     context.lineTo(path.end.x, path.end.y - 18);
-    context.stroke();
-    context.strokeStyle = palette.ink;
-    context.globalAlpha = 0.72;
-    context.lineWidth = 5;
-    context.beginPath();
-    context.moveTo(path.start.x - 34, path.start.y + 18);
-    context.lineTo(path.start.x - 34, POST_HEIGHT - 135);
-    context.bezierCurveTo(path.controls[0].x - 34, path.controls[0].y, path.controls[1].x - 34, path.controls[1].y, path.end.x - 34, 135);
-    context.lineTo(path.end.x - 34, path.end.y - 18);
     context.stroke();
     context.restore();
 }
@@ -128,6 +135,22 @@ function drawBrandLockup(context, safe, palette, label = 'NGE BADMINTON YUK!') {
     context.fillStyle = palette.ink;
     context.font = '800 25px "Plus Jakarta Sans", sans-serif';
     context.fillText(label, safe.x, safe.y + 62);
+}
+
+function resolvePanelPalette(palette, panel, postCount) {
+    if (postCount === 3 && panel === 1) {
+        return { background: palette.contrast, ink: '#ffffff', muted: '#dfe7ff', contrast: palette.background };
+    }
+
+    return palette;
+}
+
+function drawSemanticBackdrop(context, safe, palette, top, height) {
+    context.save();
+    context.fillStyle = palette.background;
+    context.globalAlpha = 0.94;
+    context.fillRect(safe.x - 24, top, safe.width + 48, height);
+    context.restore();
 }
 
 export function resolveSeedTrajectory(connection, width = POST_WIDTH * 3, height = POST_HEIGHT) {
@@ -228,7 +251,7 @@ export function drawSeedMaster(context, canvas, connection = {}) {
     const left = panelSafeArea(0);
     context.fillStyle = '#102656';
     context.font = '800 92px "Plus Jakarta Sans", sans-serif';
-    wrapText(context, 'Lagi nyari temen main?', left.x, 420, left.width, 102, 2);
+    wrapText(context, 'Lagi nyari temen main?', { x: left.x, y: 420, maxWidth: left.width, lineHeight: 102, maxLines: 2 });
 
     const center = panelSafeArea(1);
     context.fillStyle = '#2455f5';
@@ -240,53 +263,68 @@ export function drawSeedMaster(context, canvas, connection = {}) {
     context.fillStyle = '#102656';
     context.font = '800 92px "Plus Jakarta Sans", sans-serif';
     context.textAlign = 'left';
-    wrapText(context, 'Ramean lebih seru.', right.x + 344, 420, right.width - 344, 102, 2);
+    wrapText(context, 'Ramean lebih seru.', { x: right.x + 344, y: 420, maxWidth: right.width - 344, lineHeight: 102, maxLines: 2 });
     context.textAlign = 'start';
 }
 
-function drawMaster(context, canvas, design, image, settings) {
+export function drawFeedMaster(context, canvas, design, image, settings) {
     const width = canvas.width;
     const palette = PALETTES[design.connection?.background] ?? PALETTES['off-white'];
     context.fillStyle = palette.background;
     context.fillRect(0, 0, width, POST_HEIGHT);
     if (design.postCount === 3) {
-        context.fillStyle = palette.contrast;
-        context.globalAlpha = 0.14;
+        context.fillStyle = resolvePanelPalette(palette, 1, design.postCount).background;
         context.fillRect(POST_WIDTH, 0, POST_WIDTH, POST_HEIGHT);
-        context.globalAlpha = 1;
     }
-    const heroPanel = resolveHeroPanel(design.postCount, design.variant);
-    const ctaPanel = heroPanel === design.postCount - 1 && design.postCount > 1 ? design.postCount - 2 : design.postCount - 1;
-    if (image) drawPhoto(context, image, resolvePhotoBox(design.postCount, design.variant), settings);
     drawConnectionGeometry(context, width, design.connection, design.variant, palette);
+    const layout = resolveContentLayout(design.postCount, design.variant, Boolean(image));
+    if (image) drawPhoto(context, image, resolvePhotoBox(design.postCount, design.variant), settings);
+
     for (let panel = 0; panel < design.postCount; panel++) {
         const safe = panelSafeArea(panel);
-        drawBrandLockup(context, safe, palette);
-        if (panel === heroPanel && image) continue;
-        if (panel === 0 || design.postCount === 1) {
-            context.fillStyle = palette.ink;
-            context.font = `900 ${design.postCount > 1 ? 82 : 88}px "Plus Jakarta Sans", sans-serif`;
-            wrapText(context, design.headline, safe.x, 430, safe.width, 94, 4);
-            context.fillStyle = palette.muted;
-            context.font = '600 30px "Plus Jakarta Sans", sans-serif';
-            wrapText(context, design.supportingText, safe.x, 840, safe.width, 43, 3);
-        } else {
-            context.fillStyle = palette.ink;
-            context.font = '900 66px "Plus Jakarta Sans", sans-serif';
-            wrapText(context, panel === design.postCount - 1 ? design.headline : design.supportingText, safe.x, 480, safe.width, 76, 4);
+        const panelPalette = resolvePanelPalette(palette, panel, design.postCount);
+        drawBrandLockup(context, safe, panelPalette);
+
+        const compactPanel = layout.headlinePanel === layout.supportingPanel;
+        const singleWithPhoto = design.postCount === 1 && image;
+
+        if (panel === layout.headlinePanel) {
+            const headlineTop = singleWithPhoto ? 760 : compactPanel ? 280 : 330;
+            const headlineY = singleWithPhoto ? 830 : compactPanel ? 380 : 430;
+            drawSemanticBackdrop(context, safe, panelPalette, headlineTop, singleWithPhoto ? 188 : compactPanel ? 390 : 410);
+            context.fillStyle = panelPalette.ink;
+            context.font = `900 ${singleWithPhoto ? 66 : design.postCount > 1 ? 82 : 88}px "Plus Jakarta Sans", sans-serif`;
+            wrapText(context, design.headline, { x: safe.x, y: headlineY, maxWidth: safe.width, lineHeight: singleWithPhoto ? 76 : 94, maxLines: singleWithPhoto ? 2 : compactPanel ? 3 : 4 });
         }
+
+        if (design.supportingText && panel === layout.supportingPanel) {
+            const supportingTop = singleWithPhoto ? 940 : compactPanel ? 650 : 350;
+            const supportingY = singleWithPhoto ? 990 : compactPanel ? 720 : 470;
+            drawSemanticBackdrop(context, safe, panelPalette, supportingTop, compactPanel ? 230 : 420);
+            context.fillStyle = panelPalette.muted;
+            context.font = compactPanel ? '600 30px "Plus Jakarta Sans", sans-serif' : '800 54px "Plus Jakarta Sans", sans-serif';
+            wrapText(context, design.supportingText, { x: safe.x, y: supportingY, maxWidth: safe.width, lineHeight: compactPanel ? 43 : 66, maxLines: compactPanel ? 3 : 5 });
+        }
+
         const details = [design.eventDate, design.eventTime, design.venue, design.price].filter(Boolean);
-        context.fillStyle = palette.ink;
-        context.font = '700 28px "Plus Jakarta Sans", sans-serif';
-        details.slice(0, 3).forEach((detail, index) => wrapText(context, detail, safe.x, 1000 + index * 48, safe.width, 38, 1));
-        if (design.cta && panel === ctaPanel) {
+        if (details.length && panel === layout.detailsPanel) {
+            const detailsTop = singleWithPhoto ? 1060 : compactPanel ? 900 : 820;
+            const detailsY = singleWithPhoto ? 1110 : compactPanel ? 970 : 900;
+            drawSemanticBackdrop(context, safe, panelPalette, detailsTop, design.cta ? 210 : 150);
+            context.fillStyle = panelPalette.ink;
+            context.font = '700 28px "Plus Jakarta Sans", sans-serif';
+            wrapText(context, details.join('  ·  '), { x: safe.x, y: detailsY, maxWidth: safe.width, lineHeight: 40, maxLines: 2 });
+        }
+
+        if (design.cta && panel === layout.ctaPanel) {
+            const ctaY = singleWithPhoto ? 1170 : 1130;
             context.fillStyle = '#ffd23f';
             context.beginPath();
-            context.roundRect(safe.x, 1160, Math.min(330, safe.width), 82, 41);
+            context.roundRect(safe.x, ctaY, Math.min(330, safe.width), 82, 41);
             context.fill();
             context.fillStyle = '#102656';
             context.font = '800 25px "Plus Jakarta Sans", sans-serif';
-            wrapText(context, design.cta.toUpperCase(), safe.x + 36, 1212, Math.min(258, safe.width - 72), 30, 1);
+            wrapText(context, design.cta.toUpperCase(), { x: safe.x + 36, y: ctaY + 52, maxWidth: Math.min(258, safe.width - 72), lineHeight: 30, maxLines: 1 });
         }
     }
 }
@@ -297,9 +335,10 @@ function renderSeedCanvases(documentObject) {
         if (canvas.dataset.feedSeedGrid !== undefined) {
             const master = documentObject.createElement('canvas');
             drawSeedMaster(master.getContext('2d'), master, connection);
-            canvas.width = POST_WIDTH * 3;
+            const slice = Number(canvas.dataset.feedSeedSlice || 0);
+            canvas.width = POST_WIDTH;
             canvas.height = POST_WIDTH;
-            canvas.getContext('2d').drawImage(master, 0, 135, POST_WIDTH * 3, POST_WIDTH, 0, 0, POST_WIDTH * 3, POST_WIDTH);
+            canvas.getContext('2d').drawImage(master, slice * POST_WIDTH, 135, POST_WIDTH, POST_WIDTH, 0, 0, POST_WIDTH, POST_WIDTH);
             return;
         }
         drawSeedMaster(canvas.getContext('2d'), canvas, connection);
@@ -337,7 +376,7 @@ export function installFeedStudio(windowObject, documentObject) {
         if (design.isSeed) {
             drawSeedMaster(context, canvas, design.connection);
         } else {
-            drawMaster(context, canvas, design, image, settings);
+            drawFeedMaster(context, canvas, design, image, settings);
         }
         const grid = root.querySelector('[data-feed-grid]');
         grid.querySelectorAll('[data-feed-new]').forEach((item) => item.remove());
@@ -349,7 +388,20 @@ export function installFeedStudio(windowObject, documentObject) {
             preview.getContext('2d').drawImage(canvas, slice * POST_WIDTH, 135, POST_WIDTH, POST_WIDTH, 0, 0, POST_WIDTH, POST_WIDTH);
             grid.insertBefore(preview, grid.firstChild);
         }
-        root.querySelector('[data-feed-order]').innerHTML = Array.from({ length: design.postCount }, (_, index) => `<li><b>${String(index + 1).padStart(2, '0')}</b> ${index === 0 ? 'Upload pertama' : index === design.postCount - 1 ? 'Upload terakhir' : 'Upload kedua'} · potongan ${design.postCount - index}</li>`).join('');
+        const uploadOrder = root.querySelector('[data-feed-order]');
+        uploadOrder.replaceChildren();
+        Array.from({ length: design.postCount }, (_, index) => {
+            const item = documentObject.createElement('li');
+            const number = documentObject.createElement('b');
+            const description = documentObject.createElement('span');
+            number.textContent = String(index + 1).padStart(2, '0');
+            const position = index === 0 ? 'Upload pertama' : index === design.postCount - 1 ? 'Upload terakhir' : 'Upload kedua';
+            description.textContent = `${position} · potongan ${design.postCount - index}`;
+            item.append(number, description);
+            uploadOrder.append(item);
+
+            return item;
+        });
         status.textContent = 'Preview siap.';
     };
     root.querySelectorAll('[data-feed-setting]').forEach((input) => input.addEventListener('input', () => {
@@ -361,7 +413,13 @@ export function installFeedStudio(windowObject, documentObject) {
         render();
         status.textContent = `Komposisi ${design.variant} dipilih.`;
     });
-    root.querySelector('[data-feed-export]').addEventListener('click', async () => {
+    const exportButton = root.querySelector('[data-feed-export]');
+    exportButton.addEventListener('click', async () => {
+        if (exportButton.disabled) return;
+        const originalLabel = exportButton.textContent;
+        exportButton.disabled = true;
+        exportButton.textContent = 'Menyiapkan export…';
+        root.setAttribute('aria-busy', 'true');
         status.textContent = 'Menyiapkan file export…';
         const assets = [];
         for (let uploadIndex = 0; uploadIndex < design.postCount; uploadIndex++) {
@@ -391,6 +449,10 @@ export function installFeedStudio(windowObject, documentObject) {
             status.textContent = 'File diunduh dan tersimpan di Feed History.';
         } catch {
             status.textContent = 'File sudah diunduh, tetapi riwayat export belum tersimpan.';
+        } finally {
+            exportButton.disabled = false;
+            exportButton.textContent = originalLabel;
+            root.removeAttribute('aria-busy');
         }
     });
     loadImage(windowObject, design.photoUrl).then((loaded) => { image = loaded; render(); }).catch(() => { render(); status.textContent = 'Foto tidak dapat dimuat. Layout teks tetap tersedia.'; });

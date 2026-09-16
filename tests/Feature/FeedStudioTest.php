@@ -83,6 +83,11 @@ test('export assets are saved to feed history and match the post count', functio
     expect($design->exported_assets)->toHaveCount(2)->and($design->thumbnail_path)->not->toBeNull();
     Storage::disk('local')->assertExists($design->thumbnail_path);
     $this->get(route('feed-studio.thumbnail', $design))->assertOk();
+    $this->get(route('feed-studio.asset', [$design, 0]))
+        ->assertOk()
+        ->assertHeader('Content-Type', 'image/png')
+        ->assertHeader('Cache-Control', 'max-age=3600, private');
+    $this->get(route('feed-studio.asset', [$design, 2]))->assertNotFound();
 
     $this->post(route('feed-studio.assets', $design), [
         'assets' => [UploadedFile::fake()->image('only-one.png')],
@@ -92,6 +97,34 @@ test('export assets are saved to feed history and match the post count', functio
         'position_x' => 0,
         'position_y' => 0,
     ])->assertUnprocessable();
+});
+
+test('grid preview uses actual exported posts from earlier rows only', function () {
+    Storage::fake('local');
+    $administrator = User::factory()->admin()->create();
+    app(CreateFeedDesignAction::class)->ensureSeed($administrator);
+    $previous = FeedDesign::factory()->for($administrator, 'creator')->create([
+        'row_number' => 1,
+        'format' => 'connected_2',
+        'exported_assets' => ['feed-studio/exports/previous/right.png', 'feed-studio/exports/previous/left.png'],
+        'thumbnail_path' => 'feed-studio/exports/previous/thumbnail.png',
+    ]);
+    Storage::disk('local')->put($previous->thumbnail_path, 'thumbnail');
+    foreach ($previous->exported_assets as $path) {
+        Storage::disk('local')->put($path, 'post');
+    }
+    $current = FeedDesign::factory()->for($administrator, 'creator')->create(['row_number' => 2, 'format' => 'connected_3']);
+    $future = FeedDesign::factory()->for($administrator, 'creator')->create([
+        'row_number' => 3,
+        'thumbnail_path' => 'feed-studio/exports/future/thumbnail.png',
+    ]);
+
+    $response = $this->actingAs($administrator)->get(route('feed-studio.show', $current));
+
+    $response->assertOk()
+        ->assertSee(route('feed-studio.asset', [$previous, 1]), false)
+        ->assertSee(route('feed-studio.asset', [$previous, 0]), false)
+        ->assertDontSee(route('feed-studio.thumbnail', $future), false);
 });
 
 test('seed row opens the native canvas exporter and saves three instagram files', function () {
@@ -127,7 +160,9 @@ test('feed studio editor exposes master canvas grid preview and upload order', f
     app(CreateFeedDesignAction::class)->ensureSeed($administrator);
     $design = FeedDesign::factory()->for($administrator, 'creator')->create(['format' => 'connected_3']);
 
-    $this->actingAs($administrator)->get(route('feed-studio.show', $design))
+    $response = $this->actingAs($administrator)->get(route('feed-studio.show', $design));
+
+    $response
         ->assertOk()
         ->assertSee('MASTER CANVAS')
         ->assertSee('INSTAGRAM GRID')
@@ -135,4 +170,5 @@ test('feed studio editor exposes master canvas grid preview and upload order', f
         ->assertSee('data-feed-editor', false)
         ->assertSee('data-feed-seed-grid', false)
         ->assertDontSee('feed-grid-seed"', false);
+    expect(substr_count($response->getContent(), 'data-feed-seed-slice='))->toBe(3);
 });

@@ -21,4 +21,5 @@ Before planning or editing, find the row whose globs match the file's path and r
 | resources/views/public-sessions/** | .ai/rules/public-sessions.md |
 | resources/views/push-notifications/** | .ai/rules/push-notifications.md |
 | app/{Services,Http}/** | .ai/rules/services-http.md |
+| app/{Services,Http}/**, resources/{js,views,css}/** | .ai/rules/services-httpjsviewscss.md |
 | app/Services/RotationScheduleService.php | .ai/rules/services.md |

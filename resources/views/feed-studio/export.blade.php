@@ -36,7 +36,13 @@
     <section class="mt-8"><div class="section-heading"><div><span class="eyebrow">INSTAGRAM GRID</span><h2>Setelah konten di-upload</h2></div><small>Upload sesuai nomor</small></div><div class="feed-grid-preview" data-feed-grid>
         @foreach($history as $item)
             @if($item->is_seed)
-                <canvas class="feed-grid-seed-master" width="3240" height="1080" data-feed-seed-canvas data-feed-seed-grid data-connection='@json($item->connection_state)' aria-label="Seed Row connected 3 × 1"></canvas>
+                @for($seedSlice = 0; $seedSlice < 3; $seedSlice++)
+                    <canvas width="1080" height="1080" data-feed-seed-canvas data-feed-seed-grid data-feed-seed-slice="{{ $seedSlice }}" data-connection='@json($item->connection_state)' aria-label="Seed Row post {{ $seedSlice + 1 }}"></canvas>
+                @endfor
+            @elseif(filled($item->exported_assets))
+                @foreach(array_reverse($item->exported_assets, true) as $assetIndex => $assetPath)
+                    <img src="{{ route('feed-studio.asset', [$item, $assetIndex]) }}" alt="Post {{ $item->headline }}">
+                @endforeach
             @else
                 @for($post = 0; $post < $item->postCount(); $post++)<div class="feed-grid-old"><img src="{{ route('feed-studio.thumbnail', $item) }}" alt=""></div>@endfor
             @endif

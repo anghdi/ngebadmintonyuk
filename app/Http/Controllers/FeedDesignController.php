@@ -57,6 +57,7 @@ class FeedDesignController extends Controller
     {
         $history = FeedDesign::query()
             ->whereKeyNot($feedDesign->id)
+            ->where('row_number', '<', $feedDesign->row_number)
             ->where(fn ($query) => $query->whereNotNull('thumbnail_path')->orWhere('is_seed', true))
             ->latest('row_number')
             ->limit(9)
@@ -109,6 +110,17 @@ class FeedDesignController extends Controller
         abort_if($feedDesign->thumbnail_path === null || ! Storage::disk('local')->exists($feedDesign->thumbnail_path), 404);
 
         return response(Storage::disk('local')->get($feedDesign->thumbnail_path), 200, ['Content-Type' => 'image/png', 'Cache-Control' => 'private, max-age=3600']);
+    }
+
+    public function asset(FeedDesign $feedDesign, int $assetIndex): Response
+    {
+        $path = $feedDesign->exported_assets[$assetIndex] ?? null;
+        abort_if($path === null || ! Storage::disk('local')->exists($path), 404);
+
+        return response(Storage::disk('local')->get($path), 200, [
+            'Content-Type' => 'image/png',
+            'Cache-Control' => 'private, max-age=3600',
+        ]);
     }
 
     public function saveAssets(SaveFeedDesignAssetsRequest $request, FeedDesign $feedDesign, SaveFeedDesignAssetsAction $save): Response

@@ -1205,15 +1205,16 @@
     .feed-canvas-scroll { overflow-x: auto; overscroll-behavior-inline: contain; }
     .feed-canvas-scroll canvas { display: block; width: 100%; min-width: 580px; height: auto; border-radius: 5px; box-shadow: 0 12px 30px rgb(16 38 86 / 14%); }
     .feed-master-stage > p { margin: .75rem 0 0; color: #657084; font-size: .68rem; }
-    .feed-editor-controls { display: grid; gap: .75rem; border: 1px solid #e1e5ed; border-radius: 12px; background: white; padding: 1rem; }
+    .feed-editor-controls { position: sticky; top: 5.5rem; display: grid; gap: .75rem; border: 1px solid #e1e5ed; border-radius: 12px; background: white; padding: 1rem; }
     .feed-editor-controls section { display: grid; gap: .8rem; }
     .feed-editor-controls label { display: grid; gap: .3rem; font-size: .68rem; }
     .feed-editor-controls input[type=range] { width: 100%; min-height: 26px; padding: 0; border: 0; accent-color: #2455f5; }
+    .feed-editor-controls button:disabled { cursor: wait; opacity: .68; }
     .feed-grid-preview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 680px; overflow: hidden; border: 6px solid white; background: #e8ebf0; box-shadow: 0 0 0 1px #dce1eb; }
     .feed-grid-preview > * { display: grid; width: 100%; height: auto; border: 1px solid white; background: #dce2eb; aspect-ratio: 1; object-fit: cover; place-items: center; }
+    .feed-grid-preview > :nth-child(n+10) { display: none; }
     .feed-grid-preview canvas { object-fit: cover; object-position: center; }
     .feed-grid-old span { color: #738096; font-size: .62rem; font-weight: 700; }
-    .feed-grid-preview > .feed-grid-seed-master { grid-column: 1 / -1; aspect-ratio: 3 / 1; }
     [data-feed-order] li { display: flex; align-items: center; gap: .65rem; border-bottom: 1px solid #edf0f4; padding-bottom: .5rem; }
     [data-feed-order] b { display: grid; width: 28px; height: 28px; border-radius: 50%; background: #102656; color: white; font-size: .6rem; place-items: center; }
 }
@@ -1221,6 +1222,8 @@
 @media (max-width: 900px) {
     .feed-history-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .feed-editor-layout { grid-template-columns: 1fr; }
+    .feed-editor-controls { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .feed-editor-controls section { grid-column: 1 / -1; }
 }
 
 @media (max-width: 640px) {
@@ -1231,4 +1234,6 @@
     .feed-history-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
     .feed-canvas-scroll { margin-inline: -.5rem; padding-inline: .5rem; }
     .feed-canvas-scroll canvas { min-width: 520px; }
+    .feed-editor-controls { grid-template-columns: 1fr; }
+    .feed-editor-controls section { grid-column: auto; }
 }
