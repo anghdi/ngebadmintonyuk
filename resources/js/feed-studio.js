@@ -111,23 +111,104 @@ function drawPhoto(context, image, box, settings) {
     context.restore();
     context.strokeStyle = '#ffd23f';
     context.lineWidth = 8;
-    context.strokeRect(box.x + 14, box.y + 14, box.width - 28, box.height - 28);
+    context.beginPath();
+    context.roundRect(box.x + 14, box.y + 14, box.width - 28, box.height - 28, 22);
+    context.stroke();
 }
 
-function drawConnectionGeometry(context, width, connection, variant, palette) {
-    const path = resolveConnectionPath(connection, width, POST_HEIGHT, variant);
+function resolvePanelPalette(palette, panel, postCount, variant = 'editorial') {
+    if (postCount === 1) return palette;
+
+    const baseName = Object.entries(PALETTES).find(([, candidate]) => candidate === palette)?.[0] ?? 'off-white';
+    const sequences = {
+        'off-white': ['off-white', 'royal-blue', 'navy'],
+        'royal-blue': ['royal-blue', 'navy', 'off-white'],
+        navy: ['navy', 'off-white', 'royal-blue'],
+    };
+    const sequence = [...sequences[baseName]];
+
+    if (variant === 'kinetic') {
+        [sequence[1], sequence[2]] = [sequence[2], sequence[1]];
+    }
+
+    if (variant === 'sideline') {
+        sequence.reverse();
+    }
+
+    return PALETTES[sequence[panel % sequence.length]];
+}
+
+function drawCourtBlueprint(context, panel, palette, variant) {
+    const panelX = panel * POST_WIDTH;
+    const left = panelX + 54;
+    const right = panelX + POST_WIDTH - 54;
+    const top = 54;
+    const bottom = POST_HEIGHT - 54;
+    const netY = variant === 'kinetic' ? 790 : variant === 'sideline' ? 650 : 720;
+    const serviceOffset = 250;
+
     context.save();
     context.strokeStyle = palette.ink;
-    context.globalAlpha = 0.17;
-    context.lineWidth = 7;
-    context.strokeRect(54, 76, width - 108, POST_HEIGHT - 152);
+    context.globalAlpha = 0.13;
+    context.lineWidth = 5;
+    context.strokeRect(left, top, right - left, bottom - top);
+
     context.beginPath();
-    context.moveTo(0, POST_HEIGHT * 0.32);
-    context.lineTo(width, POST_HEIGHT * 0.32);
-    context.moveTo(0, POST_HEIGHT * 0.74);
-    context.lineTo(width, POST_HEIGHT * 0.74);
+    context.moveTo(left + 92, top);
+    context.lineTo(left + 92, bottom);
+    context.moveTo(right - 92, top);
+    context.lineTo(right - 92, bottom);
+    context.moveTo(left, netY - serviceOffset);
+    context.lineTo(right, netY - serviceOffset);
+    context.moveTo(left, netY + serviceOffset);
+    context.lineTo(right, netY + serviceOffset);
+    context.moveTo((left + right) / 2, top);
+    context.lineTo((left + right) / 2, netY - 14);
+    context.moveTo((left + right) / 2, netY + 14);
+    context.lineTo((left + right) / 2, bottom);
     context.stroke();
-    context.globalAlpha = 1;
+
+    context.globalAlpha = 0.24;
+    context.lineWidth = 12;
+    context.beginPath();
+    context.moveTo(left - 10, netY);
+    context.lineTo(right + 10, netY);
+    context.stroke();
+
+    context.globalAlpha = 0.16;
+    context.lineWidth = 2;
+    for (let x = left; x <= right; x += 34) {
+        context.beginPath();
+        context.moveTo(x, netY - 13);
+        context.lineTo(x, netY + 13);
+        context.stroke();
+    }
+    context.restore();
+}
+
+function drawBadmintonBackground(context, postCount, variant, palette) {
+    for (let panel = 0; panel < postCount; panel++) {
+        const panelPalette = resolvePanelPalette(palette, panel, postCount, variant);
+        const panelX = panel * POST_WIDTH;
+        context.fillStyle = panelPalette.background;
+        context.fillRect(panelX, 0, POST_WIDTH, POST_HEIGHT);
+
+        if (postCount === 1) {
+            context.save();
+            context.fillStyle = panelPalette.contrast;
+            context.globalAlpha = 0.12;
+            context.fillRect(panelX + POST_WIDTH * 0.72, 0, POST_WIDTH * 0.28, POST_HEIGHT);
+            context.fillRect(panelX, POST_HEIGHT * 0.78, POST_WIDTH, POST_HEIGHT * 0.22);
+            context.restore();
+        }
+
+        drawCourtBlueprint(context, panel, panelPalette, variant);
+    }
+}
+
+function drawConnectionGeometry(context, width, connection, variant) {
+    const path = resolveConnectionPath(connection, width, POST_HEIGHT, variant);
+    context.save();
     context.strokeStyle = '#ffd23f';
     context.lineWidth = 16;
     context.lineCap = 'round';
@@ -146,14 +227,6 @@ function drawBrandLockup(context, safe, palette, label = 'NGE BADMINTON YUK!') {
     context.fillStyle = palette.ink;
     context.font = '800 25px "Instrument Sans", sans-serif';
     context.fillText(label, safe.x, safe.y + 62);
-}
-
-function resolvePanelPalette(palette, panel, postCount) {
-    if (postCount === 3 && panel === 1) {
-        return { background: palette.contrast, ink: '#ffffff', muted: '#dfe7ff', contrast: palette.background };
-    }
-
-    return palette;
 }
 
 function drawSemanticBackdrop(context, safe, palette, top, height) {
@@ -283,19 +356,14 @@ export function drawSeedMaster(context, canvas, connection = {}) {
 export function drawFeedMaster(context, canvas, design, image, settings) {
     const width = canvas.width;
     const palette = PALETTES[design.connection?.background] ?? PALETTES['off-white'];
-    context.fillStyle = palette.background;
-    context.fillRect(0, 0, width, POST_HEIGHT);
-    if (design.postCount === 3) {
-        context.fillStyle = resolvePanelPalette(palette, 1, design.postCount).background;
-        context.fillRect(POST_WIDTH, 0, POST_WIDTH, POST_HEIGHT);
-    }
-    drawConnectionGeometry(context, width, design.connection, design.variant, palette);
+    drawBadmintonBackground(context, design.postCount, design.variant, palette);
+    drawConnectionGeometry(context, width, design.connection, design.variant);
     const layout = resolveContentLayout(design.postCount, design.variant, Boolean(image));
     if (image) drawPhoto(context, image, resolvePhotoBox(design.postCount, design.variant), settings);
 
     for (let panel = 0; panel < design.postCount; panel++) {
         const safe = panelSafeArea(panel);
-        const panelPalette = resolvePanelPalette(palette, panel, design.postCount);
+        const panelPalette = resolvePanelPalette(palette, panel, design.postCount, design.variant);
         drawBrandLockup(context, safe, panelPalette);
 
         const compactPanel = layout.headlinePanel === layout.supportingPanel;

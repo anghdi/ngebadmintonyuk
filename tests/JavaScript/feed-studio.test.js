@@ -177,6 +177,34 @@ test('connected renderer draws semantic copy once and keeps single photo posts i
     assert.ok(renderedText.includes(design.supportingText));
 });
 
+test('every format receives a badminton court background and a deliberate color composition', () => {
+    const panelColors = [];
+    const lines = [];
+    const context = new Proxy({
+        fillRect(x, y, width, height) {
+            if (y === 0 && width === POST_WIDTH && height === POST_HEIGHT) panelColors.push(this.fillStyle);
+        },
+        fillText() {},
+        measureText(value) { return { width: value.length * 10 }; },
+        lineTo(...values) { lines.push(values); },
+    }, {
+        get(target, key) { return key in target ? target[key] : () => {}; },
+    });
+    const design = {
+        postCount: 3,
+        variant: 'editorial',
+        connection: { background: 'off-white' },
+        headline: 'Main bareng',
+        supportingText: '',
+        cta: '',
+    };
+
+    drawFeedMaster(context, { width: POST_WIDTH * 3 }, design, null, { zoom: 1, x: 0, y: 0 });
+
+    assert.deepEqual(panelColors.slice(0, 3), ['#f7f4ec', '#2455f5', '#102656']);
+    assert.ok(lines.length >= 30);
+});
+
 test('connection starts at the matching bottom position and exits through the top edge', () => {
     const connection = {
         incoming_connection: [{ x: 0.78, edge: 'bottom', direction: 'diagonal-right' }],

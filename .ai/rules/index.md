@@ -15,6 +15,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/{Http,Models}/**, resources/{js,views}/**, public/manifest.webmanifest | .ai/rules/http-modelsjsviews.md |
 | app/Http/** | .ai/rules/http.md |
 | resources/{js,views,css}/**, tests/{JavaScript,Feature}/**/*FeedStudio* | .ai/rules/java-script-feature.md |
+| resources/js/feed-studio.js | .ai/rules/js.md |
 | resources/{js,views}/** | .ai/rules/jsviews.md |
 | app/{Actions,Services,Http}/**, resources/{js,views,css}/** | .ai/rules/jsviewscss.md |
 | app/{Http,Models}/**, resources/views/{members,profile}/** | .ai/rules/membersprofile.md |
