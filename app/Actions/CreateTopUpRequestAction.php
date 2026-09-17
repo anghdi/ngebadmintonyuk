@@ -77,7 +77,7 @@ class CreateTopUpRequestAction
             'venue_name' => Membership::COMMUNITY_VENUE,
             'court_name' => Membership::COMMUNITY_COURT,
             'price_per_session' => Membership::COMMUNITY_PRICE,
-            'initial_credits' => TopUpSetting::DEFAULT_CREDITS,
+            'initial_credits' => 0,
             'starts_on' => today(),
             'status' => 'active',
             'notes' => 'Paket otomatis untuk top up kuota.',

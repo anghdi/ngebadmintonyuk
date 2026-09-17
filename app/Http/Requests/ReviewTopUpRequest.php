@@ -17,7 +17,12 @@ class ReviewTopUpRequest extends FormRequest
     {
         return [
             'status' => ['required', Rule::in(['approved', 'rejected'])],
-            'review_notes' => ['nullable', 'string', 'max:1000'],
+            'review_notes' => [
+                Rule::requiredIf(fn (): bool => $this->string('status')->toString() === 'rejected'),
+                'nullable',
+                'string',
+                'max:1000',
+            ],
         ];
     }
 }

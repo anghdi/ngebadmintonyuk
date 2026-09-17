@@ -20,17 +20,41 @@ class TopUpRequestController extends Controller
     public function index(Request $request): View
     {
         if ($request->user()->isAdmin()) {
-            $topUpRequests = TopUpRequest::query()->with(['member', 'membership', 'reviewer'])->latest()->paginate(20);
+            $statusFilter = $request->string('status')->toString();
+
+            if (! in_array($statusFilter, ['pending', 'approved', 'rejected'], true)) {
+                $statusFilter = null;
+            }
+
+            $topUpRequests = TopUpRequest::query()
+                ->with(['member', 'membership', 'reviewer'])
+                ->when($statusFilter, fn ($query) => $query->where('status', $statusFilter))
+                ->orderByRaw("CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END")
+                ->latest()
+                ->paginate(20)
+                ->withQueryString();
+            $topUpSummary = [
+                'pending' => TopUpRequest::query()->where('status', 'pending')->count(),
+                'approved_this_month' => TopUpRequest::query()
+                    ->where('status', 'approved')
+                    ->whereBetween('reviewed_at', [now()->startOfMonth(), now()->endOfMonth()])
+                    ->count(),
+                'amount_this_month' => (int) TopUpRequest::query()
+                    ->where('status', 'approved')
+                    ->whereBetween('reviewed_at', [now()->startOfMonth(), now()->endOfMonth()])
+                    ->sum('amount'),
+            ];
             $topUpSetting = TopUpSetting::current();
 
-            return view('top-ups.admin', compact('topUpRequests', 'topUpSetting'));
+            return view('top-ups.admin', compact('topUpRequests', 'topUpSetting', 'topUpSummary', 'statusFilter'));
         }
 
         $memberships = $request->user()->memberships()->where('status', 'active')->withSum('transactions as balance', 'quantity')->latest()->get();
         $topUpRequests = $request->user()->topUpRequests()->with(['membership', 'reviewer'])->latest()->paginate(10);
+        $pendingTopUps = $request->user()->topUpRequests()->where('status', 'pending')->with('membership')->latest()->get();
         $topUpSetting = TopUpSetting::current();
 
-        return view('top-ups.member', compact('memberships', 'topUpRequests', 'topUpSetting'));
+        return view('top-ups.member', compact('memberships', 'topUpRequests', 'pendingTopUps', 'topUpSetting'));
     }
 
     public function store(StoreTopUpRequest $request, CreateTopUpRequestAction $createTopUpRequest): RedirectResponse

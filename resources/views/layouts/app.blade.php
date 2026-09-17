@@ -115,15 +115,25 @@
                         @endforelse
                     </div>
                 </details>
-                <div class="user-summary">
-                <span class="user-avatar"><img src="{{ ! auth()->user()->isAdmin() && auth()->user()->avatar_path ? route('profile.avatar') : asset('pwa-icon-192.png') }}" alt=""></span>
-                <span><b>{{ auth()->user()->name }}</b><small>{{ auth()->user()->isAdmin() ? 'Admin' : 'Member' }}</small></span>
-                </div>
+                @if(auth()->user()->isAdmin())
+                    <div class="user-summary">
+                        <span class="user-avatar"><img src="{{ asset('pwa-icon-192.png') }}" alt=""></span>
+                        <span><b>{{ auth()->user()->name }}</b><small>Admin</small></span>
+                    </div>
+                @else
+                    <a class="user-summary" href="{{ route('profile.edit') }}" aria-label="Buka profil {{ auth()->user()->name }}">
+                        <span class="user-avatar"><img src="{{ auth()->user()->avatar_path ? route('profile.avatar') : asset('pwa-icon-192.png') }}" alt=""></span>
+                        <span><b>{{ auth()->user()->name }}</b><small>Member</small></span>
+                    </a>
+                @endif
             </div>
         </header>
         <section class="content">
             @if(session('success'))
-                <div class="flash">{{ session('success') }}</div>
+                <div class="flash" role="status" data-toast>
+                    <span>{{ session('success') }}</span>
+                    <button type="button" aria-label="Tutup pemberitahuan" data-toast-close><x-nav-icon name="close" /></button>
+                </div>
             @endif
             @if($errors->any())
                 <div class="alert">{{ $errors->first() }}</div>
@@ -131,6 +141,16 @@
             @yield('content')
         </section>
     </main>
+
+    @if(! auth()->user()->isAdmin())
+        <nav class="member-mobile-nav" aria-label="Navigasi cepat member">
+            <a @class(['active' => request()->routeIs('dashboard')]) href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif><x-nav-icon name="home" /><span>Beranda</span></a>
+            <a @class(['active' => request()->routeIs('public-sessions.*')]) href="{{ route('public-sessions.index') }}" @if(request()->routeIs('public-sessions.*')) aria-current="page" @endif><x-nav-icon name="calendar" /><span>Jadwal</span></a>
+            <a @class(['active' => request()->routeIs('rotations.*')]) href="{{ route('rotations.index') }}" @if(request()->routeIs('rotations.*')) aria-current="page" @endif><x-nav-icon name="session" /><span>Rotasi</span></a>
+            <a @class(['active' => request()->routeIs('top-ups.*')]) href="{{ route('top-ups.index') }}" @if(request()->routeIs('top-ups.*')) aria-current="page" @endif><x-nav-icon name="wallet" /><span>Top up</span></a>
+            <a @class(['active' => request()->routeIs('profile.*')]) href="{{ route('profile.edit') }}" @if(request()->routeIs('profile.*')) aria-current="page" @endif><x-nav-icon name="users" /><span>Profil</span></a>
+        </nav>
+    @endif
 </div>
 
 <dialog class="pwa-install-dialog" data-pwa-guide aria-labelledby="pwa-install-title">

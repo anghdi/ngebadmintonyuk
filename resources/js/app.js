@@ -25,6 +25,16 @@ document.querySelectorAll('form[data-confirm]').forEach((form) => {
 const sidebar = document.querySelector('#sidebar');
 const menu = document.querySelector('[data-sidebar-open]');
 
+document.querySelectorAll('[data-toast]').forEach((toast) => {
+    const closeToast = () => {
+        toast.classList.add('is-leaving');
+        window.setTimeout(() => toast.remove(), 220);
+    };
+
+    toast.querySelector('[data-toast-close]')?.addEventListener('click', closeToast);
+    window.setTimeout(closeToast, 5000);
+});
+
 function toggleSidebar(open) {
     sidebar?.classList.toggle('open', open);
     document.body.classList.toggle('nav-open', open);

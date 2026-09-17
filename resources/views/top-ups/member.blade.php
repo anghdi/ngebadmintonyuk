@@ -22,6 +22,7 @@
                     <article class="bank-card">
                         <span>{{ $account['bank'] }}</span>
                         <div><strong>{{ $account['number'] }}</strong><small>a.n. {{ $account['holder'] }}</small></div>
+                        <button type="button" class="bank-copy" data-copy-text="{{ $account['number'] }}" data-copy-label="Salin rekening {{ $account['bank'] }}">Salin</button>
                     </article>
                 @endforeach
             </div>
@@ -32,6 +33,13 @@
         <section class="card">
             <span class="eyebrow">Bukti transfer</span>
             <h2>Kirim pengajuan</h2>
+
+            @if($pendingTopUps->isNotEmpty())
+                <div class="top-up-pending" role="status">
+                    <strong>{{ $pendingTopUps->count() }} pengajuan sedang diperiksa</strong>
+                    <span>Kuota masuk setelah pembayaran disetujui admin.</span>
+                </div>
+            @endif
 
             <div class="top-up-steps" aria-label="Tahapan top up">
                 <span><b>1</b>Transfer</span>
@@ -88,7 +96,12 @@
                     <td><strong>{{ $topUpRequest->membership->venue_name }}</strong><small>{{ $topUpRequest->membership->court_name }}</small></td>
                     <td>{{ config('community.top_up.accounts.'.$topUpRequest->bank.'.bank') }}</td>
                     <td class="money">{{ rupiah($topUpRequest->amount) }}</td>
-                    <td><span class="status-pill {{ ['pending' => 'warning', 'approved' => 'active', 'rejected' => 'muted'][$topUpRequest->status] }}">{{ ['pending' => 'Menunggu', 'approved' => 'Disetujui', 'rejected' => 'Ditolak'][$topUpRequest->status] }}</span></td>
+                    <td>
+                        <span class="status-pill {{ ['pending' => 'warning', 'approved' => 'active', 'rejected' => 'muted'][$topUpRequest->status] }}">{{ ['pending' => 'Menunggu', 'approved' => 'Disetujui', 'rejected' => 'Ditolak'][$topUpRequest->status] }}</span>
+                        @if($topUpRequest->review_notes)
+                            <small>{{ $topUpRequest->review_notes }}</small>
+                        @endif
+                    </td>
                     <td>{{ $topUpRequest->credits ? $topUpRequest->credits.'×' : '—' }}</td>
                     <td><a class="link" href="{{ route('top-ups.proof', $topUpRequest) }}" target="_blank" rel="noopener">Lihat</a></td>
                 </tr>

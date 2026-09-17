@@ -55,7 +55,7 @@
     <section class="compact-dashboard-section schedule-card">
         <div class="card-head"><div><span class="eyebrow">Jadwal</span><h2>Sesi yang kamu ikuti</h2></div></div>
         @forelse($upcomingSessions as $session)
-            <div class="schedule-row"><time><b>{{ $session->scheduled_at->format('d') }}</b>{{ $session->scheduled_at->translatedFormat('M') }}</time><span><strong>{{ $session->venue_name }}</strong><small>{{ $session->court_name }} · {{ $session->scheduled_at->format('H:i') }} WITA</small></span><b>{{ rupiah($session->price_per_session) }}</b></div>
+            <a class="schedule-row" href="{{ route('public-sessions.show', $session) }}"><time><b>{{ $session->scheduled_at->format('d') }}</b>{{ $session->scheduled_at->translatedFormat('M') }}</time><span><strong>{{ $session->venue_name }}</strong><small>{{ $session->court_name }} · {{ $session->scheduled_at->format('H:i') }} WITA</small></span><b>{{ rupiah($session->price_per_session) }}</b></a>
         @empty
             <div class="empty">Kamu belum mengikuti sesi mendatang.</div>
         @endforelse
@@ -79,7 +79,7 @@
             <span class="status-pill {{ (int) $membership->balance > 0 ? 'active' : 'muted' }}">{{ (int) $membership->balance }} kuota</span>
         </div>
     @empty
-        <div class="empty">Belum ada paket. Ajukan top up untuk mulai bermain.</div>
+        <div class="empty">Belum ada paket. <a class="link" href="{{ route('top-ups.index') }}">Ajukan top up</a> untuk mulai bermain.</div>
     @endforelse
 </section>
 @endsection

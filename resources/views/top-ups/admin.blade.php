@@ -24,6 +24,31 @@
         </form>
     </section>
 
+    <section class="top-up-summary" aria-label="Ringkasan top up">
+        <article>
+            <span>Perlu diperiksa</span>
+            <strong>{{ $topUpSummary['pending'] }}</strong>
+            <small>Pengajuan menunggu</small>
+        </article>
+        <article>
+            <span>Disetujui bulan ini</span>
+            <strong>{{ $topUpSummary['approved_this_month'] }}</strong>
+            <small>Pengajuan selesai</small>
+        </article>
+        <article>
+            <span>Top up bulan ini</span>
+            <strong>{{ rupiah($topUpSummary['amount_this_month']) }}</strong>
+            <small>Sudah masuk kas</small>
+        </article>
+    </section>
+
+    <nav class="top-up-filters" aria-label="Filter status pengajuan">
+        <a @class(['active' => $statusFilter === null]) href="{{ route('top-ups.index') }}">Semua</a>
+        <a @class(['active' => $statusFilter === 'pending']) href="{{ route('top-ups.index', ['status' => 'pending']) }}">Menunggu · {{ $topUpSummary['pending'] }}</a>
+        <a @class(['active' => $statusFilter === 'approved']) href="{{ route('top-ups.index', ['status' => 'approved']) }}">Disetujui</a>
+        <a @class(['active' => $statusFilter === 'rejected']) href="{{ route('top-ups.index', ['status' => 'rejected']) }}">Ditolak</a>
+    </nav>
+
     <section class="card table-card">
         <table class="review-table">
             <thead><tr><th>MEMBER</th><th>PAKET</th><th>TRANSFER</th><th>BUKTI</th><th>STATUS</th><th>VERIFIKASI</th></tr></thead>
@@ -39,9 +64,9 @@
                         @if($topUpRequest->status === 'pending')
                             <form method="post" action="{{ route('top-ups.update', $topUpRequest) }}" class="review-form">
                                 @csrf @method('put')
-                                <input name="review_notes" placeholder="Catatan" aria-label="Catatan verifikasi untuk {{ $topUpRequest->member->name }}">
+                                <input name="review_notes" placeholder="Alasan jika ditolak" aria-label="Catatan verifikasi untuk {{ $topUpRequest->member->name }}">
                                 <div class="review-actions">
-                                    <button class="btn primary" name="status" value="approved">Setujui 4 kuota</button>
+                                    <button class="btn primary" name="status" value="approved">Setujui</button>
                                     <button class="btn soft" name="status" value="rejected">Tolak</button>
                                 </div>
                             </form>
@@ -63,7 +88,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="6"><div class="empty">Belum ada pengajuan top up.</div></td></tr>
+                <tr><td colspan="6"><div class="empty">{{ $statusFilter ? 'Tidak ada pengajuan dengan status ini.' : 'Belum ada pengajuan top up.' }}</div></td></tr>
             @endforelse
             </tbody>
         </table>

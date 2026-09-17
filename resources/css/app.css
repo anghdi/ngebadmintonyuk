@@ -396,6 +396,18 @@
     .top-up-target { display: grid; gap: .2rem; border: 1px solid #d9e0fa; border-radius: 12px; background: #f4f7ff; padding: .8rem .9rem; }
     .top-up-target strong { color: #172a63; font-size: .8rem; }
     .top-up-target span { color: #697187; font-size: .68rem; line-height: 1.5; }
+    .top-up-pending { display: grid; gap: .2rem; margin-bottom: 1rem; border: 1px solid #efcf7c; border-radius: 12px; background: #fff9e9; padding: .8rem .9rem; color: #765700; }
+    .top-up-pending strong { font-size: .76rem; }
+    .top-up-pending span { font-size: .66rem; line-height: 1.5; }
+    .top-up-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; margin-bottom: 1rem; }
+    .top-up-summary article { border: 1px solid #e1e4ed; border-radius: 14px; background: #fff; padding: .9rem 1rem; }
+    .top-up-summary span, .top-up-summary small, .top-up-summary strong { display: block; }
+    .top-up-summary span { color: #777b89; font-size: .62rem; font-weight: 800; text-transform: uppercase; }
+    .top-up-summary strong { margin-top: .2rem; color: #172a63; font-size: 1.15rem; }
+    .top-up-summary small { margin-top: .15rem; color: #777b89; font-size: .62rem; }
+    .top-up-filters { display: flex; flex-wrap: wrap; gap: .45rem; margin-bottom: 1rem; }
+    .top-up-filters a { border: 1px solid #dfe3ef; border-radius: 999px; background: #fff; padding: .45rem .7rem; color: #5e6473; font-size: .66rem; font-weight: 800; }
+    .top-up-filters a.active { border-color: #2455f5; background: #2455f5; color: #fff; }
     .field-help { color: #848795; font-size: .66rem; font-weight: 500; }
     .review-table { min-width: 1120px; }
     .top-up-setting-card { display: grid; grid-template-columns: minmax(220px, .65fr) minmax(0, 1.35fr); align-items: end; gap: 1.5rem; }
@@ -451,8 +463,8 @@
     .payment-check span { font-size: .65rem; }
     .quick-save { min-height: 38px; border: 0; border-radius: 10px; background: #172a63; color: white; padding: .45rem .65rem; cursor: pointer; font-size: .65rem; font-weight: 800; }
     .quick-save:disabled, .payment-check:has(input:disabled) { cursor: not-allowed; opacity: .45; }
-    .quick-present-form { display: grid; min-width: 150px; gap: .3rem; margin-bottom: .65rem; }
-    .quick-present-form .btn { min-height: 38px; padding: .55rem .7rem; font-size: .68rem; }
+    .quick-present-form { display: inline-grid; width: fit-content; min-width: 120px; justify-items: start; gap: .3rem; margin-bottom: .65rem; }
+    .quick-present-form .btn { width: fit-content; min-width: 76px; min-height: 38px; padding: .55rem .8rem; font-size: .68rem; }
     .quick-present-form small, .quick-present-unavailable, .quick-present-complete { display: block; max-width: 160px; font-size: .6rem; line-height: 1.4; }
     .quick-present-form small, .quick-present-unavailable { color: #777b89; }
     .quick-present-complete { margin-bottom: .55rem; color: #167039; font-weight: 800; }
@@ -549,7 +561,7 @@
     .content { padding: 1.25rem 1rem; }
     .page-head { align-items: flex-start; flex-wrap: wrap; margin-bottom: 1.3rem; }
     .stats, .grid-2 { grid-template-columns: 1fr; }
-    .club-strip, .membership-grid, .member-columns, .admin-split, .inventory-forms, .top-up-grid, .top-up-setting-card, .member-edit-card, .dashboard-bank-section { grid-template-columns: 1fr; }
+    .club-strip, .membership-grid, .member-columns, .admin-split, .inventory-forms, .top-up-grid, .top-up-setting-card, .top-up-summary, .member-edit-card, .dashboard-bank-section { grid-template-columns: 1fr; }
     .setting-form { grid-template-columns: repeat(2, minmax(0, 1fr)) auto; }
     .member-edit-card .setting-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .package-form-card { position: static; }
@@ -1015,6 +1027,63 @@
     .public-session-card { grid-template-columns: 60px minmax(0, 1fr); }
     .public-session-detail { padding: 1.15rem; }
     .usage-guide-dialog { width: calc(100% - 1rem); max-height: calc(100dvh - 1rem); overflow-y: auto; }
+}
+
+/* Member application shell */
+@layer components {
+    .member-mobile-nav { display: none; }
+    .user-summary { border-radius: 12px; padding: .35rem .45rem; transition: background .18s ease, transform .18s ease; }
+    a.user-summary:hover { background: rgb(36 85 245 / 7%); transform: translateY(-1px); }
+    a.user-summary:focus-visible { outline: 3px solid rgb(36 85 245 / 20%); outline-offset: 2px; }
+    .flash { display: flex; align-items: center; justify-content: space-between; gap: 1rem; animation: member-toast-in .28s ease-out both; }
+    .flash.is-leaving { animation: member-toast-out .22s ease-in both; }
+    .flash button { display: grid; width: 34px; height: 34px; flex: 0 0 34px; place-items: center; border: 0; border-radius: 9px; background: rgb(22 101 52 / 9%); color: #166534; cursor: pointer; }
+    .flash button svg { width: 16px; height: 16px; }
+    body[data-push-client] .content > :not(.flash, .alert) { animation: member-content-in .32s ease-out both; }
+    .btn:active { transform: translateY(0) scale(.98); }
+    .btn:focus-visible, .member-mobile-nav a:focus-visible, .bank-copy:focus-visible { outline: 3px solid rgb(36 85 245 / 24%); outline-offset: 2px; }
+    .schedule-row { border-radius: 10px; transition: background .18s ease, transform .18s ease; }
+    .schedule-row:hover { background: #f4f6fc; transform: translateX(3px); }
+    .bank-card { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; }
+    .bank-copy { min-width: 56px; min-height: 38px; border: 1px solid rgb(255 255 255 / 20%); border-radius: 10px; background: rgb(255 255 255 / 10%); color: #fff; padding: .45rem .65rem; cursor: pointer; font-size: .66rem; font-weight: 800; transition: background .18s ease, transform .18s ease; }
+    .bank-copy:hover { background: rgb(255 255 255 / 18%); transform: translateY(-1px); }
+}
+
+@keyframes member-content-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes member-toast-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes member-toast-out {
+    to { opacity: 0; transform: translateY(-8px); }
+}
+
+@media (max-width: 800px) {
+    body[data-push-client] .content { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom)); }
+    .member-mobile-nav { position: fixed; right: max(.7rem, env(safe-area-inset-right)); bottom: max(.65rem, env(safe-area-inset-bottom)); left: max(.7rem, env(safe-area-inset-left)); z-index: 22; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border: 1px solid rgb(218 224 239 / 88%); border-radius: 19px; background: rgb(255 255 255 / 94%); padding: .42rem; box-shadow: 0 18px 48px rgb(23 42 99 / 18%); backdrop-filter: blur(18px); }
+    .member-mobile-nav a { position: relative; display: grid; min-width: 0; min-height: 52px; place-items: center; align-content: center; gap: .2rem; border-radius: 13px; color: #707789; font-size: .58rem; font-weight: 750; transition: color .18s ease, background .18s ease, transform .18s ease; }
+    .member-mobile-nav a svg { width: 19px; height: 19px; }
+    .member-mobile-nav a.active { background: #edf1ff; color: #2455f5; }
+    .member-mobile-nav a.active::after { position: absolute; bottom: .22rem; width: 16px; height: 2px; border-radius: 999px; background: #2455f5; content: ''; }
+    .member-mobile-nav a:active { transform: scale(.94); }
+    .bank-card { grid-template-columns: 44px minmax(0, 1fr) auto; gap: .65rem; }
+    .bank-card > span { width: 44px; height: 38px; flex-basis: 44px; }
+    .profile-form-card .compact-form > .btn.primary { position: sticky; bottom: calc(5.75rem + env(safe-area-inset-bottom)); z-index: 4; width: 100%; box-shadow: 0 14px 30px rgb(36 85 245 / 26%); }
+}
+
+@media (max-width: 390px) {
+    .member-mobile-nav { right: .45rem; bottom: max(.45rem, env(safe-area-inset-bottom)); left: .45rem; padding: .32rem; }
+    .member-mobile-nav a { min-height: 49px; font-size: .54rem; }
+    .member-mobile-nav a svg { width: 18px; height: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body[data-push-client] .content > :not(.flash, .alert), .flash, .flash.is-leaving { animation: none; }
 }
 
 @layer components {
