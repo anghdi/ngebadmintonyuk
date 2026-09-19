@@ -14,7 +14,7 @@
     <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <section class="card profile-form-card">
             <h2>Data diri</h2>
-            @if(! $member->hasCompleteProfile())<p class="profile-required-note">Nama dan tanggal lahir wajib diisi.</p>@endif
+            @if(! $member->hasCompleteProfile())<p class="profile-required-note">Lengkapi nama, tanggal lahir, dan level bermain.</p>@endif
             <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="compact-form" data-loading-message="Menyimpan profil…" data-upload-loading-message="Mengunggah dan menyimpan foto…">
                 @csrf @method('put')
                 <label>Nama lengkap<input name="name" value="{{ old('name', $member->name) }}" maxlength="255" autocomplete="name" required>@error('name')<span class="field-error">{{ $message }}</span>@enderror</label>
@@ -25,7 +25,7 @@
                 <small class="profile-private-note">Tanggal lahir hanya bisa dilihat kamu dan admin.</small>
                 <div class="form-grid">
                     <label>WhatsApp <span class="optional">Opsional</span><input type="tel" name="phone" value="{{ old('phone', $member->phone) }}" maxlength="30" autocomplete="tel">@error('phone')<span class="field-error">{{ $message }}</span>@enderror</label>
-                    <label>Level bermain <span class="optional">Opsional</span><select name="playing_level"><option value="">Belum dipilih</option><option value="beginner" @selected(old('playing_level', $member->playing_level) === 'beginner')>Pemula</option><option value="intermediate" @selected(old('playing_level', $member->playing_level) === 'intermediate')>Menengah</option><option value="advanced" @selected(old('playing_level', $member->playing_level) === 'advanced')>Mahir</option></select>@error('playing_level')<span class="field-error">{{ $message }}</span>@enderror</label>
+                    <label>Level bermain<select name="playing_level" required><option value="" disabled @selected(old('playing_level', $member->playing_level) === null)>Pilih level</option><option value="beginner" @selected(old('playing_level', $member->playing_level) === 'beginner')>Pemula</option><option value="intermediate" @selected(old('playing_level', $member->playing_level) === 'intermediate')>Menengah</option><option value="advanced" @selected(old('playing_level', $member->playing_level) === 'advanced')>Mahir</option></select>@error('playing_level')<span class="field-error">{{ $message }}</span>@enderror</label>
                 </div>
                 <label>Foto profil <span class="optional">Opsional</span><input type="file" name="avatar" accept="image/jpeg,image/png,image/webp">@error('avatar')<span class="field-error">{{ $message }}</span>@enderror<small>JPG, PNG, WebP · maksimal 10 MB · otomatis dikompres</small></label>
                 <label>Email<input type="email" value="{{ $member->email }}" readonly></label>

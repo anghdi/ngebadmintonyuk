@@ -20,6 +20,7 @@ class SaveGuestRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'regex:/^[0-9]{10,15}$/', Rule::unique(Guest::class)->ignore($this->route('guest'))],
+            'playing_level' => ['required', Rule::in(['beginner', 'intermediate', 'advanced'])],
         ];
     }
 

@@ -27,7 +27,7 @@ class UpdateProfileRequest extends FormRequest
             'date_of_birth' => ['required', 'date_format:Y-m-d', 'before_or_equal:today', 'after_or_equal:'.today()->subYears(120)->toDateString()],
             'nickname' => ['nullable', 'string', 'max:50'],
             'phone' => ['nullable', 'string', 'max:30'],
-            'playing_level' => ['nullable', Rule::in(['beginner', 'intermediate', 'advanced'])],
+            'playing_level' => [Rule::requiredIf($this->user()?->playing_level === null || $this->exists('playing_level')), Rule::in(['beginner', 'intermediate', 'advanced'])],
             'avatar' => ['nullable', 'image', 'mimetypes:image/jpeg,image/png,image/webp', 'max:10240', 'dimensions:max_width=4096,max_height=4096'],
         ];
     }
@@ -40,6 +40,8 @@ class UpdateProfileRequest extends FormRequest
             'date_of_birth.date_format' => 'Tanggal lahir tidak valid.',
             'date_of_birth.before_or_equal' => 'Tanggal lahir tidak boleh di masa depan.',
             'date_of_birth.after_or_equal' => 'Periksa kembali tanggal lahir.',
+            'playing_level.required' => 'Pilih level bermain dulu.',
+            'playing_level.in' => 'Pilih salah satu level bermain yang tersedia.',
             'avatar.max' => 'Ukuran foto maksimal 10 MB.',
         ];
     }
@@ -52,7 +54,7 @@ class UpdateProfileRequest extends FormRequest
             'date_of_birth' => $this->validated('date_of_birth'),
             'nickname' => $this->validated('nickname'),
             'phone' => $this->validated('phone'),
-            'playing_level' => $this->validated('playing_level'),
+            'playing_level' => $this->validated('playing_level', $this->user()->playing_level),
         ];
     }
 }

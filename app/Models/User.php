@@ -117,6 +117,7 @@ class User extends Authenticatable
     public function hasCompleteProfile(): bool
     {
         return $this->isAdmin() || (trim($this->name) !== ''
+            && in_array($this->playing_level, ['beginner', 'intermediate', 'advanced'], true)
             && $this->date_of_birth !== null
             && $this->date_of_birth->lessThanOrEqualTo(today())
             && $this->date_of_birth->greaterThanOrEqualTo(today()->subYears(120)));

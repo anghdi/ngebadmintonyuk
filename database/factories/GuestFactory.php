@@ -10,6 +10,6 @@ class GuestFactory extends Factory
 {
     public function definition(): array
     {
-        return ['name' => fake()->name(), 'phone' => null];
+        return ['name' => fake()->name(), 'phone' => null, 'playing_level' => 'intermediate'];
     }
 }

@@ -2,27 +2,39 @@
 
 namespace App\Services;
 
+use App\Models\Guest;
 use App\Models\PlaySession;
 use App\Models\SessionRegistration;
+use App\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class RotationScheduleService
 {
     /** @param Collection<int, SessionRegistration> $registrations
-     * @return list<array{id: int, name: string, user_id: int|null, guest_id: int|null}>
+     * @return list<array{id: int, name: string, user_id: int|null, guest_id: int|null, playing_level: string|null}>
      */
     public function roster(Collection $registrations): array
     {
+        $levels = User::query()
+            ->whereIn('id', $registrations->pluck('user_id')->filter()->all())
+            ->pluck('playing_level', 'id');
+        $guestLevels = Guest::query()
+            ->whereIn('id', $registrations->pluck('guest_id')->filter()->all())
+            ->pluck('playing_level', 'id');
+
         return array_values($registrations->map(fn (SessionRegistration $registration): array => [
             'id' => $registration->id,
             'name' => $registration->name,
             'user_id' => $registration->user_id,
             'guest_id' => $registration->guest_id,
+            'playing_level' => $registration->user_id
+                ? $levels->get($registration->user_id)
+                : $guestLevels->get($registration->guest_id),
         ])->all());
     }
 
-    /** @param list<array{id: int, name: string, user_id: int|null, guest_id: int|null}> $roster */
+    /** @param list<array{id: int, name: string, user_id: int|null, guest_id: int|null, playing_level?: string|null}> $roster */
     public function fingerprint(array $roster, int $courtCount): string
     {
         return hash('sha256', json_encode([$courtCount, $roster], JSON_THROW_ON_ERROR));
@@ -46,13 +58,45 @@ class RotationScheduleService
         ];
     }
 
-    /** @param list<array{id: int, name: string, user_id: int|null, guest_id: int|null}> $roster
+    /** @param list<array{id: int, name: string, user_id: int|null, guest_id: int|null, playing_level?: string|null}> $roster
      * @return array<string, mixed>
      */
     public function generate(array $roster, int $courtCount, int $roundCount): array
     {
+        $candidateCount = match (true) {
+            count($roster) <= 24 && $roundCount <= 20 => 4,
+            count($roster) <= 40 && $roundCount <= 40 => 3,
+            default => 2,
+        };
+        $bestSchedule = null;
+        $bestQuality = null;
+        $bestScore = null;
+
+        for ($attempt = 0; $attempt < $candidateCount; $attempt++) {
+            $schedule = $this->generateCandidate($roster, $courtCount, $roundCount);
+            $quality = $this->evaluateSchedule($schedule);
+            $score = array_values($quality);
+
+            if ($bestScore === null || $score < $bestScore) {
+                $bestSchedule = $schedule;
+                $bestQuality = $quality;
+                $bestScore = $score;
+            }
+        }
+
+        return $bestSchedule + [
+            'quality' => $bestQuality,
+            'candidates_evaluated' => $candidateCount,
+        ];
+    }
+
+    /** @param list<array{id: int, name: string, user_id: int|null, guest_id: int|null, playing_level?: string|null}> $roster
+     * @return array{fingerprint: string, generated_at: string, court_count: int, roster: list<array{id: int, name: string, user_id: int|null, guest_id: int|null, playing_level?: string|null}>, mix_order: list<int>, rounds: list<array{number: int, courts: list<array{number: int, label: string, team_a: array{int, int}, team_b: array{int, int}}>, rest: list<int>}>, games: array<int, int>}
+     */
+    private function generateCandidate(array $roster, int $courtCount, int $roundCount): array
+    {
         $listedIds = array_column($roster, 'id');
-        $ids = Arr::shuffle($listedIds);
+        $ids = array_values(Arr::shuffle($listedIds));
         $playersPerTurn = $courtCount * 4;
         $keptFirstGroup = count($ids) > $playersPerTurn
             && array_diff(array_slice($ids, 0, $playersPerTurn), array_slice($listedIds, 0, $playersPerTurn)) === [];
@@ -60,6 +104,14 @@ class RotationScheduleService
             $ids = [...array_slice($ids, 1), $ids[0]];
         }
         $mixOrder = array_flip($ids);
+        $levels = [];
+        foreach ($roster as $player) {
+            $levels[$player['id']] = match ($player['playing_level'] ?? null) {
+                'beginner' => 1,
+                'advanced' => 3,
+                default => 2,
+            };
+        }
         $games = array_fill_keys($listedIds, 0);
         $lastPlayed = array_fill_keys($ids, 0);
         $courtVisits = array_fill_keys($ids, [1 => 0, 2 => 0]);
@@ -89,6 +141,9 @@ class RotationScheduleService
                     $maximumEncounterFrequency = 0;
                     $repeatedEncounterPairs = 0;
                     $encounterFrequency = 0;
+                    $maximumLevelGap = 0;
+                    $totalLevelGap = 0;
+                    $maximumTeamSpread = 0;
                     $courts = [];
                     foreach ($matches as [$a, $b]) {
                         [$courtRepeatedPairs, $courtOpponentFrequency] = $this->opponentRepeatScore($teams[$a], $teams[$b], $opponents);
@@ -101,7 +156,22 @@ class RotationScheduleService
                         $maximumEncounterFrequency = max($maximumEncounterFrequency, $courtMaximumFrequency);
                         $repeatedEncounterPairs += $courtRepeatedEncounters;
                         $encounterFrequency += $courtEncounterFrequency;
-                        $courts[] = ['number' => count($courts) + 1, 'team_a' => $teams[$a], 'team_b' => $teams[$b]];
+                        $teamAStrength = $levels[$teams[$a][0]] + $levels[$teams[$a][1]];
+                        $teamBStrength = $levels[$teams[$b][0]] + $levels[$teams[$b][1]];
+                        $levelGap = abs($teamAStrength - $teamBStrength);
+                        $maximumLevelGap = max($maximumLevelGap, $levelGap);
+                        $totalLevelGap += $levelGap;
+                        $maximumTeamSpread = max(
+                            $maximumTeamSpread,
+                            abs($levels[$teams[$a][0]] - $levels[$teams[$a][1]]),
+                            abs($levels[$teams[$b][0]] - $levels[$teams[$b][1]]),
+                        );
+                        $courts[] = [
+                            'number' => count($courts) + 1,
+                            'label' => $courts === [] ? 'A' : 'B',
+                            'team_a' => $teams[$a],
+                            'team_b' => $teams[$b],
+                        ];
                     }
                     $courtOrders = $courtCount === 2 ? [$courts, array_reverse($courts)] : [$courts];
                     foreach ($courtOrders as $orderedCourts) {
@@ -124,11 +194,14 @@ class RotationScheduleService
                         $candidateScore = [
                             $maximumEncounterFrequency,
                             $repeatedEncounterPairs,
+                            $maximumLevelGap,
+                            $totalLevelGap,
                             $encounterFrequency,
                             $repeatedPartnerPairs,
                             $partnerFrequency,
                             $repeatedOpponentPairs,
                             $opponentFrequency,
+                            $maximumTeamSpread,
                             $balancePenalty,
                             $repeatPenalty,
                         ];
@@ -176,6 +249,84 @@ class RotationScheduleService
             'mix_order' => $ids,
             'rounds' => $rounds,
             'games' => $games,
+        ];
+    }
+
+    /** @param array{roster: list<array{id: int, playing_level?: string|null}>, rounds: list<array{rest: list<int>, courts: list<array{number: int, team_a: array{int, int}, team_b: array{int, int}}>}>, games: array<int, int>, court_count: int} $schedule
+     * @return array{game_spread: int, max_encounters: int, repeated_encounters: int, max_level_gap: int, total_level_gap: int, repeated_partners: int, repeated_opponents: int, max_rest_streak: int, court_imbalance: int}
+     */
+    private function evaluateSchedule(array $schedule): array
+    {
+        $levels = [];
+        foreach ($schedule['roster'] as $player) {
+            $levels[$player['id']] = match ($player['playing_level'] ?? null) {
+                'beginner' => 1,
+                'advanced' => 3,
+                default => 2,
+            };
+        }
+
+        $encounters = [];
+        $partners = [];
+        $opponents = [];
+        $restStreaks = array_fill_keys(array_keys($levels), 0);
+        $courtVisits = array_fill_keys(array_keys($levels), [1 => 0, 2 => 0]);
+        $maxRestStreak = 0;
+        $maxLevelGap = 0;
+        $totalLevelGap = 0;
+
+        foreach ($schedule['rounds'] as $round) {
+            $resting = array_fill_keys($round['rest'], true);
+            foreach ($restStreaks as $id => $streak) {
+                $restStreaks[$id] = isset($resting[$id]) ? $streak + 1 : 0;
+                $maxRestStreak = max($maxRestStreak, $restStreaks[$id]);
+            }
+
+            foreach ($round['courts'] as $court) {
+                $teamA = $court['team_a'];
+                $teamB = $court['team_b'];
+                $players = [...$teamA, ...$teamB];
+                foreach ($players as $id) {
+                    $courtVisits[$id][$court['number']]++;
+                }
+                foreach ($this->pairsWithin($players) as [$a, $b]) {
+                    $key = $this->pairKey($a, $b);
+                    $encounters[$key] = ($encounters[$key] ?? 0) + 1;
+                }
+                foreach ([$teamA, $teamB] as [$a, $b]) {
+                    $key = $this->pairKey($a, $b);
+                    $partners[$key] = ($partners[$key] ?? 0) + 1;
+                }
+                foreach ($teamA as $a) {
+                    foreach ($teamB as $b) {
+                        $key = $this->pairKey($a, $b);
+                        $opponents[$key] = ($opponents[$key] ?? 0) + 1;
+                    }
+                }
+                $levelGap = abs($levels[$teamA[0]] + $levels[$teamA[1]] - $levels[$teamB[0]] - $levels[$teamB[1]]);
+                $maxLevelGap = max($maxLevelGap, $levelGap);
+                $totalLevelGap += $levelGap;
+            }
+        }
+
+        $repeatedEncounters = array_sum(array_map(fn (int $count): int => max(0, $count - 1), $encounters));
+        $repeatedPartners = array_sum(array_map(fn (int $count): int => max(0, $count - 1), $partners));
+        $repeatedOpponents = array_sum(array_map(fn (int $count): int => max(0, $count - 1), $opponents));
+        $courtImbalance = array_sum(array_map(fn (array $visits): int => abs($visits[1] - $visits[2]), $courtVisits));
+        if ($schedule['games'] === []) {
+            throw new \LogicException('A rotation schedule must contain players.');
+        }
+
+        return [
+            'game_spread' => max($schedule['games']) - min($schedule['games']),
+            'max_encounters' => $encounters === [] ? 0 : max($encounters),
+            'repeated_encounters' => $repeatedEncounters,
+            'max_level_gap' => $maxLevelGap,
+            'total_level_gap' => $totalLevelGap,
+            'repeated_partners' => $repeatedPartners,
+            'repeated_opponents' => $repeatedOpponents,
+            'max_rest_streak' => $maxRestStreak,
+            'court_imbalance' => $schedule['court_count'] === 2 ? $courtImbalance : 0,
         ];
     }
 

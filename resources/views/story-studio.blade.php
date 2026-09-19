@@ -3,7 +3,7 @@
 @section('content')
 <div class="story-studio" data-story-studio data-logo="{{ asset('logo.webp') }}" data-demo="{{ asset('images/member-action-01.webp') }}">
     <div class="page-heading">
-        <div><span class="eyebrow">MOMEN DI LAPANGAN</span><h1>Story Studio</h1><p>Foto kamu. Cerita kita.</p></div>
+        <div><span class="eyebrow">MOMEN DI LAPANGAN</span><h1>Story Studio</h1><p>Foto atau video, siap jadi story.</p></div>
     </div>
     <section class="story-design-picker" aria-label="Pilih desain sebelum menambahkan foto">
         <h2><span>01</span> Pilih desain</h2>
@@ -22,17 +22,17 @@
         </section>
         <section class="story-controls" aria-label="Pengaturan story">
             <div class="story-control-section">
-                <h2>02 <span>Tambahkan foto</span></h2>
+                <h2>02 <span>Tambahkan media</span></h2>
                 <div class="grid grid-cols-2 gap-2">
-                    <button class="btn primary" type="button" data-story-camera><x-nav-icon name="camera" /> Ambil foto</button>
-                    <button class="btn soft" type="button" data-story-upload>Pilih foto</button>
+                    <button class="btn primary" type="button" data-story-camera><x-nav-icon name="camera" /> Kamera</button>
+                    <button class="btn soft" type="button" data-story-upload>Pilih media</button>
                 </div>
-                <input type="file" accept="image/*" capture="environment" class="sr-only" data-story-camera-input aria-label="Ambil foto dengan kamera">
-                <input type="file" accept="image/*" class="sr-only" data-story-file-input aria-label="Pilih foto dari perangkat">
-                <small>JPG, PNG, WebP. Maksimal 20 MB. Foto tetap di perangkatmu.</small>
+                <input type="file" accept="image/*,video/*" capture="environment" class="sr-only" data-story-camera-input aria-label="Ambil foto atau video dengan kamera">
+                <input type="file" accept="image/*,video/*" class="sr-only" data-story-file-input aria-label="Pilih foto atau video dari perangkat">
+                <small>Foto maksimal 20 MB. Video maksimal 100 MB dan 60 detik.</small>
             </div>
             <div class="story-control-section">
-                <h2>03 <span>Atur foto</span></h2>
+                <h2>03 <span>Atur media</span></h2>
                 <fieldset data-story-adjust disabled>
                     <label>Perbesar<input type="range" min="1" max="3" step="0.01" value="1" data-story-zoom></label>
                     <label>Geser horizontal<input type="range" min="-1" max="1" step="0.01" value="0" data-story-x></label>
@@ -43,8 +43,8 @@
             <div class="story-export">
                 <button class="btn primary full" type="button" data-story-download disabled>Unduh story</button>
                 <button class="btn soft full" type="button" data-story-share disabled hidden>Bagikan</button>
-                <p role="status" aria-live="polite" data-story-status>Tambahkan foto untuk mengunduh.</p>
-                <small>Simpan hasilnya, lalu pilih dari galeri saat membuat Story.</small>
+                <p role="status" aria-live="polite" data-story-status>Tambahkan foto atau video untuk mengunduh.</p>
+                <small>Video diekspor tanpa audio. Format menyesuaikan dukungan perangkat.</small>
             </div>
         </section>
     </div>

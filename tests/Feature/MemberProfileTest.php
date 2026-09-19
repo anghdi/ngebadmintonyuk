@@ -32,6 +32,42 @@ test('incomplete member sees blocking popup on member and public pages but can o
         ->assertDontSee('data-profile-required', false);
 });
 
+test('member without a playing level must choose one of three options', function () {
+    $member = User::factory()->member()->create(['playing_level' => null]);
+
+    $this->actingAsNotifiedMember($member)->get(route('dashboard'))
+        ->assertOk()->assertSee('data-profile-required', false);
+    $this->get(route('profile.edit'))
+        ->assertOk()->assertSee('Pilih level')->assertSee('Pemula')->assertSee('Menengah')->assertSee('Mahir');
+
+    $this->put(route('profile.update'), [
+        'name' => $member->name,
+        'date_of_birth' => '1995-05-20',
+    ])->assertSessionHasErrors('playing_level');
+
+    $this->put(route('profile.update'), [
+        'name' => $member->name,
+        'date_of_birth' => '1995-05-20',
+        'playing_level' => 'intermediate',
+    ])->assertSessionHasNoErrors();
+
+    expect($member->refresh()->playing_level)->toBe('intermediate')
+        ->and($member->hasCompleteProfile())->toBeTrue();
+    $this->get(route('dashboard'))->assertDontSee('data-profile-required', false);
+});
+
+test('invalid playing levels do not complete the profile', function () {
+    $member = User::factory()->member()->create(['playing_level' => null]);
+
+    $this->actingAsNotifiedMember($member)->put(route('profile.update'), [
+        'name' => $member->name,
+        'date_of_birth' => '1995-05-20',
+        'playing_level' => 'expert',
+    ])->assertSessionHasErrors('playing_level');
+
+    expect($member->refresh()->hasCompleteProfile())->toBeFalse();
+});
+
 test('incomplete member cannot join a session through html json or the registration action', function () {
     $member = User::factory()->incompleteProfile()->create();
     $session = PlaySession::factory()->create();

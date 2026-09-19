@@ -63,7 +63,7 @@
             @if($availableGuests->isNotEmpty())
                 <form method="post" action="{{ route('session-guests.store', $playSession) }}" class="registration-create-form">
                     @csrf
-                    <label>Tamu<select name="guest_id" required><option value="">Pilih tamu</option>@foreach($availableGuests as $guest)<option value="{{ $guest->id }}">{{ $guest->name }}{{ $guest->phone ? ' · '.$guest->phone : '' }}</option>@endforeach</select></label>
+                    <label>Tamu<select name="guest_id" required><option value="">Pilih tamu</option>@foreach($availableGuests as $guest)<option value="{{ $guest->id }}">{{ $guest->name }} · {{ ['beginner' => 'Pemula', 'intermediate' => 'Menengah', 'advanced' => 'Mahir'][$guest->playing_level ?? ''] ?? 'Level belum diisi' }}</option>@endforeach</select></label>
                     <label>Pembayaran<select name="payment_method" required><option value="cash">Tunai</option><option value="transfer">Transfer</option></select></label>
                     <button class="btn primary">Tambahkan</button>
                 </form>

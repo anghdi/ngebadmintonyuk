@@ -7,6 +7,7 @@
 @else
     @php
         $players = collect($schedule['roster'])->keyBy('id');
+        $levelLabels = ['beginner' => 'Pemula', 'intermediate' => 'Menengah', 'advanced' => 'Mahir'];
         $myId = $currentUserId ? $players->firstWhere('user_id', $currentUserId)['id'] ?? null : null;
     @endphp
     <div class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500"><span>{{ count($schedule['rounds']) }} ronde</span><span>{{ $schedule['court_count'] }} lapangan</span><span>Ganda · sesuai urutan ronde</span></div>
@@ -29,7 +30,7 @@
                             <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm">
                                 @foreach(['team_a', 'team_b'] as $team)
                                     @if($team === 'team_b')<span class="text-xs text-slate-400">vs</span>@endif
-                                    <div class="min-w-0 space-y-1">@foreach($court[$team] as $id)<p @class(['break-words', 'font-semibold text-teal-700' => $id === $myId])>{{ $players[$id]['name'] }}</p>@endforeach</div>
+                                    <div class="min-w-0 space-y-1">@foreach($court[$team] as $id)<p @class(['break-words', 'font-semibold text-teal-700' => $id === $myId])>{{ $players[$id]['name'] }} <small class="text-[11px] font-normal text-slate-500">{{ $levelLabels[$players[$id]['playing_level'] ?? ''] ?? 'Level belum diisi' }}</small></p>@endforeach</div>
                                 @endforeach
                             </div>
                         </div>

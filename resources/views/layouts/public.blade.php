@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#172a63">
-    <title>@yield('title', 'Jadwal Main') — NgeBadmintonYuk</title>
+    <title>@yield('title', 'Jadwal Main') — NgeBadminton YUK!</title>
     <link rel="icon" href="{{ asset('pwa-icon-192.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" sizes="180x180">
     <link rel="preconnect" href="https://fonts.googleapis.com">

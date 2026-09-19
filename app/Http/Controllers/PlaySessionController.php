@@ -93,7 +93,7 @@ class PlaySessionController extends Controller
             ->groupBy('user_id')
             ->pluck('total', 'user_id');
         $attendances = $playSession->attendances->keyBy('user_id');
-        $availableGuests = Guest::query()->whereNotIn('id', $registrations->pluck('guest_id')->filter())->orderBy('name')->get(['id', 'name', 'phone']);
+        $availableGuests = Guest::query()->whereNotIn('id', $registrations->pluck('guest_id')->filter())->orderBy('name')->get(['id', 'name', 'phone', 'playing_level']);
         $guestNoShowCounts = SessionRegistration::query()
             ->whereIn('guest_id', $registrations->pluck('guest_id')->filter())
             ->where('attendance_status', 'no_show')->select('guest_id')

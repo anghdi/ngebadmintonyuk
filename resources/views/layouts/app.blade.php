@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="NgeBadmintonYuk">
-    <title>@yield('title', 'NgeKas') — NgeBadmintonYuk</title>
+    <title>@yield('title', 'Beranda') — NgeBadminton YUK!</title>
     <link rel="icon" href="{{ asset('pwa-icon-192.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" sizes="180x180">
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
@@ -33,44 +33,55 @@
 <div class="shell" @if(! auth()->user()->hasCompleteProfile() && ! request()->routeIs('profile.*')) inert @endif>
     <aside id="sidebar" aria-label="Navigasi utama">
         <div class="sidebar-head">
-            <a href="{{ route('dashboard') }}" class="brand" aria-label="NgeKas — NgeBadmintonYuk">
+            <a href="{{ route('dashboard') }}" class="brand" aria-label="NgeBadminton YUK!">
                 <img src="{{ asset('logo.webp') }}" alt="NgeBadmintonYuk">
             </a>
             <button type="button" class="sidebar-close" aria-label="Tutup navigasi" data-sidebar-close><x-nav-icon name="close" /></button>
         </div>
         <div class="sidebar-intro">
             <span class="sidebar-pulse" aria-hidden="true"></span>
-            <span>Kelola komunitas</span>
+            <span>{{ auth()->user()->isAdmin() ? 'Panel admin' : 'Area member' }}</span>
         </div>
         <nav class="sidebar-nav">
-            <a @class(['active' => request()->routeIs('dashboard')]) href="{{ route('dashboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="home" /></span> Beranda</a>
-            <a @class(['active' => request()->routeIs('public-sessions.*')]) href="{{ route('public-sessions.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="calendar" /></span> Jadwal Main</a>
-            @if(! auth()->user()->isAdmin())
-                <a @class(['active' => request()->routeIs('rotations.*')]) href="{{ route('rotations.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="session" /></span> Rotasi Main</a>
-            @endif
-            <a @class(['active' => request()->routeIs('scoreboard')]) href="{{ route('scoreboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="score" /></span> Papan Skor</a>
             @if(auth()->user()->isAdmin())
-                <a @class(['active' => request()->routeIs('feed-studio.*')]) href="{{ route('feed-studio.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="camera" /></span> Feed Studio</a>
-            @else
-                <a @class(['active' => request()->routeIs('story-studio')]) href="{{ route('story-studio') }}"><span class="nav-icon-wrap"><x-nav-icon name="camera" /></span> Story Studio</a>
-            @endif
-            @if(! auth()->user()->isAdmin())
-                <a @class(['active' => request()->routeIs('profile.*')]) href="{{ route('profile.edit') }}"><span class="nav-icon-wrap"><x-nav-icon name="users" /></span> Profil Saya</a>
-            @endif
-            <a @class(['active' => request()->routeIs('top-ups.*')]) href="{{ route('top-ups.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="wallet" /></span> {{ auth()->user()->isAdmin() ? 'Verifikasi Top Up' : 'Top Up Kuota' }}</a>
-            @if(auth()->user()->isAdmin())
+                <p>UTAMA</p>
+                <a @class(['active' => request()->routeIs('dashboard')]) href="{{ route('dashboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="home" /></span> Beranda</a>
+                <a @class(['active' => request()->routeIs('play-sessions.*')]) href="{{ route('play-sessions.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="session" /></span> Sesi Bermain</a>
+                <a @class(['active' => request()->routeIs('public-sessions.*')]) href="{{ route('public-sessions.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="calendar" /></span> Jadwal Publik</a>
+
                 <p>KOMUNITAS</p>
                 <a @class(['active' => request()->routeIs('members.*')]) href="{{ route('members.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="users" /></span> Member</a>
                 <a @class(['active' => request()->routeIs('guests.*')]) href="{{ route('guests.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="users" /></span> Tamu</a>
-                <a @class(['active' => request()->routeIs('play-sessions.*')]) href="{{ route('play-sessions.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="session" /></span> Sesi Bermain</a>
                 <a @class(['active' => request()->routeIs('inventory.*')]) href="{{ route('inventory.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="shuttlecock" /></span> Shuttlecock</a>
+
+                <p>KONTEN</p>
+                <a @class(['active' => request()->routeIs('feed-studio.*')]) href="{{ route('feed-studio.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="camera" /></span> Feed Studio</a>
+                <a @class(['active' => request()->routeIs('story-studio')]) href="{{ route('story-studio') }}"><span class="nav-icon-wrap"><x-nav-icon name="camera" /></span> Story Studio</a>
+                <a @class(['active' => request()->routeIs('scoreboard')]) href="{{ route('scoreboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="score" /></span> Papan Skor</a>
+
                 <p>KEUANGAN</p>
+                <a @class(['active' => request()->routeIs('top-ups.*')]) href="{{ route('top-ups.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="wallet" /></span> Verifikasi Top Up</a>
                 <a @class(['active' => request()->routeIs('incomes.*')]) href="{{ route('incomes.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="income" /></span> Pemasukan</a>
                 <a @class(['active' => request()->routeIs('expenses.*')]) href="{{ route('expenses.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="expense" /></span> Pengeluaran</a>
                 <a @class(['active' => request()->routeIs('categories.*')]) href="{{ route('categories.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="tag" /></span> Kategori</a>
-                <a @class(['active' => request()->routeIs('reports.*')]) href="{{ route('reports.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="report" /></span> Laporan</a>
+                <a @class(['active' => request()->routeIs('reports.*')]) href="{{ route('reports.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="report" /></span> Laporan Kas</a>
                 <a @class(['active' => request()->routeIs('member-reports.*')]) href="{{ route('member-reports.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="report" /></span> Laporan Member</a>
+
+                <p>KOMUNIKASI</p>
                 <a @class(['active' => request()->routeIs('push-notifications.*')]) href="{{ route('push-notifications.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="bell" /></span> Notifikasi</a>
+            @else
+                <p>MAIN</p>
+                <a @class(['active' => request()->routeIs('dashboard')]) href="{{ route('dashboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="home" /></span> Beranda</a>
+                <a @class(['active' => request()->routeIs('public-sessions.*')]) href="{{ route('public-sessions.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="calendar" /></span> Jadwal Main</a>
+                <a @class(['active' => request()->routeIs('rotations.*')]) href="{{ route('rotations.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="session" /></span> Rotasi Main</a>
+
+                <p>ALAT</p>
+                <a @class(['active' => request()->routeIs('scoreboard')]) href="{{ route('scoreboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="score" /></span> Papan Skor</a>
+                <a @class(['active' => request()->routeIs('story-studio')]) href="{{ route('story-studio') }}"><span class="nav-icon-wrap"><x-nav-icon name="camera" /></span> Story Studio</a>
+
+                <p>AKUN</p>
+                <a @class(['active' => request()->routeIs('top-ups.*')]) href="{{ route('top-ups.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="wallet" /></span> Top Up Kuota</a>
+                <a @class(['active' => request()->routeIs('profile.*')]) href="{{ route('profile.edit') }}"><span class="nav-icon-wrap"><x-nav-icon name="users" /></span> Profil Saya</a>
             @endif
         </nav>
         <div class="sidebar-footer">
@@ -86,8 +97,8 @@
 
     <main id="main-content" tabindex="-1">
         <header>
-            <button type="button" class="menu" aria-label="Buka navigasi" aria-controls="sidebar" aria-expanded="false" data-sidebar-open><x-nav-icon name="menu" /></button>
-            <a href="{{ route('dashboard') }}" class="mobile-brand" aria-label="NgeKas">
+            <button type="button" class="menu" aria-label="Buka menu lainnya" aria-controls="sidebar" aria-expanded="false" data-sidebar-open><x-nav-icon name="menu" /><span>Menu</span></button>
+            <a href="{{ route('dashboard') }}" class="mobile-brand" aria-label="NgeBadminton YUK!">
                 <img src="{{ asset('pwa-icon-192.png') }}" alt="">
                 <strong>NgeBadmintonYuk</strong>
             </a>

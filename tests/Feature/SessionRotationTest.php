@@ -30,20 +30,23 @@ test('admin publishes all rounds from the main list including unpaid members and
 
     $schedule = $session->refresh()->rotation_schedule;
     expect($schedule['rounds'])->toHaveCount(12)
+        ->and($schedule['candidates_evaluated'])->toBe(4)
+        ->and($schedule['quality']['game_spread'])->toBe(0)
         ->and(array_column($schedule['roster'], 'id'))->not->toContain($waiting->id)
         ->and(array_column($schedule['roster'], 'guest_id'))->toContain($guest->id)
+        ->and(collect($schedule['roster'])->firstWhere('guest_id', $guest->id)['playing_level'])->toBe('intermediate')
         ->and(array_values($schedule['games']))->each->toBe(12);
     expect(Attendance::count())->toBe(0)->and(Income::count())->toBe(0);
     expect($session->registrations()->where('payment_status', 'paid')->count())->toBe(0);
 
-    $this->get(route('play-sessions.show', $session))->assertOk()->assertSee('12 giliran')->assertSee('Publikasikan rotasi')
+    $this->get(route('play-sessions.show', $session))->assertOk()->assertSee('12 giliran')->assertSee('Publikasikan rotasi')->assertSee('Pemula')->assertSee('Dipilih otomatis dari 4 variasi jadwal')
         ->assertDontSee('name="changeover_minutes"', false);
     $this->actingAsNotifiedMember($member)->get(route('rotations.show', $session))->assertNotFound();
     $this->get(route('rotations.index'))->assertOk()->assertSee('Belum ada rotasi');
     $this->get(route('public-sessions.show', $session))->assertOk()->assertSee('Menunggu rotasi disetujui admin')->assertDontSee('Ronde 12');
     $this->actingAs(User::factory()->admin()->create())->post(route('play-sessions.rotation.publish', $session), ['expected_version' => 1])->assertSessionHasNoErrors();
     $this->actingAsNotifiedMember($member)->get(route('rotations.show', $session))
-        ->assertOk()->assertSee('Ronde 12')->assertSee('Kamu main')->assertSee('Lapangan A')->assertSee('Lapangan B')->assertSee('Pasanganmu:')->assertSee($guest->name)->assertDontSee($guest->phone ?? 'PRIVATE_PHONE');
+        ->assertOk()->assertSee('Ronde 12')->assertSee('Kamu main')->assertSee('Lapangan A')->assertSee('Lapangan B')->assertSee('Pasanganmu:')->assertSee('Pemula')->assertSee($guest->name)->assertDontSee($guest->phone ?? 'PRIVATE_PHONE');
     $this->get(route('rotations.index'))->assertOk()->assertSee($session->venue_name)->assertDontSee('Belum ada rotasi');
     $session->update(['scheduled_at' => now()->subHour()]);
     $this->get(route('public-sessions.show', $session))->assertOk()->assertSee('Lihat rotasi main');
@@ -105,7 +108,48 @@ test('four players rotate through different partners', function () {
             $pairs[] = implode(':', $pair);
         }
     }
-    expect(array_unique($pairs))->toHaveCount(6);
+    expect(array_unique($pairs))->toHaveCount(6)
+        ->and($schedule['quality']['game_spread'])->toBe(0)
+        ->and($schedule['quality']['max_encounters'])->toBe(3)
+        ->and($schedule['quality']['repeated_encounters'])->toBe(12)
+        ->and($schedule['quality']['repeated_partners'])->toBe(0)
+        ->and($schedule['quality']['max_rest_streak'])->toBe(0);
+});
+
+test('rotation balances team levels when equally varied pairings are available', function () {
+    $roster = [
+        ['id' => 1, 'name' => 'Pemula A', 'user_id' => 1, 'guest_id' => null, 'playing_level' => 'beginner'],
+        ['id' => 2, 'name' => 'Pemula B', 'user_id' => 2, 'guest_id' => null, 'playing_level' => 'beginner'],
+        ['id' => 3, 'name' => 'Mahir A', 'user_id' => 3, 'guest_id' => null, 'playing_level' => 'advanced'],
+        ['id' => 4, 'name' => 'Mahir B', 'user_id' => 4, 'guest_id' => null, 'playing_level' => 'advanced'],
+    ];
+
+    $schedule = app(RotationScheduleService::class)->generate($roster, 1, 1);
+    $court = $schedule['rounds'][0]['courts'][0];
+    $levels = collect($roster)->pluck('playing_level', 'id');
+
+    expect(collect($court['team_a'])->map(fn (int $id): string => $levels[$id])->sort()->values()->all())->toBe(['advanced', 'beginner'])
+        ->and(collect($court['team_b'])->map(fn (int $id): string => $levels[$id])->sort()->values()->all())->toBe(['advanced', 'beginner'])
+        ->and($schedule['quality']['max_level_gap'])->toBe(0);
+});
+
+test('member level is stored in the roster and changing it invalidates a rotation', function () {
+    $session = PlaySession::factory()->create(['max_players' => 4]);
+    $member = User::factory()->member()->create(['playing_level' => 'beginner']);
+    SessionRegistration::factory()->for($session)->for($member)->create(['name' => $member->name]);
+    SessionRegistration::factory()->for($session)->count(3)->create();
+    $service = app(RotationScheduleService::class);
+    $registrations = $session->registrations()->oldest('id')->limit(4)->get();
+    $roster = $service->roster($registrations);
+    $schedule = $service->generate($roster, 1, 1);
+
+    expect($schedule['roster'][0]['playing_level'])->toBe('beginner');
+
+    $session->rotation_schedule = $schedule + ['published_at' => now()->toIso8601String()];
+    $session->save();
+    $member->update(['playing_level' => 'advanced']);
+
+    expect($service->viewData($session->refresh(), $registrations)['rotationStale'])->toBeTrue();
 });
 
 test('rotation avoids opponent rematches while new matchups are available', function () {
@@ -417,12 +461,19 @@ test('admin reviews a clean rotation table and downloads it as pdf', function ()
         ->assertOk()
         ->assertSee('Setiap baris satu pertandingan')
         ->assertSee('Unduh PDF')
-        ->assertDontSee('Istirahat');
+        ->assertDontSee('<th>Istirahat</th>', false);
 
     $this->get(route('play-sessions.rotation.pdf', $session))
         ->assertOk()
         ->assertHeader('content-type', 'application/pdf')
         ->assertDownload('rotasi-bermain-'.$session->scheduled_at->format('Y-m-d').'-gor-komunitas.pdf');
+
+    $pdfHtml = view('rotations.pdf', [
+        'playSession' => $session,
+        'schedule' => $session->refresh()->rotation_schedule,
+        'published' => false,
+    ])->render();
+    expect($pdfHtml)->toContain('NGE BADMINTON YUK!', 'Level belum diisi', 'Urutan pertandingan adalah rencana.');
 });
 
 test('rotation pdf is restricted to admins and rejects stale schedules', function () {

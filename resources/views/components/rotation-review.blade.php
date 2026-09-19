@@ -1,10 +1,22 @@
 @props(['schedule'])
 @php($players = collect($schedule['roster'])->keyBy('id'))
+@php($levelLabels = ['beginner' => 'Pemula', 'intermediate' => 'Menengah', 'advanced' => 'Mahir'])
 <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-600">
     @if(isset($schedule['sets_per_match']))<span>{{ $schedule['sets_per_match'] }} set × {{ $schedule['points_per_set'] }} poin</span>@endif
     @if(isset($schedule['session_duration_minutes']))<span>{{ $schedule['session_duration_minutes'] }} menit · ±{{ $schedule['minutes_per_round'] }} menit/giliran</span>@endif
     @if(isset($schedule['play_until']))<span>Selesai sekitar {{ str_replace(':', '.', $schedule['play_until']) }}</span>@endif
 </div>
+@if(isset($schedule['quality']))
+    <div class="mt-3 border-y border-slate-200 py-3 text-xs text-slate-600">
+        <p class="font-semibold text-slate-900">Dipilih otomatis dari {{ $schedule['candidates_evaluated'] }} variasi jadwal</p>
+        <div class="mt-2 flex flex-wrap gap-x-5 gap-y-1">
+            <span>Jatah main {{ min($schedule['games']) }}–{{ max($schedule['games']) }}×</span>
+            <span>Pertemuan ulang {{ $schedule['quality']['repeated_encounters'] }}</span>
+            <span>Selisih level tim maks. {{ $schedule['quality']['max_level_gap'] }}</span>
+            <span>Istirahat terlama {{ $schedule['quality']['max_rest_streak'] }} giliran</span>
+        </div>
+    </div>
+@endif
 <div class="mt-4 overflow-hidden rounded-xl border border-slate-200">
     <div class="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3">
         <p class="font-semibold text-slate-900">{{ count($schedule['rounds']) }} giliran · {{ $schedule['court_count'] }} lapangan</p>
@@ -21,9 +33,9 @@
                         <tr class="border-t border-slate-100 align-top hover:bg-slate-50/70">
                             <td class="px-4 py-3 font-semibold text-slate-900">{{ $round['number'] }}</td>
                             <td class="px-4 py-3"><span class="inline-flex min-w-8 justify-center rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700">{{ $court['label'] ?? ($court['number'] === 1 ? 'A' : 'B') }}</span></td>
-                            <td class="px-4 py-3">@foreach($court['team_a'] as $id)<span class="block {{ $loop->first ? 'font-medium text-slate-900' : 'mt-1 text-slate-600' }}">{{ $players[$id]['name'] }}</span>@endforeach</td>
+                            <td class="px-4 py-3">@foreach($court['team_a'] as $id)<span class="block {{ $loop->first ? 'font-medium text-slate-900' : 'mt-1 text-slate-600' }}">{{ $players[$id]['name'] }} <small class="ml-1 text-[11px] font-normal text-slate-500">{{ $levelLabels[$players[$id]['playing_level'] ?? ''] ?? 'Level belum diisi' }}</small></span>@endforeach</td>
                             <td class="px-2 py-3 text-center text-xs font-semibold text-slate-400">VS</td>
-                            <td class="px-4 py-3">@foreach($court['team_b'] as $id)<span class="block {{ $loop->first ? 'font-medium text-slate-900' : 'mt-1 text-slate-600' }}">{{ $players[$id]['name'] }}</span>@endforeach</td>
+                            <td class="px-4 py-3">@foreach($court['team_b'] as $id)<span class="block {{ $loop->first ? 'font-medium text-slate-900' : 'mt-1 text-slate-600' }}">{{ $players[$id]['name'] }} <small class="ml-1 text-[11px] font-normal text-slate-500">{{ $levelLabels[$players[$id]['playing_level'] ?? ''] ?? 'Level belum diisi' }}</small></span>@endforeach</td>
                         </tr>
                     @endforeach
                 @endforeach

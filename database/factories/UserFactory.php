@@ -49,7 +49,7 @@ class UserFactory extends Factory
 
     public function member(): static
     {
-        return $this->state(fn (array $attributes) => ['role' => 'member', 'date_of_birth' => '1995-05-20']);
+        return $this->state(fn (array $attributes) => ['role' => 'member', 'date_of_birth' => '1995-05-20', 'playing_level' => 'beginner']);
     }
 
     public function incompleteProfile(): static

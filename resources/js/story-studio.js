@@ -42,12 +42,37 @@ export function drawStory(context, photo, logo, settings) {
     context.fillStyle = '#263b61';
     context.fillRect(photoBox.x, photoBox.y, photoBox.width, photoBox.height);
     if (photo) {
-        const placement = getStoryPhotoPlacement(photo.naturalWidth, photo.naturalHeight, settings.zoom, settings.x, settings.y);
+        const width = photo.videoWidth || photo.naturalWidth;
+        const height = photo.videoHeight || photo.naturalHeight;
+        const placement = getStoryPhotoPlacement(width, height, settings.zoom, settings.x, settings.y);
         context.drawImage(photo, placement.x, placement.y, placement.width, placement.height);
     }
     context.restore();
 
     drawFrameForeground(context, settings.theme);
+}
+
+function loadVideo(windowObject, documentObject, source) {
+    return new Promise((resolve, reject) => {
+        const video = documentObject.createElement('video');
+        video.preload = 'auto';
+        video.playsInline = true;
+        video.muted = true;
+        video.onloadeddata = () => resolve(video);
+        video.onerror = () => reject(new Error('Video tidak dapat dibaca. Gunakan video MP4, MOV, atau WebM.'));
+        video.src = source;
+    });
+}
+
+function recorderFormat(windowObject) {
+    const candidates = [
+        ['video/mp4;codecs=h264', 'mp4'],
+        ['video/webm;codecs=vp9', 'webm'],
+        ['video/webm;codecs=vp8', 'webm'],
+        ['video/webm', 'webm'],
+    ];
+
+    return candidates.find(([mimeType]) => windowObject.MediaRecorder?.isTypeSupported?.(mimeType)) ?? [null, 'webm'];
 }
 
 function loadImage(windowObject, source) {
@@ -77,7 +102,7 @@ function installPhotoDrag(canvas, find, settings, getPhoto, render) {
         if (!photo) {
             return;
         }
-        const placement = getStoryPhotoPlacement(photo.naturalWidth, photo.naturalHeight, settings.zoom);
+        const placement = getStoryPhotoPlacement(photo.videoWidth || photo.naturalWidth, photo.videoHeight || photo.naturalHeight, settings.zoom);
         drag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, startX: settings.x, startY: settings.y, placement };
         canvas.setPointerCapture(event.pointerId);
     });
@@ -110,23 +135,34 @@ export function installStoryStudio(windowObject, documentObject) {
     let photo = null;
     let logo = null;
     let hasUserPhoto = false;
+    let mediaKind = 'image';
+    let mediaUrl = null;
+    let previewAnimation = null;
     let loadSequence = 0;
     let exportedFile = null;
     let renderSequence = 0;
-    const render = () => {
+    const drawCanvas = (includeThumbnails = true) => {
         drawStory(context, photo, logo, settings);
-        root.querySelectorAll('[data-story-thumbnail]').forEach((thumbnail) => {
-            const thumbnailContext = thumbnail.getContext('2d');
-            thumbnailContext.save();
-            thumbnailContext.scale(thumbnail.width / storySize.width, thumbnail.height / storySize.height);
-            drawStory(thumbnailContext, photo, logo, { ...settings, theme: thumbnail.dataset.storyThumbnail });
-            thumbnailContext.restore();
-        });
+        if (includeThumbnails) {
+            root.querySelectorAll('[data-story-thumbnail]').forEach((thumbnail) => {
+                const thumbnailContext = thumbnail.getContext('2d');
+                thumbnailContext.save();
+                thumbnailContext.scale(thumbnail.width / storySize.width, thumbnail.height / storySize.height);
+                drawStory(thumbnailContext, photo, logo, { ...settings, theme: thumbnail.dataset.storyThumbnail });
+                thumbnailContext.restore();
+            });
+        }
+    };
+    const render = () => {
+        drawCanvas();
         const sequence = ++renderSequence;
         exportedFile = null;
-        find('download').disabled = true;
+        find('download').disabled = !hasUserPhoto;
         find('share').disabled = true;
-        if (hasUserPhoto) {
+        find('share').hidden = true;
+        find('download').textContent = mediaKind === 'video' ? 'Export video' : 'Unduh story';
+        if (hasUserPhoto && mediaKind === 'image') {
+            find('download').disabled = true;
             canvas.toBlob((blob) => {
                 if (!blob || sequence !== renderSequence) {
                     return;
@@ -137,6 +173,23 @@ export function installStoryStudio(windowObject, documentObject) {
                 find('share').disabled = false;
             }, 'image/png');
         }
+    };
+    const stopPreview = () => {
+        if (previewAnimation !== null) {
+            windowObject.cancelAnimationFrame(previewAnimation);
+            previewAnimation = null;
+        }
+    };
+    const startVideoPreview = () => {
+        stopPreview();
+        const drawVideoFrame = () => {
+            if (mediaKind !== 'video' || !photo) {
+                return;
+            }
+            drawCanvas(false);
+            previewAnimation = windowObject.requestAnimationFrame(drawVideoFrame);
+        };
+        previewAnimation = windowObject.requestAnimationFrame(drawVideoFrame);
     };
     const resetPosition = () => {
         ['zoom', 'x', 'y'].forEach((name) => {
@@ -150,31 +203,51 @@ export function installStoryStudio(windowObject, documentObject) {
         if (!file) {
             return;
         }
-        if (!file.type.startsWith('image/') || file.size > 20 * 1024 * 1024) {
-            status.textContent = 'Pilih foto dengan ukuran maksimal 20 MB.';
+        const isImage = file.type.startsWith('image/');
+        const isVideo = file.type.startsWith('video/');
+        const maximumSize = isVideo ? 100 * 1024 * 1024 : 20 * 1024 * 1024;
+        if ((!isImage && !isVideo) || file.size > maximumSize) {
+            status.textContent = 'Gunakan foto maksimal 20 MB atau video maksimal 100 MB.';
             return;
         }
         const sequence = ++loadSequence;
         const url = windowObject.URL.createObjectURL(file);
-        status.textContent = 'Menyiapkan foto…';
+        status.textContent = isVideo ? 'Menyiapkan video…' : 'Menyiapkan foto…';
         try {
-            const loaded = await loadImage(windowObject, url);
+            const loaded = isVideo
+                ? await loadVideo(windowObject, documentObject, url)
+                : await loadImage(windowObject, url);
             if (sequence !== loadSequence) {
+                windowObject.URL.revokeObjectURL(url);
                 return;
             }
+            stopPreview();
+            photo?.pause?.();
+            if (mediaUrl) {
+                windowObject.URL.revokeObjectURL(mediaUrl);
+            }
             photo = loaded;
+            mediaKind = isVideo ? 'video' : 'image';
+            mediaUrl = isVideo ? url : null;
             hasUserPhoto = true;
             canvas.dataset.draggable = '';
             resetPosition();
             find('adjust').disabled = false;
-            find('preview-note').textContent = 'Geser foto langsung di pratinjau untuk mengatur posisi.';
-            status.textContent = 'Foto siap. Atur frame, lalu unduh.';
+            find('preview-note').textContent = `Geser ${isVideo ? 'video' : 'foto'} langsung di pratinjau untuk mengatur posisi.`;
+            status.textContent = isVideo ? 'Video siap. Atur frame, lalu export.' : 'Foto siap. Atur frame, lalu unduh.';
             render();
+            if (isVideo) {
+                photo.loop = true;
+                photo.play().catch(() => {});
+                startVideoPreview();
+            }
         } catch (error) {
             if (sequence === loadSequence) {
                 status.textContent = error.message;
             }
-        } finally {
+            windowObject.URL.revokeObjectURL(url);
+        }
+        if (isImage) {
             windowObject.URL.revokeObjectURL(url);
         }
     };
@@ -191,7 +264,80 @@ export function installStoryStudio(windowObject, documentObject) {
         render();
     }));
     find('reset').addEventListener('click', () => { resetPosition(); render(); });
-    find('download').addEventListener('click', () => {
+    const exportVideo = async () => {
+        if (!photo || !canvas.captureStream || !windowObject.MediaRecorder) {
+            status.textContent = 'Browser ini belum mendukung export video. Gunakan Chrome, Edge, atau Safari terbaru.';
+            return;
+        }
+        const downloadButton = find('download');
+        const duration = Math.min(Number.isFinite(photo.duration) ? photo.duration : 60, 60);
+        const [mimeType, extension] = recorderFormat(windowObject);
+        const stream = canvas.captureStream(30);
+        const chunks = [];
+        const recorder = new windowObject.MediaRecorder(stream, {
+            ...(mimeType ? { mimeType } : {}),
+            videoBitsPerSecond: 8_000_000,
+        });
+        recorder.addEventListener('dataavailable', (event) => {
+            if (event.data.size > 0) {
+                chunks.push(event.data);
+            }
+        });
+        const stopped = new Promise((resolve) => recorder.addEventListener('stop', resolve, { once: true }));
+        downloadButton.disabled = true;
+        downloadButton.setAttribute('aria-busy', 'true');
+        downloadButton.textContent = 'Mengekspor…';
+        stopPreview();
+        photo.pause();
+        photo.loop = false;
+        photo.currentTime = 0;
+        drawCanvas(false);
+        recorder.start(1000);
+        const startedAt = windowObject.performance.now();
+        const drawExportFrame = () => {
+            drawCanvas(false);
+            const progress = Math.min(100, Math.round((photo.currentTime / duration) * 100));
+            status.textContent = `Mengekspor video ${progress}%`;
+            if (!photo.ended && photo.currentTime < duration) {
+                previewAnimation = windowObject.requestAnimationFrame(drawExportFrame);
+            }
+        };
+        await photo.play();
+        drawExportFrame();
+        await new Promise((resolve) => {
+            const finish = () => {
+                if (windowObject.performance.now() - startedAt < 250) {
+                    return;
+                }
+                resolve();
+            };
+            photo.addEventListener('ended', finish, { once: true });
+            windowObject.setTimeout(resolve, Math.ceil(duration * 1000) + 350);
+        });
+        photo.pause();
+        stopPreview();
+        recorder.stop();
+        await stopped;
+        stream.getTracks().forEach((track) => track.stop());
+        const outputType = recorder.mimeType || mimeType || 'video/webm';
+        exportedFile = new windowObject.File(chunks, `ngebadmintonyuk-story.${extension}`, { type: outputType });
+        downloadStory(windowObject, documentObject, exportedFile);
+        find('share').hidden = !windowObject.navigator.canShare?.({ files: [exportedFile] });
+        find('share').disabled = false;
+        downloadButton.disabled = false;
+        downloadButton.removeAttribute('aria-busy');
+        downloadButton.textContent = 'Export ulang video';
+        status.textContent = `Video ${Math.round(duration)} detik berhasil diunduh.`;
+        photo.currentTime = 0;
+        photo.loop = true;
+        photo.play().catch(() => {});
+        startVideoPreview();
+    };
+    find('download').addEventListener('click', async () => {
+        if (mediaKind === 'video') {
+            await exportVideo();
+            return;
+        }
         if (exportedFile) {
             downloadStory(windowObject, documentObject, exportedFile);
             status.textContent = 'Story diunduh. Cek folder unduhan perangkatmu.';
@@ -205,7 +351,7 @@ export function installStoryStudio(windowObject, documentObject) {
             await windowObject.navigator.share({ files: [exportedFile], title: 'NgeBadmintonYuk' });
         } catch (error) {
             if (error.name !== 'AbortError') {
-                status.textContent = 'Belum bisa dibagikan. Gunakan tombol Unduh story.';
+                status.textContent = 'Belum bisa dibagikan. Gunakan tombol unduh atau export.';
             }
         }
     });

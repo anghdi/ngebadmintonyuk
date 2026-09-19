@@ -19,19 +19,21 @@ test('guest management is only available to administrators', function () {
 
 test('admin creates guests without accounts normalizes phone and can edit them', function () {
     $admin = User::factory()->admin()->create();
-    $this->actingAs($admin)->post(route('guests.store'), ['name' => 'Raka', 'phone' => '0812-3456-7890'])
+    $this->actingAs($admin)->post(route('guests.store'), ['name' => 'Raka', 'phone' => '0812-3456-7890', 'playing_level' => 'beginner'])
         ->assertRedirect(route('guests.index'))->assertSessionHasNoErrors();
     $guest = Guest::query()->sole();
-    expect($guest->phone)->toBe('6281234567890');
+    expect($guest->phone)->toBe('6281234567890')->and($guest->playing_level)->toBe('beginner');
     $this->assertDatabaseCount('users', 1);
-    $this->put(route('guests.update', $guest), ['name' => 'Raka Baru', 'phone' => $guest->phone])
+    $this->put(route('guests.update', $guest), ['name' => 'Raka Baru', 'phone' => $guest->phone, 'playing_level' => 'advanced'])
         ->assertSessionHasNoErrors();
-    $this->post(route('guests.store'), ['name' => 'Duplikat', 'phone' => '081234567890'])
+    $this->post(route('guests.store'), ['name' => 'Duplikat', 'phone' => '081234567890', 'playing_level' => 'intermediate'])
         ->assertSessionHasErrors('phone');
-    $this->post(route('guests.store'), ['name' => 'Tanpa WA', 'phone' => ''])->assertSessionHasNoErrors();
+    $this->post(route('guests.store'), ['name' => 'Tanpa WA', 'phone' => '', 'playing_level' => 'intermediate'])->assertSessionHasNoErrors();
+    $this->post(route('guests.store'), ['name' => 'Tanpa level'])->assertSessionHasErrors('playing_level');
+    $this->post(route('guests.store'), ['name' => 'Level keliru', 'playing_level' => 'expert'])->assertSessionHasErrors('playing_level');
     $this->post(route('guests.store'), ['name' => ''])->assertSessionHasErrors('name');
     $this->post(route('guests.store'), ['name' => 'Invalid', 'phone' => '12'])->assertSessionHasErrors('phone');
-    $this->get(route('guests.index'))->assertOk()->assertSee('Raka Baru')->assertSee('Tanpa WA');
+    $this->get(route('guests.index'))->assertOk()->assertSee('Raka Baru')->assertSee('Mahir')->assertSee('Tanpa WA');
 });
 
 test('guest registrations share capacity and waiting order with members', function () {
@@ -135,7 +137,25 @@ test('closed sessions reject guests and cross session attendance cannot be edite
 test('editing guest contact does not rewrite session history', function () {
     $guest = Guest::factory()->create(['name' => 'Nama Lama']);
     $registration = SessionRegistration::factory()->create(['guest_id' => $guest->id, 'user_id' => null, 'name' => $guest->name]);
-    $this->actingAs(User::factory()->admin()->create())->put(route('guests.update', $guest), ['name' => 'Nama Baru'])
+    $this->actingAs(User::factory()->admin()->create())->put(route('guests.update', $guest), ['name' => 'Nama Baru', 'playing_level' => 'intermediate'])
         ->assertSessionHasNoErrors();
     expect($registration->refresh()->name)->toBe('Nama Lama');
+});
+
+test('guest needs a level before joining a session', function () {
+    $guest = Guest::factory()->create(['playing_level' => null]);
+    $session = PlaySession::factory()->create();
+    $this->actingAs(User::factory()->admin()->create());
+
+    $this->post(route('session-guests.store', $session), ['guest_id' => $guest->id, 'payment_method' => 'cash'])
+        ->assertSessionHasErrors('guest_id');
+
+    $this->put(route('guests.update', $guest), [
+        'name' => $guest->name,
+        'phone' => $guest->phone,
+        'playing_level' => 'beginner',
+    ])->assertSessionHasNoErrors();
+
+    $this->post(route('session-guests.store', $session), ['guest_id' => $guest->id, 'payment_method' => 'cash'])
+        ->assertSessionHasNoErrors();
 });

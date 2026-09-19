@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#2455f5">
-    <title>Aktifkan notifikasi — NgeKas</title>
+    <title>Aktifkan notifikasi — NgeBadminton YUK!</title>
     <link rel="icon" href="{{ asset('pwa-icon-192.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" sizes="180x180">
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">

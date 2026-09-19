@@ -49,6 +49,16 @@ test('design selection comes before photo upload and has three previews', () => 
     assert.equal(template.includes('data-story-caption'), false);
 });
 
+test('accepts photos and videos while keeping export controls device local', () => {
+    const template = readFileSync(new URL('../../resources/views/story-studio.blade.php', import.meta.url), 'utf8');
+    const script = readFileSync(new URL('../../resources/js/story-studio.js', import.meta.url), 'utf8');
+
+    assert.ok(template.includes('accept="image/*,video/*"'));
+    assert.ok(script.includes('canvas.captureStream(30)'));
+    assert.ok(script.includes('new windowObject.MediaRecorder'));
+    assert.equal(script.includes('fetch('), false);
+});
+
 test('twibbon designs have different compositions, not just different colors', () => {
     const compositions = ['blue', 'yellow', 'minimal'].map((theme) => {
         const commands = [];

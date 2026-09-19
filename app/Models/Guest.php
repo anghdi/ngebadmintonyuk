@@ -12,8 +12,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property string $name
  * @property string|null $phone
+ * @property string|null $playing_level
  */
-#[Fillable(['name', 'phone'])]
+#[Fillable(['name', 'phone', 'playing_level'])]
 class Guest extends Model
 {
     /** @use HasFactory<GuestFactory> */

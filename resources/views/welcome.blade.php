@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ __('Welcome') }} - {{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'NgeBadminton YUK!') }}</title>
 
         <link rel="icon" href="{{ asset('pwa-icon-192.png') }}" type="image/png">
         <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" sizes="180x180">

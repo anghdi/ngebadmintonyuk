@@ -15,12 +15,21 @@ test('story studio requires authentication and current device notifications', fu
         ->toContain(RequireMemberNotifications::class);
 });
 
-test('story studio contains camera upload and export controls', function () {
+test('story studio contains photo video and export controls', function () {
     $template = file_get_contents(resource_path('views/story-studio.blade.php'));
 
     expect($template)
         ->toContain('capture="environment"')
+        ->toContain('accept="image/*,video/*"')
         ->toContain('data-story-file-input')
         ->toContain('data-story-download')
         ->toContain('data-story-share');
+});
+
+test('story studio is visible in the administrator navigation', function () {
+    $template = file_get_contents(resource_path('views/layouts/app.blade.php'));
+
+    expect($template)
+        ->toContain("request()->routeIs('story-studio')")
+        ->toContain("route('story-studio')");
 });

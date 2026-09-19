@@ -8,7 +8,7 @@
         <p>Member sejak {{ $member->memberSince()->translatedFormat('d M Y') }} · {{ $member->membershipDuration() }} bersama komunitas</p>
     </div>
     <div class="actions">
-        <a class="btn primary" href="{{ route('top-ups.index') }}">Top up kuota</a>
+        <a class="btn primary" href="{{ route('public-sessions.index') }}">Cari jadwal</a>
         <span class="member-number">Member #{{ str_pad((string) $member->id, 4, '0', STR_PAD_LEFT) }}</span>
     </div>
 </div>
@@ -20,8 +20,47 @@
     <div><small>Terpakai</small><strong>{{ $usedCredits }}</strong><span>kuota</span></div>
 </section>
 
+<nav class="member-quick-actions" aria-label="Aksi cepat">
+    <a href="{{ route('public-sessions.index') }}"><span><x-nav-icon name="calendar" /></span><strong>Cari jadwal</strong><small>Lihat sesi tersedia</small></a>
+    <a href="{{ route('rotations.index') }}"><span><x-nav-icon name="session" /></span><strong>Cek rotasi</strong><small>Lihat giliran main</small></a>
+    <a href="{{ route('top-ups.index') }}"><span><x-nav-icon name="wallet" /></span><strong>Top up</strong><small>Tambah kuota main</small></a>
+    <a href="{{ route('story-studio') }}"><span><x-nav-icon name="camera" /></span><strong>Buat story</strong><small>Foto atau video</small></a>
+</nav>
+
+<section class="compact-dashboard-section member-package-section">
+    <div class="card-head"><div><span class="eyebrow">Paket</span><h2>Kuota bermain</h2></div><a href="{{ route('top-ups.index') }}">Kelola top up</a></div>
+    @forelse($memberships as $membership)
+        <div class="member-package-row">
+            <span><strong>{{ $membership->venue_name }}</strong><small>{{ $membership->isCommunityPackage() ? 'Semua sesi komunitas' : $membership->court_name }}</small></span>
+            <span class="status-pill {{ (int) $membership->balance > 0 ? 'active' : 'muted' }}">{{ (int) $membership->balance }} kuota</span>
+        </div>
+    @empty
+        <div class="empty">Belum ada paket. <a class="link" href="{{ route('top-ups.index') }}">Ajukan top up</a> untuk mulai bermain.</div>
+    @endforelse
+</section>
+
+<div class="member-columns">
+    <section class="compact-dashboard-section schedule-card">
+        <div class="card-head"><div><span class="eyebrow">Jadwal</span><h2>Sesi yang kamu ikuti</h2></div></div>
+        @forelse($upcomingSessions as $session)
+            <a class="schedule-row" href="{{ route('public-sessions.show', $session) }}"><time><b>{{ $session->scheduled_at->format('d') }}</b>{{ $session->scheduled_at->translatedFormat('M') }}</time><span><strong>{{ $session->venue_name }}</strong><small>{{ $session->court_name }} · {{ $session->scheduled_at->format('H:i') }} WITA</small></span><b>{{ rupiah($session->price_per_session) }}</b></a>
+        @empty
+            <div class="empty">Kamu belum mengikuti sesi mendatang.</div>
+        @endforelse
+    </section>
+
+    <section class="compact-dashboard-section ledger-card">
+        <div class="card-head"><div><span class="eyebrow">Riwayat</span><h2>Penggunaan kuota</h2></div></div>
+        @forelse($transactions as $transaction)
+            <div class="ledger-row"><span class="ledger-sign {{ $transaction->quantity > 0 ? 'plus' : 'minus' }}">{{ $transaction->quantity > 0 ? '+' : '−' }}</span><span><strong>{{ $transaction->notes }}</strong><small>{{ $transaction->membership->venue_name }} · {{ $transaction->created_at->translatedFormat('d M Y') }}</small></span><b>{{ $transaction->quantity > 0 ? '+' : '' }}{{ $transaction->quantity }}</b></div>
+        @empty
+            <div class="empty">Belum ada mutasi kuota.</div>
+        @endforelse
+    </section>
+</div>
+
 <section class="member-cash-summary" aria-labelledby="member-cash-title">
-    <div><span class="eyebrow">Laporan · {{ $today->translatedFormat('F Y') }}</span><h2 id="member-cash-title">Laporan bulan berjalan</h2></div>
+    <div><span class="eyebrow">Laporan · {{ $today->translatedFormat('F Y') }}</span><h2 id="member-cash-title">Kas bulan berjalan</h2></div>
     <dl>
         <div><dt>Masuk</dt><dd class="income">{{ rupiah($currentCashReport['totalIncome']) }}</dd></div>
         <div><dt>Keluar</dt><dd class="expense">{{ rupiah($currentCashReport['totalExpense']) }}</dd></div>
@@ -49,37 +88,5 @@
             </figure>
         @endforeach
     </div>
-</section>
-
-<div class="member-columns">
-    <section class="compact-dashboard-section schedule-card">
-        <div class="card-head"><div><span class="eyebrow">Jadwal</span><h2>Sesi yang kamu ikuti</h2></div></div>
-        @forelse($upcomingSessions as $session)
-            <a class="schedule-row" href="{{ route('public-sessions.show', $session) }}"><time><b>{{ $session->scheduled_at->format('d') }}</b>{{ $session->scheduled_at->translatedFormat('M') }}</time><span><strong>{{ $session->venue_name }}</strong><small>{{ $session->court_name }} · {{ $session->scheduled_at->format('H:i') }} WITA</small></span><b>{{ rupiah($session->price_per_session) }}</b></a>
-        @empty
-            <div class="empty">Kamu belum mengikuti sesi mendatang.</div>
-        @endforelse
-    </section>
-
-    <section class="compact-dashboard-section ledger-card">
-        <div class="card-head"><div><span class="eyebrow">Riwayat</span><h2>Penggunaan kuota</h2></div></div>
-        @forelse($transactions as $transaction)
-            <div class="ledger-row"><span class="ledger-sign {{ $transaction->quantity > 0 ? 'plus' : 'minus' }}">{{ $transaction->quantity > 0 ? '+' : '−' }}</span><span><strong>{{ $transaction->notes }}</strong><small>{{ $transaction->membership->venue_name }} · {{ $transaction->created_at->translatedFormat('d M Y') }}</small></span><b>{{ $transaction->quantity > 0 ? '+' : '' }}{{ $transaction->quantity }}</b></div>
-        @empty
-            <div class="empty">Belum ada mutasi kuota.</div>
-        @endforelse
-    </section>
-</div>
-
-<section class="compact-dashboard-section member-package-section">
-    <div class="card-head"><div><span class="eyebrow">Paket</span><h2>Kuota bermain</h2></div><a href="{{ route('top-ups.index') }}">Kelola top up</a></div>
-    @forelse($memberships as $membership)
-        <div class="member-package-row">
-            <span><strong>{{ $membership->venue_name }}</strong><small>{{ $membership->isCommunityPackage() ? 'Semua sesi komunitas' : $membership->court_name }}</small></span>
-            <span class="status-pill {{ (int) $membership->balance > 0 ? 'active' : 'muted' }}">{{ (int) $membership->balance }} kuota</span>
-        </div>
-    @empty
-        <div class="empty">Belum ada paket. <a class="link" href="{{ route('top-ups.index') }}">Ajukan top up</a> untuk mulai bermain.</div>
-    @endforelse
 </section>
 @endsection

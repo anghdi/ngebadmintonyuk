@@ -9,4 +9,4 @@
 @forelse($$key as $item)<tr><td>{{ $loop->iteration }}</td><td>{{ $item->date->translatedFormat('d M Y') }}</td><td>{{ $item->category->name }}</td><td>{{ $item->details->pluck('name')->join(', ') }}</td><td>{{ $item->description ?: '-' }}</td><td class="right">{{ rupiah($item->details_sum_amount) }}</td></tr>@empty<tr><td colspan="6" class="empty">Tidak ada transaksi {{ strtolower($label) }} pada periode ini.</td></tr>@endforelse
 <tr class="total"><td colspan="5">TOTAL {{ strtoupper($label) }}</td><td class="right">{{ rupiah($key === 'incomes' ? $totalIncome : $totalExpense) }}</td></tr></tbody></table>
 @endforeach
-<div class="footer">NgeKas - NgeBadmintonYuk <span style="float:right">Halaman <span class="pagenum"></span></span></div></body></html>
+<div class="footer">NgeBadminton YUK! <span style="float:right">Halaman <span class="pagenum"></span></span></div></body></html>

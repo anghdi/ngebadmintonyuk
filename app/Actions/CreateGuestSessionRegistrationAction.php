@@ -22,6 +22,9 @@ class CreateGuestSessionRegistrationAction
             if (! in_array($data['payment_method'], ['cash', 'transfer'], true)) {
                 throw ValidationException::withMessages(['payment_method' => 'Tamu hanya dapat membayar tunai atau transfer.']);
             }
+            if (! in_array($guest->playing_level, ['beginner', 'intermediate', 'advanced'], true)) {
+                throw ValidationException::withMessages(['guest_id' => 'Isi level tamu di menu Tamu sebelum menambahkannya ke sesi.']);
+            }
             if ($session->registrations()->where('guest_id', $guest->id)->exists()) {
                 throw ValidationException::withMessages(['guest_id' => 'Tamu sudah masuk daftar sesi.']);
             }
