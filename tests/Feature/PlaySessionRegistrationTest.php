@@ -3,6 +3,7 @@
 use App\Models\Attendance;
 use App\Models\Income;
 use App\Models\Membership;
+use App\Models\MembershipTransaction;
 use App\Models\PlaySession;
 use App\Models\PushNotification;
 use App\Models\SessionRegistration;
@@ -451,7 +452,7 @@ test('member dashboard replaces notification status with a useful monthly report
 
     $response = $this->actingAsNotifiedMember($account)->get(route('dashboard'))
         ->assertSuccessful()
-        ->assertSee('Laporan bulan berjalan')
+        ->assertSee('Kas bulan berjalan')
         ->assertSee('1 tahun 2 bulan bersama komunitas')
         ->assertSee('Saldo saat ini')
         ->assertSee('Sesi yang kamu ikuti')
@@ -464,5 +465,26 @@ test('member dashboard replaces notification status with a useful monthly report
         ->assertDontSee('Notifikasi sesi lain')
         ->assertDontSee('Pengiriman gagal')
         ->assertSee('GOR Saya Ikuti')
+        ->assertDontSee('Cari jadwal')
+        ->assertDontSee('aria-label="Aksi cepat"', false)
+        ->assertDontSee('Kelola top up')
         ->assertDontSee('GOR Tidak Diikuti');
+});
+
+test('member dashboard only offers contextual actions while admin dashboard stays unchanged', function () {
+    $member = User::factory()->member()->create();
+    $membership = Membership::factory()->for($member)->create();
+    MembershipTransaction::factory()->for($membership)->create(['quantity' => 1]);
+
+    $this->actingAsNotifiedMember($member)->get(route('dashboard'))
+        ->assertSuccessful()
+        ->assertSee('Kuota tinggal 1')
+        ->assertSee('Top up kuota')
+        ->assertSee('Cari jadwal')
+        ->assertDontSee('aria-label="Aksi cepat"', false);
+
+    $this->actingAs(User::factory()->admin()->create())->get(route('dashboard'))
+        ->assertSuccessful()
+        ->assertSee('Pemasukan')
+        ->assertSee('Pengeluaran');
 });

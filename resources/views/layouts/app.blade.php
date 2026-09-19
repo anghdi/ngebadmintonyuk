@@ -70,18 +70,18 @@
                 <p>KOMUNIKASI</p>
                 <a @class(['active' => request()->routeIs('push-notifications.*')]) href="{{ route('push-notifications.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="bell" /></span> Notifikasi</a>
             @else
-                <p>MAIN</p>
-                <a @class(['active' => request()->routeIs('dashboard')]) href="{{ route('dashboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="home" /></span> Beranda</a>
-                <a @class(['active' => request()->routeIs('public-sessions.*')]) href="{{ route('public-sessions.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="calendar" /></span> Jadwal Main</a>
-                <a @class(['active' => request()->routeIs('rotations.*')]) href="{{ route('rotations.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="session" /></span> Rotasi Main</a>
+                <p class="member-primary-heading">MAIN</p>
+                <a @class(['member-sidebar-primary', 'active' => request()->routeIs('dashboard')]) href="{{ route('dashboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="home" /></span> Beranda</a>
+                <a @class(['member-sidebar-primary', 'active' => request()->routeIs('public-sessions.*')]) href="{{ route('public-sessions.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="calendar" /></span> Jadwal Main</a>
+                <a @class(['member-sidebar-primary', 'active' => request()->routeIs('rotations.*')]) href="{{ route('rotations.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="session" /></span> Rotasi Main</a>
 
                 <p>ALAT</p>
                 <a @class(['active' => request()->routeIs('scoreboard')]) href="{{ route('scoreboard') }}"><span class="nav-icon-wrap"><x-nav-icon name="score" /></span> Papan Skor</a>
                 <a @class(['active' => request()->routeIs('story-studio')]) href="{{ route('story-studio') }}"><span class="nav-icon-wrap"><x-nav-icon name="camera" /></span> Story Studio</a>
 
-                <p>AKUN</p>
-                <a @class(['active' => request()->routeIs('top-ups.*')]) href="{{ route('top-ups.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="wallet" /></span> Top Up Kuota</a>
-                <a @class(['active' => request()->routeIs('profile.*')]) href="{{ route('profile.edit') }}"><span class="nav-icon-wrap"><x-nav-icon name="users" /></span> Profil Saya</a>
+                <p class="member-primary-heading">AKUN</p>
+                <a @class(['member-sidebar-primary', 'active' => request()->routeIs('top-ups.*')]) href="{{ route('top-ups.index') }}"><span class="nav-icon-wrap"><x-nav-icon name="wallet" /></span> Top Up Kuota</a>
+                <a @class(['member-sidebar-primary', 'active' => request()->routeIs('profile.*')]) href="{{ route('profile.edit') }}"><span class="nav-icon-wrap"><x-nav-icon name="users" /></span> Profil Saya</a>
             @endif
         </nav>
         <div class="sidebar-footer">
